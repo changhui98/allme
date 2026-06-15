@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/*
+ * CSS 초기화
+ * 기본 리셋은 Tailwind 내장 Preflight(modern-normalize 기반)가 담당한다.
+ * (box-sizing: border-box, margin 0, heading/list 스타일 제거, border 리셋 등)
+ * 아래 @layer base 에는 Preflight 위에 실무에서 자주 보강하는 항목만 추가한다.
+ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* 한국어 서비스용 한글 친화 시스템 폰트 스택. 웹폰트(Pretendard 등)는 추후 next/font로 연동 */
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+      "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* 미디어 요소 기본값 보정 */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* 폼 요소가 부모 폰트/색을 상속하도록 */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* 긴 단어/URL 줄바꿈 보정 */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+}
