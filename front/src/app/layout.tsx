@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ThemeProvider from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "두레 - 통합 서비스 마켓플레이스",
@@ -13,8 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full">
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="ko" className="h-full" suppressHydrationWarning>
+      <body className="flex min-h-full flex-col">
+        <ThemeProvider>
+          <Header />
+          {children}
+          <Footer />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
