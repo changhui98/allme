@@ -1,0 +1,9 @@
+# 프로덕션: docker compose -f docker-compose.prod.yml up --build
+services:
+  front:
+    build:
+      context: ./front
+      target: runner
+    ports:
+      - "3001:3001"
+    restart: unless-stopped

@@ -1,0 +1,16 @@
+# 개발 모드 (핫 리로드): docker compose up --build
+# 프로덕션은 docker-compose.prod.yml 참조
+services:
+  front:
+    build:
+      context: ./front
+      target: dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./front:/app # 소스 실시간 반영 (핫 리로드)
+      - /app/node_modules # 호스트 node_modules(macOS arm64) 차단
+      - /app/.next # 호스트 .next 산출물 차단
+    environment:
+      - NEXT_WATCH_POLLING=true # next.config.ts의 watchOptions 폴링 활성화 (핫 리로드)
+    restart: unless-stopped
