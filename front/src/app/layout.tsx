@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "두레 - 통합 서비스 마켓플레이스",
+  title: "올미 - 통합 서비스 마켓플레이스",
   description:
     "웹 제작·페인트·청소·인테리어 등 모든 분야의 서비스 업체를 한곳에서 찾고, 예약부터 결제까지 한 번에.",
 };

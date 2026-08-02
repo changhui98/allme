@@ -16,9 +16,9 @@ export default function Header() {
         <Link
           href="/"
           className="shrink-0 text-xl font-bold tracking-tight"
-          aria-label="두레 홈"
+          aria-label="올미 홈"
         >
-          두레
+          올미
         </Link>
 
         {/* 카테고리 네비 (데스크탑) */}

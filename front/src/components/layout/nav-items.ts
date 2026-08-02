@@ -39,7 +39,7 @@ export const FOOTER_GROUPS: FooterLinkGroup[] = [
     links: CATEGORIES,
   },
   {
-    title: "두레",
+    title: "올미",
     links: [
       { label: "회사 소개", href: "/about" },
       { label: "업체 등록", href: "/business/register" },
