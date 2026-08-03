@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AUTH_LINKS, CATEGORIES } from "./nav-items";
+import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 /**
- * 모바일(<md) 전용 네비. 햄버거 버튼으로 카테고리/검색/로그인 패널을 토글한다.
+ * 모바일(<md) 전용 네비. 햄버거 버튼으로 주요 메뉴/검색/로그인 패널을 토글한다.
  * 상태가 필요한 부분만 클라이언트 컴포넌트로 분리해 Header는 서버 컴포넌트로 유지한다.
  */
 export default function MobileNav() {
@@ -83,10 +83,10 @@ export default function MobileNav() {
             />
           </form>
 
-          {/* 카테고리 */}
-          <nav aria-label="카테고리" className="mt-4">
+          {/* 주요 메뉴 */}
+          <nav aria-label="주요 메뉴" className="mt-4">
             <ul className="flex flex-col">
-              {CATEGORIES.map((c) => (
+              {BOARD_LINKS.map((c) => (
                 <li key={c.href}>
                   <Link
                     href={c.href}

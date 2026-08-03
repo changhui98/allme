@@ -1,8 +1,9 @@
 /**
  * 헤더·푸터·모바일 네비가 공유하는 링크 데이터의 단일 출처(single source of truth).
- * 카테고리/링크를 추가·수정할 때는 이 파일만 고치면 모든 공통 컴포넌트에 반영된다.
+ * 링크를 추가·수정할 때는 이 파일만 고치면 모든 공통 컴포넌트에 반영된다.
  *
- * 라우팅 페이지는 아직 없으므로 href는 계획된 경로를 가리키는 플레이스홀더다.
+ * 게시판 2개(/services, /requests) 외의 href는 아직 계획된 경로를 가리키는 플레이스홀더다.
+ * 카테고리는 네비 링크가 아니라 목록 필터로 쓰이므로 @/lib/categories에 있다.
  */
 
 export type NavLink = {
@@ -16,14 +17,12 @@ export type FooterLinkGroup = {
 };
 
 /**
- * 오픈 시 카테고리 4개 (CLAUDE.md "초기 범위는 좁게" 원칙).
- * 청소 / 인테리어 / 페인트·도장 / 웹·디자인 제작
+ * 헤더 주요 메뉴 — 거래의 양방향 게시판.
+ * 해드려요: 업체가 등록한 서비스 목록 / 해주세요: 사용자가 올린 요청 목록
  */
-export const CATEGORIES: NavLink[] = [
-  { label: "청소", href: "/category/cleaning" },
-  { label: "인테리어", href: "/category/interior" },
-  { label: "페인트·도장", href: "/category/painting" },
-  { label: "웹·디자인 제작", href: "/category/web-design" },
+export const BOARD_LINKS: NavLink[] = [
+  { label: "해드려요", href: "/services" },
+  { label: "해주세요", href: "/requests" },
 ];
 
 /** 헤더 우측 인증 관련 링크 */
@@ -35,8 +34,8 @@ export const AUTH_LINKS = {
 /** 푸터 링크 그룹 */
 export const FOOTER_GROUPS: FooterLinkGroup[] = [
   {
-    title: "카테고리",
-    links: CATEGORIES,
+    title: "둘러보기",
+    links: BOARD_LINKS,
   },
   {
     title: "올미",

@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { AUTH_LINKS, CATEGORIES } from "./nav-items";
+import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 /**
  * 모든 페이지 공통 헤더 (서버 컴포넌트).
- * 구성: 로고 / 카테고리 네비 / 검색 / 로그인·회원가입.
+ * 구성: 로고 / 주요 메뉴(해드려요·해주세요) / 검색 / 로그인·회원가입.
  * 모바일에서는 네비·검색·로그인을 MobileNav(햄버거)로 접는다.
  */
 export default function Header() {
@@ -21,10 +21,10 @@ export default function Header() {
           올미
         </Link>
 
-        {/* 카테고리 네비 (데스크탑) */}
-        <nav aria-label="카테고리" className="hidden md:block">
+        {/* 주요 메뉴 (데스크탑) */}
+        <nav aria-label="주요 메뉴" className="hidden md:block">
           <ul className="flex items-center gap-1">
-            {CATEGORIES.map((c) => (
+            {BOARD_LINKS.map((c) => (
               <li key={c.href}>
                 <Link
                   href={c.href}
