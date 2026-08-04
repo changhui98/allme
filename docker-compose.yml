@@ -11,6 +11,8 @@ services:
       - ./front:/app # 소스 실시간 반영 (핫 리로드)
       - /app/node_modules # 호스트 node_modules(macOS arm64) 차단
       - /app/.next # 호스트 .next 산출물 차단
-    environment:
-      - NEXT_WATCH_POLLING=true # next.config.ts의 watchOptions 폴링 활성화 (핫 리로드)
+    # 핫 리로드는 Docker Desktop의 VirtioFS 파일 공유가 호스트 파일 이벤트를
+    # 전달해주는 것에 의존한다 (Settings → General → VirtioFS 활성화 필수).
+    # 주의: NEXT_WATCH_POLLING(watchOptions.pollIntervalMs) 폴링은 Next 16.2.9
+    # Turbopack에서 파일 감시 자체를 죽이는 문제가 있어 사용하지 않는다.
     restart: unless-stopped
