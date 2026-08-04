@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `올미_서비스_기획안.md` — "올미(allme)" 통합 서비스 마켓플레이스 기획안 (v0.1 초안, 2026-06-12)
 - `front/` — 프론트엔드 프로젝트. **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4 + ESLint**로 초기 세팅 완료. 소스는 `front/src/app/`에 위치.
 
-백엔드는 아직 없다. 아래 "계획된 기술 스택"의 백엔드(NestJS 등)와 추가 프론트 라이브러리(TanStack Query/Zustand/RHF/Zod)는 *계획* 단계이며, 구현이 진행되면 이 문서를 갱신한다.
+백엔드는 아직 없다. 아래 "계획된 기술 스택"의 백엔드(Java + Spring Boot)와 추가 프론트 라이브러리(TanStack Query/Zustand/RHF/Zod)는 *계획* 단계이며, 구현이 진행되면 이 문서를 갱신한다.
 
 ### 프론트엔드 개발 명령 (`front/`에서 실행)
 
@@ -41,11 +41,12 @@ npm run lint    # ESLint
 
 ## 계획된 기술 스택
 
-### 백엔드 (추천: TypeScript + NestJS)
-- **언어/프레임워크**: TypeScript + NestJS (Node.js) — 모듈/DI 구조로 결제·정산·예약 도메인 확장 시 구조 유지
+### 백엔드 (확정: Java + Spring Boot)
+- **언어/프레임워크**: Java 21 (LTS) + Spring Boot 3.x — 결제·정산 도메인 레퍼런스가 풍부하고, 트랜잭션 관리(`@Transactional`)가 성숙해 에스크로 거래 상태 머신 구현에 유리
 - **DB**: PostgreSQL — 거래·정산은 트랜잭션 무결성이 필수라 RDB 사용
-- **ORM**: Prisma 또는 TypeORM
-- **캐시/세션**: Redis
+- **ORM**: Spring Data JPA (Hibernate) + QueryDSL (탐색 필터 등 동적 쿼리)
+- **인증/보안**: Spring Security + OAuth2 Client (카카오·구글)
+- **캐시/세션**: Redis (Spring Data Redis)
 - **파일 저장**: S3 호환 스토리지 (포트폴리오 이미지, 결과물 파일)
 
 ### 프론트엔드 (추천: Next.js + TypeScript)
@@ -55,7 +56,7 @@ npm run lint    # ESLint
 - **폼**: React Hook Form + Zod (백엔드와 검증 스키마 공유 가능)
 - **차트 (v2 시세 기능)**: Recharts 또는 ECharts
 
-> 설계 의도: 프론트/백 모두 TypeScript로 통일해 DTO·검증 스키마(Zod)를 공유한다. **SEO가 매출과 직결**되므로(예: "강남 입주청소" 검색 유입) 업체 상세/카테고리 페이지는 SSR이 필수다.
+> 설계 의도: 백엔드가 Java라 프론트(TS)와 DTO·Zod 스키마를 직접 공유할 수 없으므로, **OpenAPI 스펙(springdoc-openapi)을 단일 API 계약**으로 삼고 프론트 타입을 스펙에서 자동 생성(openapi-typescript 등)한다. 백엔드 검증은 Bean Validation, 프론트 단 검증은 Zod로 각자 처리. **SEO가 매출과 직결**되므로(예: "강남 입주청소" 검색 유입) 업체 상세/카테고리 페이지는 SSR이 필수다.
 
 ### 주요 외부 연동 (MVP)
 - **PG/에스크로**: 토스페이먼츠 또는 포트원 (카드/간편결제)
@@ -63,7 +64,7 @@ npm run lint    # ESLint
 - **사업자등록번호 진위확인**: 국세청 사업자등록정보 진위확인 API
 - **알림**: 카카오 알림톡 (예약 수락/완료) + 이메일
 
-> 절충안으로, 메인 API는 NestJS로 두고 v2의 **시세 집계·통계 배치만 Python(pandas 등)**으로 분리하는 구성을 염두에 둔다.
+> 절충안으로, 메인 API는 Spring Boot로 두고 v2의 **시세 집계·통계 배치만 Python(pandas 등)**으로 분리하는 구성을 염두에 둔다.
 
 ## 핵심 아키텍처 원칙 (구현 시 반드시 지킬 것)
 
