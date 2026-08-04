@@ -59,3 +59,5 @@ next-env.d.ts
 .DS_Store
 ._*
 Thumbs.db
+# 내부 기획 문서 (저장소에 올리지 않음)
+올미_서비스_기획안.md
