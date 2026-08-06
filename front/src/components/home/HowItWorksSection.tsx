@@ -1,0 +1,60 @@
+import ScrollReveal from "@/components/motion/ScrollReveal";
+
+const STEPS = [
+  {
+    title: "탐색·비교",
+    description: "분야별 서비스를 둘러보고 가격·리뷰·포트폴리오를 비교하세요.",
+  },
+  {
+    title: "예약 요청",
+    description: "원하는 일정과 작업 내용을 담아 업체에 예약을 요청하세요.",
+  },
+  {
+    title: "안전결제",
+    description: "결제금은 올미가 보관해요. 업체에 바로 지급되지 않아 안심.",
+  },
+  {
+    title: "완료 확인 후 정산",
+    description: "작업 완료를 직접 확인한 뒤에야 업체에 정산됩니다.",
+  },
+];
+
+/**
+ * 거래 사이클 4단계 소개 (서버 컴포넌트).
+ * 에스크로(완료 확인 후 지급)가 핵심 차별점이라 3·4단계에 명시한다.
+ */
+export default function HowItWorksSection() {
+  return (
+    <section aria-labelledby="how-it-works-heading">
+      <ScrollReveal>
+        <h2
+          id="how-it-works-heading"
+          className="text-xl font-bold tracking-tight sm:text-2xl"
+        >
+          이렇게 진행돼요
+        </h2>
+        <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+          예약부터 정산까지, 거래의 모든 단계를 올미가 함께합니다.
+        </p>
+      </ScrollReveal>
+
+      <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {STEPS.map((step, index) => (
+          <li key={step.title}>
+            <ScrollReveal delay={index * 80} className="h-full">
+              <div className="h-full rounded-lg border border-stone-200 p-5 dark:border-zinc-800">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary dark:bg-zinc-800 dark:text-zinc-100">
+                  {index + 1}
+                </span>
+                <h3 className="mt-3 font-semibold">{step.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-zinc-400">
+                  {step.description}
+                </p>
+              </div>
+            </ScrollReveal>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}

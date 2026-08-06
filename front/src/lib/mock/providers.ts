@@ -51,6 +51,8 @@ export type Provider = {
   businessRegistrationMasked: string;
   /** 사업자 진위 확인(국세청 API) 통과 여부 */
   verified: boolean;
+  /** 플랫폼 가입일 (YYYY-MM-DD) — "새로 합류한 업체" 정렬·표시용 */
+  joinedAt: string;
   rating: number;
   reviewCount: number;
   /** 응답률(%) */
@@ -78,6 +80,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 강남·서초 외",
     businessRegistrationMasked: "211-86-***42",
     verified: true,
+    joinedAt: "2026-05-02",
     rating: 4.8,
     reviewCount: 180,
     responseRate: 98,
@@ -165,6 +168,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 전 지역",
     businessRegistrationMasked: "105-27-***81",
     verified: true,
+    joinedAt: "2026-06-14",
     rating: 4.6,
     reviewCount: 84,
     responseRate: 92,
@@ -240,6 +244,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 송파·강동",
     businessRegistrationMasked: "220-81-***17",
     verified: true,
+    joinedAt: "2026-05-27",
     rating: 4.7,
     reviewCount: 43,
     responseRate: 88,
@@ -323,6 +328,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 전 지역",
     businessRegistrationMasked: "144-88-***29",
     verified: true,
+    joinedAt: "2026-07-08",
     rating: 4.7,
     reviewCount: 53,
     responseRate: 95,
@@ -414,6 +420,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 강서·양천 외",
     businessRegistrationMasked: "109-14-***56",
     verified: true,
+    joinedAt: "2026-06-30",
     rating: 4.7,
     reviewCount: 105,
     responseRate: 97,
@@ -499,6 +506,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 전 지역",
     businessRegistrationMasked: "138-45-***03",
     verified: true,
+    joinedAt: "2026-05-15",
     rating: 4.4,
     reviewCount: 19,
     responseRate: 85,
@@ -574,6 +582,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 (온라인 협업 가능)",
     businessRegistrationMasked: "774-87-***90",
     verified: true,
+    joinedAt: "2026-07-21",
     rating: 4.6,
     reviewCount: 78,
     responseRate: 99,
@@ -664,6 +673,7 @@ const PROVIDERS: Provider[] = [
     region: "서울 (온라인 협업 가능)",
     businessRegistrationMasked: "689-86-***34",
     verified: true,
+    joinedAt: "2026-08-01",
     rating: 4.8,
     reviewCount: 36,
     responseRate: 96,
@@ -735,4 +745,11 @@ export function getProviders(): Provider[] {
 
 export function getProvider(id: string): Provider | undefined {
   return PROVIDERS.find((p) => p.id === id);
+}
+
+/** 가입일 최신순 상위 limit개 — 랜딩 "새로 합류한 업체" 롤링용. */
+export function getNewProviders(limit: number): Provider[] {
+  return [...PROVIDERS]
+    .sort((a, b) => b.joinedAt.localeCompare(a.joinedAt))
+    .slice(0, limit);
 }
