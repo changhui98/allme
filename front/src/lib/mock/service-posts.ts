@@ -186,10 +186,33 @@ const SERVICE_POSTS: ServicePost[] = [
   },
 ];
 
-/** 카테고리 미지정 시 전체 목록을 반환한다. */
-export function getServicePosts(category?: CategoryId): ServicePost[] {
-  if (!category) return SERVICE_POSTS;
-  return SERVICE_POSTS.filter((p) => p.category === category);
+/**
+ * 카테고리 미지정 시 전체 목록을 반환한다.
+ * query는 제목·설명·업체명에 대한 대소문자 무시 부분 일치 검색.
+ */
+export function getServicePosts(
+  category?: CategoryId,
+  query?: string,
+): ServicePost[] {
+  let posts = category
+    ? SERVICE_POSTS.filter((p) => p.category === category)
+    : SERVICE_POSTS;
+  const keyword = query?.trim().toLowerCase();
+  if (keyword) {
+    posts = posts.filter((p) =>
+      [p.title, p.description, p.providerName].some((text) =>
+        text.toLowerCase().includes(keyword),
+      ),
+    );
+  }
+  return posts;
+}
+
+/** 리뷰 많은 순 상위 limit개 — 랜딩 "인기 서비스" 섹션용. */
+export function getPopularServicePosts(limit: number): ServicePost[] {
+  return [...SERVICE_POSTS]
+    .sort((a, b) => b.reviewCount - a.reviewCount)
+    .slice(0, limit);
 }
 
 /** 특정 업체가 등록한 서비스 목록. 업체 상세 페이지에서 사용한다. */

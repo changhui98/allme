@@ -40,6 +40,8 @@ export default function Header() {
         {/* 검색 (데스크탑) */}
         <form
           role="search"
+          action="/services"
+          method="get"
           className="ml-auto hidden max-w-xs flex-1 items-center gap-2 rounded-md border border-stone-300 px-3 py-2 md:flex dark:border-zinc-700"
         >
           <svg
