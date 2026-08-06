@@ -85,3 +85,25 @@
     overflow-wrap: break-word;
   }
 }
+
+/*
+ * 스크롤 리빌 (ScrollReveal 컴포넌트 전용).
+ * 숨김 스타일을 (scripting: enabled)로 게이트해 no-JS·크롤러 환경에서는
+ * 콘텐츠가 항상 즉시 보인다 — 초기 HTML 인덱싱(SEO)에 영향 없음.
+ * reduced-motion 사용자는 애니메이션 없이 바로 표시.
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
