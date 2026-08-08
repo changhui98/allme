@@ -39,7 +39,7 @@ export default function Home() {
             </h2>
             <Link
               href="/services"
-              className="text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-zinc-400 dark:hover:text-white"
+              className="text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
             >
               전체 보기 →
             </Link>

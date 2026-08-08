@@ -13,34 +13,34 @@ export default function TrustSection() {
       </h2>
 
       <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-zinc-800">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-zinc-800 dark:text-zinc-100">
+        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <ShieldIcon />
           </span>
           <h3 className="mt-4 font-semibold">에스크로 안전결제</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
             결제금은 올미가 보관하고, 작업 완료를 확인한 뒤에만 업체에
             정산합니다. 먹튀·분쟁 걱정 없이 거래하세요.
           </p>
         </li>
 
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-zinc-800">
+        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
             <BadgeCheckIcon />
           </span>
           <h3 className="mt-4 font-semibold">사업자 인증</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
             국세청 사업자등록 진위확인을 통과한 업체에만 인증 마크를
             드립니다. 검증된 업체와 만나세요.
           </p>
         </li>
 
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-zinc-800">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-500 dark:bg-amber-950">
+        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-500 dark:bg-amber-950 dark:text-amber-400">
             <StarIcon />
           </span>
           <h3 className="mt-4 font-semibold">실거래 리뷰</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
             올미에서 실제로 거래를 마친 사용자만 리뷰를 남길 수 있어요.
             부풀려진 후기 없이 있는 그대로.
           </p>

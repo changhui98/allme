@@ -53,7 +53,7 @@ export default async function ProviderDetailPage({
               {provider.bio.map((paragraph, i) => (
                 <p
                   key={i}
-                  className="text-sm leading-relaxed text-stone-600 dark:text-zinc-300"
+                  className="text-sm leading-relaxed text-stone-600 dark:text-stone-300"
                 >
                   {paragraph}
                 </p>
@@ -64,11 +64,11 @@ export default async function ProviderDetailPage({
           <section>
             <h2 className="text-lg font-bold">
               제공 서비스{" "}
-              <span className="font-medium text-stone-400 dark:text-zinc-500">
+              <span className="font-medium text-stone-400 dark:text-stone-500">
                 {services.length}
               </span>
             </h2>
-            <ul className="mt-3 divide-y divide-stone-200 dark:divide-zinc-800">
+            <ul className="mt-3 divide-y divide-stone-200 dark:divide-stone-800">
               {services.map((service) => (
                 <li key={service.id} className="py-4 first:pt-0 last:pb-0">
                   <div className="flex items-start justify-between gap-4">
@@ -76,15 +76,15 @@ export default async function ProviderDetailPage({
                       <h3 className="font-semibold leading-snug">
                         {service.title}
                         {showServiceCategory && (
-                          <span className="ml-2 inline-block rounded-full bg-stone-100 px-2 py-0.5 align-middle text-xs font-medium text-stone-600 dark:bg-zinc-800 dark:text-zinc-300">
+                          <span className="ml-2 inline-block rounded-full bg-stone-100 px-2 py-0.5 align-middle text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
                             {getCategoryLabel(service.category)}
                           </span>
                         )}
                       </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-zinc-300">
+                      <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
                         {service.description}
                       </p>
-                      <p className="mt-1.5 flex items-center gap-1 text-xs text-stone-500 dark:text-zinc-400">
+                      <p className="mt-1.5 flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
                         <svg
                           aria-hidden="true"
                           className="size-3.5"
@@ -119,7 +119,7 @@ export default async function ProviderDetailPage({
           <section>
             <h2 className="text-lg font-bold">
               리뷰{" "}
-              <span className="font-medium text-stone-400 dark:text-zinc-500">
+              <span className="font-medium text-stone-400 dark:text-stone-500">
                 {provider.reviewCount}
               </span>
             </h2>

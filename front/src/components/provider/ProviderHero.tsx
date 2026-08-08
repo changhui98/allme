@@ -45,7 +45,7 @@ export default function ProviderHero({ provider }: { provider: Provider }) {
             )}
           </div>
 
-          <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
             {provider.tagline}
           </p>
 
@@ -53,23 +53,23 @@ export default function ProviderHero({ provider }: { provider: Provider }) {
             {provider.categories.map((category) => (
               <span
                 key={category}
-                className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-zinc-800 dark:text-zinc-300"
+                className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300"
               >
                 {getCategoryLabel(category)}
               </span>
             ))}
-            <span className="text-stone-500 dark:text-zinc-400">
+            <span className="text-stone-500 dark:text-stone-400">
               {provider.region}
             </span>
             <span
-              className="flex items-center gap-1 text-stone-600 dark:text-zinc-300"
+              className="flex items-center gap-1 text-stone-600 dark:text-stone-300"
               aria-label={`평점 ${provider.rating}점, 리뷰 ${provider.reviewCount}개`}
             >
               <span aria-hidden="true" className="text-amber-500">
                 ★
               </span>
               <span className="font-medium">{provider.rating.toFixed(1)}</span>
-              <span className="text-stone-400 dark:text-zinc-500">
+              <span className="text-stone-400 dark:text-stone-500">
                 ({provider.reviewCount})
               </span>
             </span>
@@ -77,17 +77,17 @@ export default function ProviderHero({ provider }: { provider: Provider }) {
         </div>
       </div>
 
-      <dl className="mt-6 grid grid-cols-3 divide-x divide-stone-200 rounded-lg border border-stone-200 py-4 text-center dark:divide-zinc-800 dark:border-zinc-800">
+      <dl className="mt-6 grid grid-cols-3 divide-x divide-stone-200 rounded-lg border border-stone-200 py-4 text-center dark:divide-stone-800 dark:border-stone-800">
         <div>
-          <dt className="text-xs text-stone-500 dark:text-zinc-400">응답률</dt>
+          <dt className="text-xs text-stone-500 dark:text-stone-400">응답률</dt>
           <dd className="mt-1 font-bold">{provider.responseRate}%</dd>
         </div>
         <div>
-          <dt className="text-xs text-stone-500 dark:text-zinc-400">경력</dt>
+          <dt className="text-xs text-stone-500 dark:text-stone-400">경력</dt>
           <dd className="mt-1 font-bold">{provider.careerYears}년</dd>
         </div>
         <div>
-          <dt className="text-xs text-stone-500 dark:text-zinc-400">
+          <dt className="text-xs text-stone-500 dark:text-stone-400">
             거래 완료
           </dt>
           <dd className="mt-1 font-bold">

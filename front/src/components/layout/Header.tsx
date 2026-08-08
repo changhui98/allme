@@ -10,7 +10,7 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
  */
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[var(--background)]/95 backdrop-blur dark:border-zinc-800">
+    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[var(--background)]/95 backdrop-blur dark:border-stone-800">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         {/* 로고 */}
         <Link
@@ -28,7 +28,7 @@ export default function Header() {
               <li key={c.href}>
                 <Link
                   href={c.href}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white"
                 >
                   {c.label}
                 </Link>
@@ -42,7 +42,7 @@ export default function Header() {
           role="search"
           action="/services"
           method="get"
-          className="ml-auto hidden max-w-xs flex-1 items-center gap-2 rounded-md border border-stone-300 px-3 py-2 md:flex dark:border-zinc-700"
+          className="ml-auto hidden max-w-xs flex-1 items-center gap-2 rounded-md border border-stone-300 px-3 py-2 md:flex dark:border-stone-700"
         >
           <svg
             width="18"
@@ -71,7 +71,7 @@ export default function Header() {
           <ThemeToggle />
           <Link
             href={AUTH_LINKS.login.href}
-            className="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="rounded-md px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
           >
             {AUTH_LINKS.login.label}
           </Link>

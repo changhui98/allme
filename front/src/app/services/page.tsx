@@ -33,7 +33,7 @@ export default async function ServicesPage({
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
       <h1 className="text-2xl font-bold tracking-tight">해드려요</h1>
-      <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
         업체들이 등록한 서비스를 둘러보고 마음에 드는 곳에 예약을 요청하세요.
       </p>
 
@@ -46,8 +46,8 @@ export default async function ServicesPage({
       </div>
 
       {query && (
-        <p className="mt-6 text-sm text-stone-500 dark:text-zinc-400">
-          <span className="font-semibold text-stone-700 dark:text-zinc-200">
+        <p className="mt-6 text-sm text-stone-500 dark:text-stone-400">
+          <span className="font-semibold text-stone-700 dark:text-stone-200">
             &lsquo;{query}&rsquo;
           </span>{" "}
           검색 결과 {posts.length}건
@@ -55,7 +55,7 @@ export default async function ServicesPage({
       )}
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-stone-500 dark:text-zinc-400">
+        <p className="mt-16 text-center text-stone-500 dark:text-stone-400">
           {query
             ? "검색 결과가 없어요. 다른 검색어로 시도해 보세요."
             : "이 카테고리에 등록된 서비스가 아직 없어요."}

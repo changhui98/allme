@@ -24,13 +24,13 @@
   --primary-foreground: #ffffff;
 }
 
-/* 다크: 차가운 톤(이전 색). 포인트는 흰색 버튼으로 분기 */
+/* 다크: 라이트와 같은 웜 톤의 다크 브라운 + 밝은 테라코타 포인트 */
 .dark {
-  --background: #0a0a0a; /* near-black */
-  --foreground: #ededed;
-  --primary: #ffffff; /* 다크 CTA = 흰색 버튼 */
-  --primary-hover: #e4e4e7; /* zinc-200 */
-  --primary-foreground: #18181b; /* zinc-900 (흰 버튼 위 텍스트) */
+  --background: #1c1917; /* stone-900 — 따뜻한 다크 브라운 */
+  --foreground: #e7e5e4; /* stone-200 — 웜 오프화이트 */
+  --primary: #d97757; /* 밝은 테라코타 — 다크에서도 브랜드 컬러 유지 */
+  --primary-hover: #e08d6e; /* 다크 테마 hover는 밝아지는 방향 */
+  --primary-foreground: #211510; /* 밝은 버튼 위 웜 니어블랙 */
 }
 
 /*

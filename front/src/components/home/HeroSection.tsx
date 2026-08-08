@@ -8,7 +8,7 @@ import { CATEGORIES, type CategoryId } from "@/lib/categories";
 export default function HeroSection() {
   return (
     <section className="py-12 text-center sm:py-20">
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-zinc-800 dark:text-zinc-300">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
         <span
           aria-hidden="true"
           className="h-1.5 w-1.5 rounded-full bg-primary"
@@ -20,7 +20,7 @@ export default function HeroSection() {
         필요한 서비스,
         <br className="sm:hidden" /> 찾고 맡기고 결제까지
       </h1>
-      <p className="mx-auto mt-4 max-w-xl text-base text-stone-500 sm:text-lg dark:text-zinc-400">
+      <p className="mx-auto mt-4 max-w-xl text-base text-stone-500 sm:text-lg dark:text-stone-400">
         청소부터 웹 제작까지 — 예약, 안전결제, 정산을 올미 한곳에서.
         검증된 업체와 안심하고 거래하세요.
       </p>
@@ -30,7 +30,7 @@ export default function HeroSection() {
         role="search"
         action="/services"
         method="get"
-        className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-full border border-stone-300 bg-white py-2 pl-5 pr-2 shadow-sm focus-within:border-stone-400 dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-zinc-500"
+        className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-full border border-stone-300 bg-white py-2 pl-5 pr-2 shadow-sm focus-within:border-stone-400 dark:border-stone-700 dark:bg-stone-800/60 dark:focus-within:border-stone-500"
       >
         <svg
           width="20"
@@ -69,7 +69,7 @@ export default function HeroSection() {
         </Link>
         <Link
           href="/requests"
-          className="rounded-md border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className="rounded-md border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800"
         >
           견적 요청 올리기
         </Link>
@@ -81,9 +81,9 @@ export default function HeroSection() {
           <li key={category.id}>
             <Link
               href={`/services?category=${category.id}`}
-              className="flex flex-col items-center gap-2 rounded-lg border border-stone-200 p-5 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+              className="flex flex-col items-center gap-2 rounded-lg border border-stone-200 p-5 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
             >
-              <span className="text-stone-500 dark:text-zinc-400">
+              <span className="text-stone-500 dark:text-stone-400">
                 <CategoryIcon id={category.id} />
               </span>
               <span className="text-sm font-medium">{category.label}</span>

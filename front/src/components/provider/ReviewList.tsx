@@ -23,7 +23,7 @@ export default function ReviewList({
 
   return (
     <div>
-      <ul className="divide-y divide-stone-200 dark:divide-zinc-800">
+      <ul className="divide-y divide-stone-200 dark:divide-stone-800">
         {visible.map((review) => (
           <li key={review.id} className="py-4 first:pt-0 last:pb-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -33,22 +33,22 @@ export default function ReviewList({
               >
                 <span aria-hidden="true">
                   {"★".repeat(review.rating)}
-                  <span className="text-stone-300 dark:text-zinc-700">
+                  <span className="text-stone-300 dark:text-stone-700">
                     {"★".repeat(5 - review.rating)}
                   </span>
                 </span>
               </span>
               <span className="text-sm font-medium">{review.authorMasked}</span>
-              <span className="text-xs text-stone-400 dark:text-zinc-500">
+              <span className="text-xs text-stone-400 dark:text-stone-500">
                 {review.date}
               </span>
             </div>
             {review.serviceTitle && (
-              <p className="mt-1 text-xs text-stone-500 dark:text-zinc-400">
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
                 {review.serviceTitle}
               </p>
             )}
-            <p className="mt-1.5 text-sm leading-relaxed text-stone-600 dark:text-zinc-300">
+            <p className="mt-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
               {review.content}
             </p>
           </li>
@@ -59,7 +59,7 @@ export default function ReviewList({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="mt-4 w-full rounded-lg border border-stone-300 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+          className="mt-4 w-full rounded-lg border border-stone-300 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800/60"
         >
           리뷰 {totalCount}개 모두 보기
         </button>

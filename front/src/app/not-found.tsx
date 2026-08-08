@@ -12,7 +12,7 @@ export default function NotFound() {
       <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
         페이지를 찾을 수 없어요
       </h1>
-      <p className="max-w-md text-base text-stone-500 dark:text-zinc-400">
+      <p className="max-w-md text-base text-stone-500 dark:text-stone-400">
         요청하신 페이지가 없거나 아직 준비 중입니다. 올미는 현재 초기 세팅
         단계로, 일부 메뉴는 곧 열릴 예정이에요.
       </p>

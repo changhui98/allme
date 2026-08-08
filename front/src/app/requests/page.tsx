@@ -30,7 +30,7 @@ export default async function RequestsPage({
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
       <h1 className="text-2xl font-bold tracking-tight">해주세요</h1>
-      <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
         필요한 일을 올려두면 업체들이 확인하고 제안을 보내드려요.
       </p>
 
@@ -39,7 +39,7 @@ export default async function RequestsPage({
       </div>
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-stone-500 dark:text-zinc-400">
+        <p className="mt-16 text-center text-stone-500 dark:text-stone-400">
           이 카테고리에 올라온 요청이 아직 없어요.
         </p>
       ) : (

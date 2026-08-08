@@ -33,7 +33,7 @@ export default function HowItWorksSection() {
         >
           이렇게 진행돼요
         </h2>
-        <p className="mt-1 text-sm text-stone-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
           예약부터 정산까지, 거래의 모든 단계를 올미가 함께합니다.
         </p>
       </ScrollReveal>
@@ -42,12 +42,12 @@ export default function HowItWorksSection() {
         {STEPS.map((step, index) => (
           <li key={step.title}>
             <ScrollReveal delay={index * 80} className="h-full">
-              <div className="h-full rounded-lg border border-stone-200 p-5 dark:border-zinc-800">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary dark:bg-zinc-800 dark:text-zinc-100">
+              <div className="h-full rounded-lg border border-stone-200 p-5 dark:border-stone-800">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                   {index + 1}
                 </span>
                 <h3 className="mt-3 font-semibold">{step.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-zinc-400">
+                <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
                   {step.description}
                 </p>
               </div>

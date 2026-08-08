@@ -30,7 +30,7 @@ export default function MobileNav() {
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-700 hover:bg-stone-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
       >
         {open ? (
           // X 아이콘
@@ -66,12 +66,12 @@ export default function MobileNav() {
       {open && (
         <div
           id="mobile-nav-panel"
-          className="absolute inset-x-0 top-full border-b border-stone-200 bg-[var(--background)] px-4 py-4 shadow-sm dark:border-zinc-800"
+          className="absolute inset-x-0 top-full border-b border-stone-200 bg-[var(--background)] px-4 py-4 shadow-sm dark:border-stone-800"
         >
           {/* 검색 */}
           <form
             role="search"
-            className="flex items-center gap-2 rounded-md border border-stone-300 px-3 py-2 dark:border-zinc-700"
+            className="flex items-center gap-2 rounded-md border border-stone-300 px-3 py-2 dark:border-stone-700"
             onSubmit={(e) => e.preventDefault()}
           >
             <SearchIcon />
@@ -91,7 +91,7 @@ export default function MobileNav() {
                   <Link
                     href={c.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-md px-2 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    className="block rounded-md px-2 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                   >
                     {c.label}
                   </Link>
@@ -101,12 +101,12 @@ export default function MobileNav() {
           </nav>
 
           {/* 테마 토글 + 로그인/회원가입 */}
-          <div className="mt-4 flex items-center gap-2 border-t border-stone-200 pt-4 dark:border-zinc-800">
+          <div className="mt-4 flex items-center gap-2 border-t border-stone-200 pt-4 dark:border-stone-800">
             <ThemeToggle />
             <Link
               href={AUTH_LINKS.login.href}
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-center text-sm font-medium text-stone-700 hover:bg-stone-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-center text-sm font-medium text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800"
             >
               {AUTH_LINKS.login.label}
             </Link>

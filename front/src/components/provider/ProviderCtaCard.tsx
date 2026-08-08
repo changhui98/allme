@@ -28,7 +28,7 @@ export default function ProviderCtaCard({
     <button
       type="button"
       disabled
-      className="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+      className="rounded-lg border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800/60"
     >
       채팅 문의
     </button>
@@ -36,10 +36,10 @@ export default function ProviderCtaCard({
 
   if (variant === "bottom-bar") {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-background px-4 py-3 lg:hidden dark:border-zinc-800">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-background px-4 py-3 lg:hidden dark:border-stone-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-stone-500 dark:text-zinc-400">시작가</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">시작가</p>
             <p className="text-base font-bold">{formatPriceFrom(priceFrom)}</p>
           </div>
           <div className="flex gap-2">
@@ -47,7 +47,7 @@ export default function ProviderCtaCard({
             {reserveButton}
           </div>
         </div>
-        <p className="mx-auto mt-1.5 max-w-6xl text-xs text-stone-400 dark:text-zinc-500">
+        <p className="mx-auto mt-1.5 max-w-6xl text-xs text-stone-400 dark:text-stone-500">
           예약·채팅 기능은 오픈 준비 중이에요
         </p>
       </div>
@@ -55,19 +55,19 @@ export default function ProviderCtaCard({
   }
 
   return (
-    <aside className="sticky top-20 hidden rounded-lg border border-stone-200 p-5 lg:block dark:border-zinc-800">
-      <p className="text-xs text-stone-500 dark:text-zinc-400">시작가</p>
+    <aside className="sticky top-20 hidden rounded-lg border border-stone-200 p-5 lg:block dark:border-stone-800">
+      <p className="text-xs text-stone-500 dark:text-stone-400">시작가</p>
       <p className="mt-0.5 text-2xl font-bold">{formatPriceFrom(priceFrom)}</p>
       <div className="mt-4 flex flex-col gap-2">
         {reserveButton}
         {chatButton}
       </div>
-      <p className="mt-3 text-xs text-stone-400 dark:text-zinc-500">
+      <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">
         예약·채팅 기능은 오픈 준비 중이에요
       </p>
-      <p className="mt-4 border-t border-stone-200 pt-3 text-xs text-stone-500 dark:border-zinc-800 dark:text-zinc-400">
+      <p className="mt-4 border-t border-stone-200 pt-3 text-xs text-stone-500 dark:border-stone-800 dark:text-stone-400">
         평균 응답률{" "}
-        <span className="font-semibold text-stone-700 dark:text-zinc-200">
+        <span className="font-semibold text-stone-700 dark:text-stone-200">
           {responseRate}%
         </span>{" "}
         · 빠르게 답변드려요

@@ -35,7 +35,7 @@ export default function CategoryTabs({
                 className={
                   isActive
                     ? "block rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground"
-                    : "block rounded-full border border-stone-300 px-4 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+                    : "block rounded-full border border-stone-300 px-4 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white"
                 }
               >
                 {tab.label}

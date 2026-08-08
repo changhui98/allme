@@ -31,12 +31,12 @@ export default function NewItemsSection() {
       <div className="mt-5 space-y-6">
         <div>
           <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-sm font-semibold text-stone-500 dark:text-zinc-400">
+            <h3 className="text-sm font-semibold text-stone-500 dark:text-stone-400">
               새 요청
             </h3>
             <Link
               href="/requests"
-              className="text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-zinc-400 dark:hover:text-white"
+              className="text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
             >
               전체 보기 →
             </Link>
@@ -53,7 +53,7 @@ export default function NewItemsSection() {
 
         <div>
           <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-sm font-semibold text-stone-500 dark:text-zinc-400">
+            <h3 className="text-sm font-semibold text-stone-500 dark:text-stone-400">
               새로 합류한 업체
             </h3>
           </div>
@@ -76,15 +76,15 @@ function NewRequestItem({ post }: { post: RequestPost }) {
   return (
     <Link
       href="/requests"
-      className="flex h-full flex-col gap-1.5 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+      className="flex h-full flex-col gap-1.5 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
     >
       <div className="flex items-center gap-2">
-        <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-zinc-800 dark:text-zinc-300">
+        <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
           {getCategoryLabel(post.category)}
         </span>
         <span className="truncate text-sm font-semibold">{post.title}</span>
       </div>
-      <p className="truncate text-xs text-stone-500 dark:text-zinc-400">
+      <p className="truncate text-xs text-stone-500 dark:text-stone-400">
         {post.region} · 예산 {post.budget} · 제안 {post.proposalCount}건
       </p>
     </Link>
@@ -95,7 +95,7 @@ function NewProviderItem({ provider }: { provider: Provider }) {
   return (
     <Link
       href={`/providers/${provider.id}`}
-      className="flex h-full items-center gap-3 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+      className="flex h-full items-center gap-3 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
     >
       <span
         aria-hidden="true"
@@ -114,7 +114,7 @@ function NewProviderItem({ provider }: { provider: Provider }) {
             </span>
           )}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-stone-500 dark:text-zinc-400">
+        <span className="mt-0.5 block truncate text-xs text-stone-500 dark:text-stone-400">
           {provider.tagline} · {provider.region}
         </span>
       </span>
