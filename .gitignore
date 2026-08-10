@@ -31,6 +31,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Markdown 문서 (혼자 개발 — CLAUDE.md 등 로컬 문서는 추적 제외)
+*.md
+
 # Environment variables (.env.example만 커밋)
 .env
 .env.*
