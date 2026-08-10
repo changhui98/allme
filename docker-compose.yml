@@ -5,13 +5,29 @@ services:
   db:
     image: postgres:16-alpine
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: allme
-      POSTGRES_USER: allme
-      POSTGRES_PASSWORD: allme
+      # 호스트 5433 → 컨테이너 5432. 사귐 서비스 PostgreSQL(호스트 5432)과 충돌 방지.
+      - "5433:5432"
+    env_file: ./back/.env.dev
     volumes:
       - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  back:
+    build:
+      context: ./back
+    ports:
+      - "8080:8080"
+    env_file: ./back/.env.dev
+    depends_on:
+      db:
+        condition: service_healthy
+    # 소스 수정하며 개발할 때는 호스트에서 ./gradlew bootRun 사용 (localhost:5433).
+    # 이 서비스는 전체 스택을 한 번에 띄울 때 쓰며, 코드 반영은 --build 재빌드 필요.
     restart: unless-stopped
 
   front:

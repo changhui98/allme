@@ -1,5 +1,30 @@
-# 프로덕션: docker compose -f docker-compose.prod.yml up --build
+# 프로덕션: docker compose -f docker-compose.prod.yml up -d --build
+# 사전 준비: back/.env.prod의 CHANGE_ME 값 교체
 services:
+  db:
+    image: postgres:16-alpine
+    # 외부 노출 불필요 — back이 컴포즈 네트워크 내부(db:5432)로 접속
+    env_file: ./back/.env.prod
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  back:
+    build:
+      context: ./back
+    ports:
+      - "8080:8080"
+    env_file: ./back/.env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   front:
     build:
       context: ./front
@@ -7,3 +32,6 @@ services:
     ports:
       - "3001:3001"
     restart: unless-stopped
+
+volumes:
+  db-data:
