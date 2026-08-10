@@ -48,11 +48,25 @@ next-env.d.ts
 # Vercel
 .vercel
 
+# Java / Gradle (back)
+.gradle/
+bin/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated/
+.springBeans
+.sts4-cache
+
 # Editors / IDE
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+*.iml
+*.iws
+*.ipr
 *.swp
 
 # OS files

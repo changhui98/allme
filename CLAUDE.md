@@ -6,8 +6,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `올미_서비스_기획안.md` — "올미(allme)" 통합 서비스 마켓플레이스 기획안 (v0.1 초안, 2026-06-12)
 - `front/` — 프론트엔드 프로젝트. **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4 + ESLint**로 초기 세팅 완료. 소스는 `front/src/app/`에 위치.
+- `back/` — 백엔드 프로젝트. **Spring Boot 4.1.0 + Java 21 + Gradle**로 초기 세팅 완료(기존 계획의 3.x 대신 4.x로 확정). 패키지 루트는 `com.allme.back`.
 
-백엔드는 아직 없다. 아래 "계획된 기술 스택"의 백엔드(Java + Spring Boot)와 추가 프론트 라이브러리(TanStack Query/Zustand/RHF/Zod)는 *계획* 단계이며, 구현이 진행되면 이 문서를 갱신한다.
+추가 프론트 라이브러리(TanStack Query/Zustand/RHF/Zod)와 백엔드의 QueryDSL·Security·Redis는 아직 *계획* 단계이며, 구현이 진행되면 이 문서를 갱신한다.
+
+### 백엔드 DDD 구조 (`back/src/main/java/com/allme/back/`)
+
+도메인별 최상위 폴더(`user`, …) + 공통 `global` 패키지 구조. 각 도메인은 4계층으로 나눈다:
+
+- `application/service/`(유스케이스 서비스) · `application/port/`(외부 연동 인터페이스)
+- `domain/` — 루트에 `~ErrorCode`·도메인 예외, `entity/`(JPA 엔티티), `repository/`(**인터페이스만**)
+- `infrastructure/repository/`(`~JpaRepository`·`~RepositoryImpl` 구현체) 및 외부 어댑터
+- `presentation/` — `controller/`, `dto/request/`, `dto/response/`
+
+규칙: application은 domain 인터페이스에만 의존(DIP). 엔티티는 `@Getter` + `@NoArgsConstructor(PROTECTED)` + `global/entity/BaseEntity` 상속. 예외는 도메인별 `~ErrorCode` enum → `AppException` → `GlobalExceptionHandler` 흐름. 새 도메인 추가 시 이 구조를 그대로 적용한다.
+
+### 백엔드 개발 명령 (`back/`에서 실행)
+
+```bash
+docker compose up -d db   # PostgreSQL 기동 (저장소 루트에서)
+cd back
+./gradlew build           # 빌드 + 테스트
+./gradlew bootRun         # 개발 서버 (8080)
+```
+
+- **gitignore 통합**: `front/`·`back/` 모두 저장소 루트의 `.gitignore` 한 곳에서 관리한다. 하위 폴더에 별도 `.gitignore`를 만들지 말 것.
 
 ### 프론트엔드 개발 명령 (`front/`에서 실행)
 
@@ -42,7 +65,7 @@ npm run lint    # ESLint
 ## 계획된 기술 스택
 
 ### 백엔드 (확정: Java + Spring Boot)
-- **언어/프레임워크**: Java 21 (LTS) + Spring Boot 3.x — 결제·정산 도메인 레퍼런스가 풍부하고, 트랜잭션 관리(`@Transactional`)가 성숙해 에스크로 거래 상태 머신 구현에 유리
+- **언어/프레임워크**: Java 21 (LTS) + Spring Boot 4.x (4.1.0으로 세팅 완료) — 결제·정산 도메인 레퍼런스가 풍부하고, 트랜잭션 관리(`@Transactional`)가 성숙해 에스크로 거래 상태 머신 구현에 유리
 - **DB**: PostgreSQL — 거래·정산은 트랜잭션 무결성이 필수라 RDB 사용
 - **ORM**: Spring Data JPA (Hibernate) + QueryDSL (탐색 필터 등 동적 쿼리)
 - **인증/보안**: Spring Security + OAuth2 Client (카카오·구글)

@@ -1,6 +1,19 @@
 # 개발 모드 (핫 리로드): docker compose up --build
+# 백엔드 개발 시 DB만 띄우기: docker compose up -d db
 # 프로덕션은 docker-compose.prod.yml 참조
 services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: allme
+      POSTGRES_USER: allme
+      POSTGRES_PASSWORD: allme
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   front:
     build:
       context: ./front
@@ -16,3 +29,6 @@ services:
     # 주의: NEXT_WATCH_POLLING(watchOptions.pollIntervalMs) 폴링은 Next 16.2.9
     # Turbopack에서 파일 감시 자체를 죽이는 문제가 있어 사용하지 않는다.
     restart: unless-stopped
+
+volumes:
+  db-data:
