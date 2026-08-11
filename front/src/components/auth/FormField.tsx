@@ -12,6 +12,10 @@ type FormFieldProps = {
   type: "text" | "email" | "password";
   /** 브라우저 자동완성 힌트 (예: email, current-password, new-password) */
   autoComplete: string;
+  /** 초기값 (비제어 유지 — 값이 있으면 :not(:placeholder-shown)으로 라벨이 떠 있는 상태가 된다) */
+  defaultValue?: string;
+  /** 본인인증 결과 프리필처럼 수정 불가로 보여줄 때 */
+  readOnly?: boolean;
 };
 
 export default function FormField({
@@ -19,6 +23,8 @@ export default function FormField({
   label,
   type,
   autoComplete,
+  defaultValue,
+  readOnly,
 }: FormFieldProps) {
   return (
     <div className="relative pt-5">
@@ -27,8 +33,10 @@ export default function FormField({
         name={id}
         type={type}
         autoComplete={autoComplete}
+        defaultValue={defaultValue}
+        readOnly={readOnly}
         placeholder=" "
-        className="peer w-full border-b border-stone-300 bg-transparent py-2 text-[15px] outline-none dark:border-stone-700"
+        className="peer w-full border-b border-stone-300 bg-transparent py-2 text-[15px] outline-none read-only:text-stone-500 dark:border-stone-700 dark:read-only:text-stone-400"
       />
       <label
         htmlFor={id}
