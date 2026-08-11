@@ -3,8 +3,9 @@ import type { ReactNode } from "react";
 
 /**
  * 로그인·회원가입 페이지 공용 셸. (서버 컴포넌트)
- * 카드 박스 없이 페이지 배경 위에 바로 얹는 중앙 정렬 컬럼 —
  * 상단에 로고·제목·안내 문구, 본문에 폼, 하단에 보조 링크 영역을 담는다.
+ * 배경은 페이지와 동일하게 두고 sm 이상에서만 얇은 경계선 박스를 씌운다
+ * (네이버 로그인 방식 — 좁은 모바일에서는 보더 없이 전면 사용).
  */
 type AuthShellProps = {
   title: string;
@@ -23,7 +24,7 @@ export default function AuthShell({
 }: AuthShellProps) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm sm:max-w-md sm:rounded-2xl sm:border sm:border-stone-200 sm:p-10 dark:sm:border-stone-800">
         <Link
           href="/"
           className="block text-center text-3xl font-bold tracking-tight text-primary"
