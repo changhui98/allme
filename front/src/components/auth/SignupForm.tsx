@@ -1,4 +1,5 @@
 import FormField from "@/components/auth/FormField";
+import { PRIMARY_CTA } from "@/lib/button-styles";
 
 /**
  * 회원가입 정보 입력 폼 (약관 동의·본인인증 완료 후 스텝 3).
@@ -47,10 +48,7 @@ export default function SignupForm({
         autoComplete="new-password"
       />
 
-      <button
-        type="submit"
-        className="mt-6 w-full rounded-lg bg-primary py-3 text-[15px] font-semibold text-primary-foreground hover:bg-primary-hover"
-      >
+      <button type="submit" className={`mt-6 ${PRIMARY_CTA}`}>
         가입하기
       </button>
     </form>

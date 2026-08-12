@@ -3,6 +3,7 @@ import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
 import FormField from "@/components/auth/FormField";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import { PRIMARY_CTA } from "@/lib/button-styles";
 
 export const metadata: Metadata = {
   title: "로그인 | 올미",
@@ -28,10 +29,7 @@ export default function LoginPage() {
           <Link href="/forgot-password" className="hover:text-foreground">
             비밀번호 찾기
           </Link>
-          <span
-            aria-hidden="true"
-            className="h-3 w-px bg-stone-300 dark:bg-stone-700"
-          />
+          <span aria-hidden="true" className="h-3 w-px bg-border" />
           <Link href="/signup" className="hover:text-foreground">
             회원가입
           </Link>
@@ -51,10 +49,7 @@ export default function LoginPage() {
           type="password"
           autoComplete="current-password"
         />
-        <button
-          type="submit"
-          className="mt-8 w-full rounded-lg bg-primary py-3 text-[15px] font-semibold text-primary-foreground hover:bg-primary-hover"
-        >
+        <button type="submit" className={`mt-8 ${PRIMARY_CTA}`}>
           로그인
         </button>
       </form>

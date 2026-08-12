@@ -34,11 +34,11 @@ export default function SocialLoginButtons({ variant }: SocialLoginButtonsProps)
     <div className="mt-6">
       <div
         aria-hidden="true"
-        className="flex items-center gap-3 text-xs text-stone-400"
+        className="flex items-center gap-3 text-xs text-muted"
       >
-        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+        <span className="h-px flex-1 bg-border" />
         또는
-        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
+        <span className="h-px flex-1 bg-border" />
       </div>
 
       <div className="mt-6 flex flex-col gap-2">

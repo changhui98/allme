@@ -13,6 +13,10 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-danger: var(--danger);
 }
 
 /* 라이트(기본): 따뜻한 흰 배경 + 테라코타 포인트 */
@@ -22,6 +26,10 @@
   --primary: #c2613d; /* terracotta */
   --primary-hover: #a84f30;
   --primary-foreground: #ffffff;
+  --border: #e7e5e4; /* stone-200 — 보더·구분선 공통 */
+  --muted: #78716c; /* stone-500 — 보조 텍스트 */
+  --surface: #f5f0e8; /* 배경보다 반 톤 어두운 웜 — 안내 박스 등 면 요소 */
+  --danger: #dc2626; /* red-600 — 에러 텍스트 */
 }
 
 /* 다크: 라이트와 같은 웜 톤의 다크 브라운 + 밝은 테라코타 포인트 */
@@ -31,6 +39,10 @@
   --primary: #d97757; /* 밝은 테라코타 — 다크에서도 브랜드 컬러 유지 */
   --primary-hover: #e08d6e; /* 다크 테마 hover는 밝아지는 방향 */
   --primary-foreground: #211510; /* 밝은 버튼 위 웜 니어블랙 */
+  --border: #44403c; /* stone-700 */
+  --muted: #a8a29e; /* stone-400 */
+  --surface: #292524; /* stone-800 */
+  --danger: #f87171; /* red-400 — 다크 배경에서 대비 확보 */
 }
 
 /*
@@ -83,6 +95,12 @@
   h5,
   h6 {
     overflow-wrap: break-word;
+  }
+
+  /* 키보드 포커스 공통 링 (outline-none 유틸리티를 쓴 요소는 각자 대체 표시를 가진다) */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
 

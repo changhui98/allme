@@ -36,11 +36,11 @@ export default function FormField({
         defaultValue={defaultValue}
         readOnly={readOnly}
         placeholder=" "
-        className="peer w-full border-b border-stone-300 bg-transparent py-2 text-[15px] outline-none read-only:text-stone-500 dark:border-stone-700 dark:read-only:text-stone-400"
+        className="peer w-full border-b border-border bg-transparent py-2 text-[15px] outline-none read-only:text-muted"
       />
       <label
         htmlFor={id}
-        className="pointer-events-none absolute left-0 top-[27px] text-[15px] text-stone-400 transition-all duration-150 peer-focus:top-0 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs dark:text-stone-500"
+        className="pointer-events-none absolute left-0 top-[27px] text-[15px] text-muted transition-all duration-150 peer-focus:top-0 peer-focus:text-xs peer-focus:text-primary peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-xs"
       >
         {label}
       </label>

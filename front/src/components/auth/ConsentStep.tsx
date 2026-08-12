@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import LegalDocBody from "@/components/legal/LegalDocBody";
+import { PRIMARY_CTA } from "@/lib/button-styles";
 import { PRIVACY_DOC } from "@/lib/legal/privacy";
 import { TERMS_DOC } from "@/lib/legal/terms";
 import type { LegalDoc } from "@/lib/legal/types";
@@ -67,7 +68,7 @@ export default function ConsentStep({
 
   return (
     <div className="flex flex-col">
-      <label className="flex items-center gap-2 border-b border-stone-200 pb-4 font-semibold dark:border-stone-700">
+      <label className="flex items-center gap-2 border-b border-border pb-4 font-semibold">
         <input
           type="checkbox"
           checked={allChecked}
@@ -80,7 +81,7 @@ export default function ConsentStep({
       <ul className="mt-4 flex flex-col gap-3">
         {CONSENT_ITEMS.map((item) => (
           <li key={item.key}>
-            <label className="flex items-start gap-2 text-sm text-stone-600 dark:text-stone-300">
+            <label className="flex items-start gap-2 text-sm text-muted">
               <input
                 type="checkbox"
                 checked={checked[item.key]}
@@ -92,14 +93,14 @@ export default function ConsentStep({
                   className={
                     item.required
                       ? "font-medium text-primary"
-                      : "text-stone-400 dark:text-stone-500"
+                      : "text-muted/70"
                   }
                 >
                   [{item.required ? "필수" : "선택"}]
                 </span>{" "}
                 {item.label}
                 {item.description && (
-                  <span className="mt-0.5 block text-xs text-stone-400 dark:text-stone-500">
+                  <span className="mt-0.5 block text-xs text-muted/70">
                     {item.description}
                   </span>
                 )}
@@ -108,10 +109,10 @@ export default function ConsentStep({
 
             {item.doc && (
               <details className="mt-1 pl-6">
-                <summary className="cursor-pointer text-xs text-stone-400 underline hover:text-foreground dark:text-stone-500">
+                <summary className="cursor-pointer text-xs text-muted underline hover:text-foreground">
                   전문 보기
                 </summary>
-                <div className="mt-2 max-h-64 overflow-y-auto rounded-lg border border-stone-200 p-4 dark:border-stone-700">
+                <div className="mt-2 max-h-64 overflow-y-auto rounded-lg border border-border p-4">
                   <LegalDocBody doc={item.doc} compact />
                 </div>
               </details>
@@ -124,7 +125,7 @@ export default function ConsentStep({
         type="button"
         onClick={() => onAgreed({ marketing: checked.marketing })}
         disabled={!requiredChecked}
-        className="mt-8 w-full rounded-lg bg-primary py-3 text-[15px] font-semibold text-primary-foreground hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+        className={`mt-8 ${PRIMARY_CTA}`}
       >
         동의하고 계속하기
       </button>
