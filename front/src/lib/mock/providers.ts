@@ -18,7 +18,7 @@ export type PortfolioItem = {
   /** 한 줄 설명 */
   summary: string;
   category: CategoryId;
-  /** 이미지 스토리지가 없어 그라데이션 배경으로 대체. 흰 텍스트 오버레이 전제로 어두운 톤만 사용 */
+  /** 이미지 스토리지가 없어 그라데이션(gradients.css의 grad 블록)으로 대체. 흰 텍스트 전제로 어두운 톤만 사용 */
   themeClass: string;
 };
 
@@ -61,7 +61,7 @@ export type Provider = {
   careerYears: number;
   /** 플랫폼 거래 완료 건수 */
   completedCount: number;
-  /** 아바타(이니셜) 배경 그라데이션 — 흰 글자 전제로 어두운 톤만 사용 */
+  /** 아바타(이니셜) 배경 — gradients.css의 grad 블록 모디파이어. 흰 글자 전제로 어두운 톤만 사용 */
   avatarClass: string;
   portfolio: PortfolioItem[];
   reviews: ProviderReview[];
@@ -86,28 +86,28 @@ const PROVIDERS: Provider[] = [
     responseRate: 98,
     careerYears: 10,
     completedCount: 1240,
-    avatarClass: "bg-gradient-to-br from-sky-700 to-cyan-600",
+    avatarClass: "grad grad--br-sky-700-cyan-600",
     portfolio: [
       {
         id: "p1-w1",
         title: "역삼동 오피스텔 입주청소",
         summary: "24평 · 새집증후군 케어 포함",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-sky-800 to-cyan-700",
+        themeClass: "grad grad--br-sky-800-cyan-700",
       },
       {
         id: "p1-w2",
         title: "서초 신축 아파트 34평 입주청소",
         summary: "베란다 곰팡이 방지 시공 병행",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-cyan-800 to-sky-600",
+        themeClass: "grad grad--br-cyan-800-sky-600",
       },
       {
         id: "p1-w3",
         title: "마포 공유오피스 정기 청소",
         summary: "주 2회 새벽 방문 · 6개월 계약",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-slate-700 to-sky-700",
+        themeClass: "grad grad--br-slate-700-sky-700",
       },
     ],
     reviews: [
@@ -174,28 +174,28 @@ const PROVIDERS: Provider[] = [
     responseRate: 92,
     careerYears: 6,
     completedCount: 520,
-    avatarClass: "bg-gradient-to-br from-teal-700 to-emerald-600",
+    avatarClass: "grad grad--br-teal-700-emerald-600",
     portfolio: [
       {
         id: "p2-w1",
         title: "은평 빌라 이사 올인원 패키지",
         summary: "이사 전후 청소 + 곰팡이 케어",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-teal-800 to-emerald-700",
+        themeClass: "grad grad--br-teal-800-emerald-700",
       },
       {
         id: "p2-w2",
         title: "동작 아파트 거주 청소",
         summary: "주방 찌든 때 특수 케어 집중",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-emerald-800 to-teal-600",
+        themeClass: "grad grad--br-emerald-800-teal-600",
       },
       {
         id: "p2-w3",
         title: "관악 원룸 퇴거 청소",
         summary: "보증금 반환용 원상복구 청소",
         category: "cleaning",
-        themeClass: "bg-gradient-to-br from-slate-700 to-teal-700",
+        themeClass: "grad grad--br-slate-700-teal-700",
       },
     ],
     reviews: [
@@ -250,35 +250,35 @@ const PROVIDERS: Provider[] = [
     responseRate: 88,
     careerYears: 15,
     completedCount: 210,
-    avatarClass: "bg-gradient-to-br from-stone-700 to-orange-800",
+    avatarClass: "grad grad--br-stone-700-orange-800",
     portfolio: [
       {
         id: "p3-w1",
         title: "잠실 아파트 34평 전체 리모델링",
         summary: "구조 변경 + 주방 확장 · 6주 시공",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-stone-800 to-orange-900",
+        themeClass: "grad grad--br-stone-800-orange-900",
       },
       {
         id: "p3-w2",
         title: "강동 구축 아파트 올수리",
         summary: "25년차 구축 · 배관 교체 포함",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-orange-900 to-amber-800",
+        themeClass: "grad grad--br-orange-900-amber-800",
       },
       {
         id: "p3-w3",
         title: "송파 아파트 전체 도장·도배",
         summary: "리모델링 연계 친환경 도장",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-amber-900 to-stone-700",
+        themeClass: "grad grad--br-amber-900-stone-700",
       },
       {
         id: "p3-w4",
         title: "위례 신혼집 인테리어",
         summary: "3D 시안 그대로 구현한 사례",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-stone-700 to-amber-800",
+        themeClass: "grad grad--br-stone-700-amber-800",
       },
     ],
     reviews: [
@@ -334,35 +334,35 @@ const PROVIDERS: Provider[] = [
     responseRate: 95,
     careerYears: 9,
     completedCount: 180,
-    avatarClass: "bg-gradient-to-br from-stone-700 to-amber-700",
+    avatarClass: "grad grad--br-stone-700-amber-700",
     portfolio: [
       {
         id: "p4-w1",
         title: "성수 카페 '모노톤' 신규 오픈",
         summary: "브랜딩 연계 · 45평 상업 공간",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-stone-800 to-amber-800",
+        themeClass: "grad grad--br-stone-800-amber-800",
       },
       {
         id: "p4-w2",
         title: "노원 아파트 주방 리뉴얼",
         summary: "ㄷ자 주방 확장 · 2주 시공",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-amber-900 to-orange-800",
+        themeClass: "grad grad--br-amber-900-orange-800",
       },
       {
         id: "p4-w3",
         title: "연남동 브런치 매장 리뉴얼",
         summary: "운영 중단 없이 야간 시공",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-zinc-700 to-stone-600",
+        themeClass: "grad grad--br-zinc-700-stone-600",
       },
       {
         id: "p4-w4",
         title: "도봉 욕실 전체 교체",
         summary: "방수 재시공 포함 · 5일 완료",
         category: "interior",
-        themeClass: "bg-gradient-to-br from-stone-700 to-zinc-600",
+        themeClass: "grad grad--br-stone-700-zinc-600",
       },
     ],
     reviews: [
@@ -426,28 +426,28 @@ const PROVIDERS: Provider[] = [
     responseRate: 97,
     careerYears: 12,
     completedCount: 860,
-    avatarClass: "bg-gradient-to-br from-emerald-800 to-teal-600",
+    avatarClass: "grad grad--br-emerald-800-teal-600",
     portfolio: [
       {
         id: "p5-w1",
         title: "목동 아파트 전체 도장·도배",
         summary: "32평 · 친환경 페인트 · 4일",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-emerald-900 to-teal-700",
+        themeClass: "grad grad--br-emerald-900-teal-700",
       },
       {
         id: "p5-w2",
         title: "성수 원룸 포인트 도장",
         summary: "침실 한 면 포인트 컬러 시공",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-teal-800 to-emerald-600",
+        themeClass: "grad grad--br-teal-800-emerald-600",
       },
       {
         id: "p5-w3",
         title: "강서 상가 내부 도장",
         summary: "영업 종료 후 야간 작업 진행",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-slate-700 to-emerald-700",
+        themeClass: "grad grad--br-slate-700-emerald-700",
       },
     ],
     reviews: [
@@ -512,28 +512,28 @@ const PROVIDERS: Provider[] = [
     responseRate: 85,
     careerYears: 18,
     completedCount: 140,
-    avatarClass: "bg-gradient-to-br from-slate-700 to-blue-800",
+    avatarClass: "grad grad--br-slate-700-blue-800",
     portfolio: [
       {
         id: "p6-w1",
         title: "구로 5층 상가 외벽 도장",
         summary: "균열 보수 + 방수 동시 시공",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-slate-800 to-blue-900",
+        themeClass: "grad grad--br-slate-800-blue-900",
       },
       {
         id: "p6-w2",
         title: "영등포 빌딩 옥상 방수 도장",
         summary: "우레탄 방수 · 10년 보증",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-blue-900 to-slate-700",
+        themeClass: "grad grad--br-blue-900-slate-700",
       },
       {
         id: "p6-w3",
         title: "금천 공장 외벽 재도장",
         summary: "주말 작업으로 조업 중단 없이",
         category: "painting",
-        themeClass: "bg-gradient-to-br from-zinc-700 to-blue-800",
+        themeClass: "grad grad--br-zinc-700-blue-800",
       },
     ],
     reviews: [
@@ -588,35 +588,35 @@ const PROVIDERS: Provider[] = [
     responseRate: 99,
     careerYears: 7,
     completedCount: 310,
-    avatarClass: "bg-gradient-to-br from-indigo-800 to-violet-600",
+    avatarClass: "grad grad--br-indigo-800-violet-600",
     portfolio: [
       {
         id: "p7-w1",
         title: "베이커리 '밀앤버터' 홈페이지",
         summary: "예약 폼 + 지도 연동 · 4주",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-indigo-900 to-violet-700",
+        themeClass: "grad grad--br-indigo-900-violet-700",
       },
       {
         id: "p7-w2",
         title: "헬스장 오픈 랜딩페이지",
         summary: "7일 패키지 · 사전등록 320건",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-violet-800 to-purple-700",
+        themeClass: "grad grad--br-violet-800-purple-700",
       },
       {
         id: "p7-w3",
         title: "법률사무소 반응형 홈페이지",
         summary: "상담 신청 흐름 중심 설계",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-slate-700 to-indigo-800",
+        themeClass: "grad grad--br-slate-700-indigo-800",
       },
       {
         id: "p7-w4",
         title: "공방 클래스 예약 사이트",
         summary: "클래스 일정표 + 결제 링크 연동",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-purple-900 to-indigo-700",
+        themeClass: "grad grad--br-purple-900-indigo-700",
       },
     ],
     reviews: [
@@ -679,28 +679,28 @@ const PROVIDERS: Provider[] = [
     responseRate: 96,
     careerYears: 5,
     completedCount: 150,
-    avatarClass: "bg-gradient-to-br from-fuchsia-800 to-purple-700",
+    avatarClass: "grad grad--br-fuchsia-800-purple-700",
     portfolio: [
       {
         id: "p8-w1",
         title: "핸드메이드 브랜드 쇼핑몰 구축",
         summary: "로고 리뉴얼 + 상세페이지 20종",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-fuchsia-900 to-purple-800",
+        themeClass: "grad grad--br-fuchsia-900-purple-800",
       },
       {
         id: "p8-w2",
         title: "건강식품 브랜드 스토어",
         summary: "브랜드 톤 정립 후 몰 전체 적용",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-purple-900 to-fuchsia-700",
+        themeClass: "grad grad--br-purple-900-fuchsia-700",
       },
       {
         id: "p8-w3",
         title: "패션 편집숍 리브랜딩",
         summary: "기존 몰 유지하며 단계별 교체",
         category: "web-design",
-        themeClass: "bg-gradient-to-br from-slate-700 to-purple-800",
+        themeClass: "grad grad--br-slate-700-purple-800",
       },
     ],
     reviews: [

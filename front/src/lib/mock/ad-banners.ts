@@ -15,7 +15,7 @@ export type AdBanner = {
   subcopy: string;
   /** 클릭 시 이동 경로. 상세 페이지가 없으므로 카테고리 필터로 연결한다 */
   href: string;
-  /** 배너별 배경 클래스. 텍스트는 흰색 고정이므로 어두운 톤 그라데이션만 사용할 것 */
+  /** 배너별 배경 — gradients.css의 grad 블록 모디파이어. 흰 텍스트 전제로 어두운 톤만 사용할 것 */
   themeClass: string;
 };
 
@@ -26,7 +26,7 @@ const AD_BANNERS: AdBanner[] = [
     headline: "여름맞이 입주청소 20% 할인",
     subcopy: "8월 예약 한정 · 강남·서초 당일 견적",
     href: "/services?category=cleaning",
-    themeClass: "bg-gradient-to-r from-sky-700 to-cyan-600",
+    themeClass: "grad grad--r-sky-700-cyan-600",
   },
   {
     id: "ad2",
@@ -34,7 +34,7 @@ const AD_BANNERS: AdBanner[] = [
     headline: "카페 창업 인테리어 무료 상담",
     subcopy: "3D 시안 제공 · 오픈 일정 맞춤 시공",
     href: "/services?category=interior",
-    themeClass: "bg-gradient-to-r from-stone-700 to-amber-700",
+    themeClass: "grad grad--r-stone-700-amber-700",
   },
   {
     id: "ad3",
@@ -42,7 +42,7 @@ const AD_BANNERS: AdBanner[] = [
     headline: "친환경 도장 시공 이벤트",
     subcopy: "가구 보양 무료 · 곰팡이 케어 포함",
     href: "/services?category=painting",
-    themeClass: "bg-gradient-to-r from-emerald-800 to-teal-600",
+    themeClass: "grad grad--r-emerald-800-teal-600",
   },
   {
     id: "ad4",
@@ -50,7 +50,7 @@ const AD_BANNERS: AdBanner[] = [
     headline: "소상공인 홈페이지 첫 달 유지보수 무료",
     subcopy: "기획부터 배포까지 · 반응형 기본",
     href: "/services?category=web-design",
-    themeClass: "bg-gradient-to-r from-indigo-800 to-violet-600",
+    themeClass: "grad grad--r-indigo-800-violet-600",
   },
 ];
 
