@@ -30,7 +30,7 @@ const CONSENT_ITEMS: ConsentItem[] = [
     key: "marketing",
     label: "마케팅 정보 수신 동의",
     required: false,
-    description: "이벤트·혜택 소식을 이메일로 받아볼 수 있어요.",
+    description: "이벤트·혜택 소식을 문자·알림톡으로 받아볼 수 있어요.",
   },
 ];
 

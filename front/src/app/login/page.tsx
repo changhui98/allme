@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 /**
  * 로그인 페이지. (서버 컴포넌트)
- * 아직 UI 레이아웃 단계 — 이메일 로그인 제출과 소셜 OAuth 연동은
+ * 아직 UI 레이아웃 단계 — 아이디 로그인 제출과 소셜 OAuth 연동은
  * 백엔드 user 도메인 구현 후 붙인다. /forgot-password는 계획된 경로 플레이스홀더.
  */
 export default function LoginPage() {
@@ -39,7 +39,12 @@ export default function LoginPage() {
       }
     >
       <form className="flex flex-col gap-2">
-        <FormField id="email" label="이메일" type="email" autoComplete="email" />
+        <FormField
+          id="login-id"
+          label="아이디"
+          type="text"
+          autoComplete="username"
+        />
         <FormField
           id="password"
           label="비밀번호"

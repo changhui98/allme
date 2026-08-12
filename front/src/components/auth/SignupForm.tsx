@@ -28,7 +28,12 @@ export default function SignupForm({
         defaultValue={name}
         readOnly
       />
-      <FormField id="email" label="이메일" type="email" autoComplete="email" />
+      <FormField
+        id="login-id"
+        label="아이디"
+        type="text"
+        autoComplete="username"
+      />
       <FormField
         id="password"
         label="비밀번호 (8자 이상)"
