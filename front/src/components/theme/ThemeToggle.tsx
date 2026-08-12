@@ -22,8 +22,8 @@ export default function ThemeToggle() {
 
   const isDark = resolvedTheme === "dark";
 
-  const buttonClass =
-    "inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800";
+  // 공용 아이콘 버튼 블록 (styles/components/button.css) — MobileNav 햄버거와 동일
+  const buttonClass = "icon-btn";
 
   // 마운트 전: 레이아웃 흔들림 방지용 동일 크기 placeholder
   if (!mounted) {

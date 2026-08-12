@@ -14,8 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full" suppressHydrationWarning>
-      <body className="flex min-h-full flex-col">
+    // html/body 프레임 스타일(height·flex column)은 styles/base.css가 담당
+    <html lang="ko" suppressHydrationWarning>
+      <body>
         {/* 헤더/푸터는 (main) 그룹 레이아웃 소관 — 인증 페이지((auth))는 독립 레이아웃을 쓴다 */}
         <ThemeProvider>{children}</ThemeProvider>
       </body>

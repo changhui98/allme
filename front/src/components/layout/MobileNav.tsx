@@ -7,7 +7,9 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
 
 /**
  * 모바일(<md) 전용 네비. 햄버거 버튼으로 주요 메뉴/검색/로그인 패널을 토글한다.
+ * 스타일: styles/components/mobile-nav.css (버튼은 공용 .icon-btn)
  * 상태가 필요한 부분만 클라이언트 컴포넌트로 분리해 Header는 서버 컴포넌트로 유지한다.
+ * 패널의 absolute 배치는 부모 .header가 sticky(포지셔닝 컨텍스트)인 것에 의존한다.
  */
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -23,14 +25,14 @@ export default function MobileNav() {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="mobile-nav">
       <button
         type="button"
         aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+        className="icon-btn"
       >
         {open ? (
           // X 아이콘
@@ -64,14 +66,11 @@ export default function MobileNav() {
       </button>
 
       {open && (
-        <div
-          id="mobile-nav-panel"
-          className="absolute inset-x-0 top-full border-b border-stone-200 bg-[var(--background)] px-4 py-4 shadow-sm dark:border-stone-800"
-        >
+        <div id="mobile-nav-panel" className="mobile-nav__panel">
           {/* 검색 */}
           <form
             role="search"
-            className="flex items-center gap-2 rounded-md border border-stone-300 px-3 py-2 dark:border-stone-700"
+            className="mobile-nav__search"
             onSubmit={(e) => e.preventDefault()}
           >
             <SearchIcon />
@@ -79,19 +78,19 @@ export default function MobileNav() {
               type="search"
               name="q"
               placeholder="어떤 서비스를 찾으세요?"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+              className="mobile-nav__search-input"
             />
           </form>
 
           {/* 주요 메뉴 */}
-          <nav aria-label="주요 메뉴" className="mt-4">
-            <ul className="flex flex-col">
+          <nav aria-label="주요 메뉴" className="mobile-nav__menu">
+            <ul className="mobile-nav__list">
               {BOARD_LINKS.map((c) => (
                 <li key={c.href}>
                   <Link
                     href={c.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-md px-2 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                    className="mobile-nav__link"
                   >
                     {c.label}
                   </Link>
@@ -101,19 +100,19 @@ export default function MobileNav() {
           </nav>
 
           {/* 테마 토글 + 로그인/회원가입 */}
-          <div className="mt-4 flex items-center gap-2 border-t border-stone-200 pt-4 dark:border-stone-800">
+          <div className="mobile-nav__footer">
             <ThemeToggle />
             <Link
               href={AUTH_LINKS.login.href}
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-md border border-stone-300 px-3 py-2 text-center text-sm font-medium text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800"
+              className="mobile-nav__login"
             >
               {AUTH_LINKS.login.label}
             </Link>
             <Link
               href={AUTH_LINKS.signup.href}
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+              className="mobile-nav__signup"
             >
               {AUTH_LINKS.signup.label}
             </Link>
@@ -134,7 +133,7 @@ function SearchIcon() {
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
-      className="shrink-0 text-stone-400"
+      className="mobile-nav__search-icon"
       aria-hidden="true"
     >
       <circle cx="11" cy="11" r="7" />

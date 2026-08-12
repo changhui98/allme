@@ -5,6 +5,7 @@
  */
 @layer base {
   html {
+    height: 100%;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -13,8 +14,11 @@
       "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
   }
 
+  /* 앱 프레임: 헤더-본문-푸터 세로 배치, 본문(flex:1)이 남은 높이를 채운다 */
   body {
-    min-height: 100dvh;
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
     background: var(--background);
     color: var(--foreground);
   }

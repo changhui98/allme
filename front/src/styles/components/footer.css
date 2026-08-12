@@ -1,0 +1,96 @@
+/* 전 페이지 공통 푸터 — 링크 그룹 + 사업자 정보 */
+.footer {
+  border-top-width: 1px;
+  border-color: var(--stone-200);
+  background-color: var(--background);
+}
+
+.dark .footer {
+  border-color: var(--stone-800);
+}
+
+.footer__inner {
+  margin-inline: auto;
+  max-width: 72rem;
+  padding: 2.5rem 1rem;
+}
+
+.footer__groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+@media (min-width: 48rem) {
+  .footer__groups {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.footer__group-title {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: var(--stone-900);
+}
+
+.dark .footer__group-title {
+  color: var(--stone-100);
+}
+
+.footer__links {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer__link {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--stone-500);
+}
+
+.footer__link:hover {
+  color: var(--stone-900);
+}
+
+.dark .footer__link {
+  color: var(--stone-400);
+}
+
+.dark .footer__link:hover {
+  color: #ffffff;
+}
+
+.footer__bottom {
+  margin-top: 2.5rem;
+  border-top-width: 1px;
+  border-color: var(--stone-200);
+  padding-top: 1.5rem;
+}
+
+.dark .footer__bottom {
+  border-color: var(--stone-800);
+}
+
+.footer__brand {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.footer__info {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.625;
+  color: var(--stone-400);
+}
+
+.footer__copyright {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-400);
+}
