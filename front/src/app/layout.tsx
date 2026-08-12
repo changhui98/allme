@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -18,11 +16,8 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full" suppressHydrationWarning>
       <body className="flex min-h-full flex-col">
-        <ThemeProvider>
-          <Header />
-          {children}
-          <Footer />
-        </ThemeProvider>
+        {/* 헤더/푸터는 (main) 그룹 레이아웃 소관 — 인증 페이지((auth))는 독립 레이아웃을 쓴다 */}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
