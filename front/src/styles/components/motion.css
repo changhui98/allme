@@ -1,5 +1,5 @@
 /*
- * 모션 블록.
+ * 모션 블록 — 스크롤 리빌(.reveal) + 롤링 행(.rolling-row).
  * 스크롤 리빌(ScrollReveal 컴포넌트 전용).
  * 숨김 스타일을 (scripting: enabled)로 게이트해 no-JS·크롤러 환경에서는
  * 콘텐츠가 항상 즉시 보인다 — 초기 HTML 인덱싱(SEO)에 영향 없음.
@@ -18,5 +18,53 @@
   .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/*
+ * 롤링 행(RollingRow 컴포넌트 전용) — 여러 칸이 보이며 몇 초마다 한 칸씩 옆으로 넘어간다.
+ * 표시 칸 수는 --visible 변수와 아이템 flex-basis를 브레이크포인트마다 함께 맞춘다
+ * (트랙의 translateX 인라인 스타일이 100% / var(--visible)로 한 칸 이동량을 계산한다).
+ */
+.rolling-row {
+  overflow: hidden;
+}
+
+.rolling-row__track {
+  --visible: 1;
+  margin-inline: -0.375rem;
+  display: flex;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-duration: 500ms;
+}
+
+/* 복제본 → 원본 되감기 프레임: 점프가 보이지 않도록 전환을 끈다 */
+.rolling-row__track--instant {
+  transition: none;
+}
+
+.rolling-row__item {
+  flex: 0 0 100%;
+  padding-inline: 0.375rem;
+}
+
+@media (min-width: 40rem) {
+  .rolling-row__track {
+    --visible: 2;
+  }
+
+  .rolling-row__item {
+    flex-basis: 50%;
+  }
+}
+
+@media (min-width: 64rem) {
+  .rolling-row__track {
+    --visible: 3;
+  }
+
+  .rolling-row__item {
+    flex-basis: 33.333333%;
   }
 }

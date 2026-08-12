@@ -12,36 +12,29 @@ const ROLLING_COUNT = 8;
 /**
  * "방금 올라왔어요" — 새 요청·새 업체를 한 줄 아이템 롤링으로 보여준다 (서버 컴포넌트).
  * 아이템은 여기서 서버 렌더해 RollingRow(클라이언트)에 노드로 넘긴다 → SSR 보존.
+ * 스타일: styles/pages/home.css
  */
 export default function NewItemsSection() {
   const requests = getRequestPosts().slice(0, ROLLING_COUNT);
   const providers = getNewProviders(ROLLING_COUNT);
 
   return (
-    <section aria-labelledby="new-items-heading">
-      <div className="flex items-baseline justify-between gap-4">
-        <h2
-          id="new-items-heading"
-          className="text-xl font-bold tracking-tight sm:text-2xl"
-        >
+    <section aria-labelledby="new-items-heading" className="new-items">
+      <div className="new-items__head">
+        <h2 id="new-items-heading" className="new-items__heading">
           방금 올라왔어요
         </h2>
       </div>
 
-      <div className="mt-5 space-y-6">
+      <div className="new-items__groups">
         <div>
-          <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-sm font-semibold text-stone-500 dark:text-stone-400">
-              새 요청
-            </h3>
-            <Link
-              href="/requests"
-              className="text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
-            >
+          <div className="new-items__head">
+            <h3 className="new-items__group-title">새 요청</h3>
+            <Link href="/requests" className="new-items__more">
               전체 보기 →
             </Link>
           </div>
-          <div className="mt-2">
+          <div className="new-items__row">
             <RollingRow
               label="새로 올라온 요청"
               items={requests.map((post) => (
@@ -52,12 +45,10 @@ export default function NewItemsSection() {
         </div>
 
         <div>
-          <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-sm font-semibold text-stone-500 dark:text-stone-400">
-              새로 합류한 업체
-            </h3>
+          <div className="new-items__head">
+            <h3 className="new-items__group-title">새로 합류한 업체</h3>
           </div>
-          <div className="mt-2">
+          <div className="new-items__row">
             <RollingRow
               label="새로 합류한 업체"
               items={providers.map((provider) => (
@@ -76,15 +67,15 @@ function NewRequestItem({ post }: { post: RequestPost }) {
   return (
     <Link
       href="/requests"
-      className="flex h-full flex-col gap-1.5 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
+      className="card card--interactive new-items__item new-items__item--request"
     >
-      <div className="flex items-center gap-2">
-        <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
+      <div className="new-items__item-head">
+        <span className="pill new-items__pill">
           {getCategoryLabel(post.category)}
         </span>
-        <span className="truncate text-sm font-semibold">{post.title}</span>
+        <span className="new-items__item-title">{post.title}</span>
       </div>
-      <p className="truncate text-xs text-stone-500 dark:text-stone-400">
+      <p className="new-items__item-meta">
         {post.region} · 예산 {post.budget} · 제안 {post.proposalCount}건
       </p>
     </Link>
@@ -95,26 +86,22 @@ function NewProviderItem({ provider }: { provider: Provider }) {
   return (
     <Link
       href={`/providers/${provider.id}`}
-      className="flex h-full items-center gap-3 rounded-lg border border-stone-200 px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
+      className="card card--interactive new-items__item new-items__item--provider"
     >
       <span
         aria-hidden="true"
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${provider.avatarClass}`}
+        className={`new-items__avatar ${provider.avatarClass}`}
       >
         {provider.name.charAt(0)}
       </span>
-      <span className="min-w-0">
-        <span className="flex items-center gap-1.5">
-          <span className="truncate text-sm font-semibold">
-            {provider.name}
-          </span>
+      <span className="new-items__item-body">
+        <span className="new-items__name-row">
+          <span className="new-items__item-title">{provider.name}</span>
           {provider.verified && (
-            <span className="shrink-0 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-              인증
-            </span>
+            <span className="badge--verified new-items__verified">인증</span>
           )}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-stone-500 dark:text-stone-400">
+        <span className="new-items__item-meta new-items__item-meta--spaced">
           {provider.tagline} · {provider.region}
         </span>
       </span>

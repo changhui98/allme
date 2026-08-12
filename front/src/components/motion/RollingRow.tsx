@@ -17,6 +17,7 @@ const MAX_VISIBLE = 3;
  *   transition 없이 0으로 되돌린다 (복제본과 원본이 같은 그림이라 점프가 보이지 않음)
  * - hover·포커스 시 일시정지, "동작 줄이기" 설정 시 자동 롤링 없음 (AdBannerCarousel 관례)
  * - 아이템은 서버에서 렌더한 노드를 받아 표시만 담당 → 초기 HTML에 콘텐츠 포함(SEO)
+ * 스타일: styles/components/motion.css (.rolling-row 블록)
  */
 export default function RollingRow({
   items,
@@ -56,14 +57,14 @@ export default function RollingRow({
     <div
       aria-roledescription="carousel"
       aria-label={label}
-      className="overflow-hidden"
+      className="rolling-row"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
       <ul
-        className={`-mx-1.5 flex [--visible:1] sm:[--visible:2] lg:[--visible:3] ${instant ? "" : "transition-transform duration-500 ease-out"}`}
+        className={`rolling-row__track${instant ? " rolling-row__track--instant" : ""}`}
         style={{ transform: `translateX(calc(${index} * -100% / var(--visible)))` }}
         onTransitionEnd={(e) => {
           // 자식(카드 hover 등)의 transitionend 버블링은 무시한다
@@ -81,7 +82,7 @@ export default function RollingRow({
             <li
               key={i}
               inert={isClone || undefined}
-              className="shrink-0 grow-0 basis-full px-1.5 sm:basis-1/2 lg:basis-1/3"
+              className="rolling-row__item"
             >
               {item}
             </li>

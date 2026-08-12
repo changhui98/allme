@@ -4,23 +4,21 @@ import { CATEGORIES, type CategoryId } from "@/lib/categories";
 /**
  * 랜딩 첫 화면 — 가치 제안 + 검색 + 양방향 CTA + 카테고리 진입 (서버 컴포넌트).
  * LCP·SEO를 위해 리빌 애니메이션 없이 즉시 렌더한다.
+ * 스타일: styles/pages/home.css
  */
 export default function HeroSection() {
   return (
-    <section className="py-12 text-center sm:py-20">
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
-        <span
-          aria-hidden="true"
-          className="h-1.5 w-1.5 rounded-full bg-primary"
-        />
+    <section className="hero">
+      <span className="pill hero__badge">
+        <span aria-hidden="true" className="hero__badge-dot" />
         서울 지역 오픈
       </span>
 
-      <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+      <h1 className="hero__title">
         필요한 서비스,
-        <br className="sm:hidden" /> 찾고 맡기고 결제까지
+        <br className="hero__title-break" /> 찾고 맡기고 결제까지
       </h1>
-      <p className="mx-auto mt-4 max-w-xl text-base text-stone-500 sm:text-lg dark:text-stone-400">
+      <p className="hero__subtitle">
         청소부터 웹 제작까지 — 예약, 안전결제, 정산을 올미 한곳에서.
         검증된 업체와 안심하고 거래하세요.
       </p>
@@ -30,7 +28,7 @@ export default function HeroSection() {
         role="search"
         action="/services"
         method="get"
-        className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-full border border-stone-300 bg-white py-2 pl-5 pr-2 shadow-sm focus-within:border-stone-400 dark:border-stone-700 dark:bg-stone-800/60 dark:focus-within:border-stone-500"
+        className="hero__search"
       >
         <svg
           width="20"
@@ -40,7 +38,7 @@ export default function HeroSection() {
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
-          className="shrink-0 text-stone-400"
+          className="hero__search-icon"
           aria-hidden="true"
         >
           <circle cx="11" cy="11" r="7" />
@@ -50,43 +48,37 @@ export default function HeroSection() {
           type="search"
           name="q"
           placeholder="어떤 서비스가 필요하세요? 예: 입주청소"
-          className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400 sm:text-base"
+          className="hero__search-input"
         />
         <button
           type="submit"
-          className="shrink-0 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
+          className="hero__search-submit"
         >
           검색
         </button>
       </form>
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          href="/services"
-          className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
-        >
+      <div className="hero__actions">
+        <Link href="/services" className="hero__cta hero__cta--primary">
           서비스 둘러보기
         </Link>
-        <Link
-          href="/requests"
-          className="rounded-md border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-200 dark:hover:bg-stone-800"
-        >
+        <Link href="/requests" className="hero__cta hero__cta--secondary">
           견적 요청 올리기
         </Link>
       </div>
 
       {/* 카테고리 바로가기 — 검색 페이지가 따로 없어 카테고리 필터가 탐색 입구 역할 */}
-      <ul className="mx-auto mt-12 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+      <ul className="hero__categories">
         {CATEGORIES.map((category) => (
           <li key={category.id}>
             <Link
               href={`/services?category=${category.id}`}
-              className="flex flex-col items-center gap-2 rounded-lg border border-stone-200 p-5 transition-colors hover:border-stone-300 hover:bg-stone-50 dark:border-stone-800 dark:hover:border-stone-700 dark:hover:bg-stone-800/60"
+              className="card card--interactive hero__category"
             >
-              <span className="text-stone-500 dark:text-stone-400">
+              <span className="hero__category-icon">
                 <CategoryIcon id={category.id} />
               </span>
-              <span className="text-sm font-medium">{category.label}</span>
+              <span className="hero__category-label">{category.label}</span>
             </Link>
           </li>
         ))}

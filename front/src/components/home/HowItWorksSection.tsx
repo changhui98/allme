@@ -22,34 +22,28 @@ const STEPS = [
 /**
  * 거래 사이클 4단계 소개 (서버 컴포넌트).
  * 에스크로(완료 확인 후 지급)가 핵심 차별점이라 3·4단계에 명시한다.
+ * 스타일: styles/pages/home.css
  */
 export default function HowItWorksSection() {
   return (
-    <section aria-labelledby="how-it-works-heading">
+    <section aria-labelledby="how-it-works-heading" className="how-it-works">
       <ScrollReveal>
-        <h2
-          id="how-it-works-heading"
-          className="text-xl font-bold tracking-tight sm:text-2xl"
-        >
+        <h2 id="how-it-works-heading" className="how-it-works__heading">
           이렇게 진행돼요
         </h2>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="how-it-works__subtitle">
           예약부터 정산까지, 거래의 모든 단계를 올미가 함께합니다.
         </p>
       </ScrollReveal>
 
-      <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ol className="how-it-works__steps">
         {STEPS.map((step, index) => (
           <li key={step.title}>
-            <ScrollReveal delay={index * 80} className="h-full">
-              <div className="h-full rounded-lg border border-stone-200 p-5 dark:border-stone-800">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                  {index + 1}
-                </span>
-                <h3 className="mt-3 font-semibold">{step.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-                  {step.description}
-                </p>
+            <ScrollReveal delay={index * 80} className="how-it-works__reveal">
+              <div className="card how-it-works__card">
+                <span className="how-it-works__step-num">{index + 1}</span>
+                <h3 className="how-it-works__step-title">{step.title}</h3>
+                <p className="how-it-works__step-desc">{step.description}</p>
               </div>
             </ScrollReveal>
           </li>

@@ -1,46 +1,44 @@
 /**
  * 신뢰 요소 3종 — 에스크로 안전결제 / 사업자 인증 / 실거래 리뷰 (서버 컴포넌트).
  * 색은 기존 의미론을 따른다: primary(브랜드), emerald(인증 뱃지), amber(별점).
+ * 스타일: styles/pages/home.css
  */
 export default function TrustSection() {
   return (
-    <section aria-labelledby="trust-heading">
-      <h2
-        id="trust-heading"
-        className="text-xl font-bold tracking-tight sm:text-2xl"
-      >
+    <section aria-labelledby="trust-heading" className="trust">
+      <h2 id="trust-heading" className="trust__heading">
         올미가 거래를 지켜요
       </h2>
 
-      <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <ul className="trust__list">
+        <li className="card trust__card">
+          <span className="trust__icon trust__icon--primary">
             <ShieldIcon />
           </span>
-          <h3 className="mt-4 font-semibold">에스크로 안전결제</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
+          <h3 className="trust__title">에스크로 안전결제</h3>
+          <p className="trust__desc">
             결제금은 올미가 보관하고, 작업 완료를 확인한 뒤에만 업체에
             정산합니다. 먹튀·분쟁 걱정 없이 거래하세요.
           </p>
         </li>
 
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+        <li className="card trust__card">
+          <span className="trust__icon trust__icon--emerald">
             <BadgeCheckIcon />
           </span>
-          <h3 className="mt-4 font-semibold">사업자 인증</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
+          <h3 className="trust__title">사업자 인증</h3>
+          <p className="trust__desc">
             국세청 사업자등록 진위확인을 통과한 업체에만 인증 마크를
             드립니다. 검증된 업체와 만나세요.
           </p>
         </li>
 
-        <li className="rounded-lg border border-stone-200 p-6 dark:border-stone-800">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-500 dark:bg-amber-950 dark:text-amber-400">
+        <li className="card trust__card">
+          <span className="trust__icon trust__icon--amber">
             <StarIcon />
           </span>
-          <h3 className="mt-4 font-semibold">실거래 리뷰</h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
+          <h3 className="trust__title">실거래 리뷰</h3>
+          <p className="trust__desc">
             올미에서 실제로 거래를 마친 사용자만 리뷰를 남길 수 있어요.
             부풀려진 후기 없이 있는 그대로.
           </p>
