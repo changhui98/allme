@@ -1,0 +1,33 @@
+/*
+ * 공용 버튼 블록.
+ * .btn 은 형태(라운드·전환·비활성)만, 색은 --primary/--secondary 모디파이어가,
+ * 크기·배치는 --block 또는 사용처 블록의 엘리먼트 클래스가 정한다.
+ */
+.btn {
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn--primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+/* 폼 하단 풀폭 CTA (구 PRIMARY_CTA: w-full py-3 text-[15px]) */
+.btn--block {
+  width: 100%;
+  padding-block: 0.75rem;
+  font-size: 15px;
+}

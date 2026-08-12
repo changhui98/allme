@@ -1,0 +1,163 @@
+/*
+ * mock 데이터(광고 배너·업체 아바타·포트폴리오)가 참조하는 그라데이션 모디파이어.
+ * 구 Tailwind 그라데이션은 oklab 보간으로 컴파일되므로 `in oklab`을 반드시 유지한다
+ * (누락 시 srgb 보간이 되어 중간색이 달라진다).
+ * 명명: .grad--{방향}-{시작색}-{끝색} (br = to bottom right, r = to right)
+ */
+
+/* 배너용 (to right) */
+
+.grad--r-sky-700-cyan-600 {
+  background-image: linear-gradient(to right in oklab, var(--sky-700), var(--cyan-600));
+}
+
+.grad--r-stone-700-amber-700 {
+  background-image: linear-gradient(to right in oklab, var(--stone-700), var(--amber-700));
+}
+
+.grad--r-emerald-800-teal-600 {
+  background-image: linear-gradient(to right in oklab, var(--emerald-800), var(--teal-600));
+}
+
+.grad--r-indigo-800-violet-600 {
+  background-image: linear-gradient(to right in oklab, var(--indigo-800), var(--violet-600));
+}
+
+
+/* 아바타·포트폴리오용 (to bottom right) */
+
+.grad--br-amber-900-orange-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--amber-900), var(--orange-800));
+}
+
+.grad--br-amber-900-stone-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--amber-900), var(--stone-700));
+}
+
+.grad--br-blue-900-slate-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--blue-900), var(--slate-700));
+}
+
+.grad--br-cyan-800-sky-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--cyan-800), var(--sky-600));
+}
+
+.grad--br-emerald-800-teal-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--emerald-800), var(--teal-600));
+}
+
+.grad--br-emerald-900-teal-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--emerald-900), var(--teal-700));
+}
+
+.grad--br-fuchsia-800-purple-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--fuchsia-800), var(--purple-700));
+}
+
+.grad--br-fuchsia-900-purple-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--fuchsia-900), var(--purple-800));
+}
+
+.grad--br-indigo-800-violet-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--indigo-800), var(--violet-600));
+}
+
+.grad--br-indigo-900-violet-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--indigo-900), var(--violet-700));
+}
+
+.grad--br-orange-900-amber-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--orange-900), var(--amber-800));
+}
+
+.grad--br-purple-900-fuchsia-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--purple-900), var(--fuchsia-700));
+}
+
+.grad--br-purple-900-indigo-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--purple-900), var(--indigo-700));
+}
+
+.grad--br-sky-700-cyan-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--sky-700), var(--cyan-600));
+}
+
+.grad--br-sky-800-cyan-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--sky-800), var(--cyan-700));
+}
+
+.grad--br-slate-700-blue-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--blue-800));
+}
+
+.grad--br-slate-700-emerald-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--emerald-700));
+}
+
+.grad--br-slate-700-indigo-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--indigo-800));
+}
+
+.grad--br-slate-700-purple-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--purple-800));
+}
+
+.grad--br-slate-700-sky-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--sky-700));
+}
+
+.grad--br-slate-700-teal-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-700), var(--teal-700));
+}
+
+.grad--br-slate-800-blue-900 {
+  background-image: linear-gradient(to bottom right in oklab, var(--slate-800), var(--blue-900));
+}
+
+.grad--br-stone-700-amber-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-700), var(--amber-700));
+}
+
+.grad--br-stone-700-amber-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-700), var(--amber-800));
+}
+
+.grad--br-stone-700-orange-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-700), var(--orange-800));
+}
+
+.grad--br-stone-700-zinc-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-700), var(--zinc-600));
+}
+
+.grad--br-stone-800-amber-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-800), var(--amber-800));
+}
+
+.grad--br-stone-800-orange-900 {
+  background-image: linear-gradient(to bottom right in oklab, var(--stone-800), var(--orange-900));
+}
+
+.grad--br-teal-700-emerald-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--teal-700), var(--emerald-600));
+}
+
+.grad--br-teal-800-emerald-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--teal-800), var(--emerald-600));
+}
+
+.grad--br-teal-800-emerald-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--teal-800), var(--emerald-700));
+}
+
+.grad--br-violet-800-purple-700 {
+  background-image: linear-gradient(to bottom right in oklab, var(--violet-800), var(--purple-700));
+}
+
+.grad--br-zinc-700-blue-800 {
+  background-image: linear-gradient(to bottom right in oklab, var(--zinc-700), var(--blue-800));
+}
+
+.grad--br-zinc-700-stone-600 {
+  background-image: linear-gradient(to bottom right in oklab, var(--zinc-700), var(--stone-600));
+}

@@ -1,12 +1,29 @@
+/*
+ * 전역 스타일 매니페스트 — 모든 CSS 파일은 여기서만 import한다 (root layout 1곳 로드).
+ * 실제 정의는 src/styles/ 하위 파일에 있고, 이 파일은 순서만 책임진다.
+ * 순서: (전환 기간: Tailwind) → 토큰 → base → 공용 블록 → 페이지 → 유틸.
+ *
+ * [전환 기간 주의] Tailwind 제거 작업이 진행 중이다. 아직 전환 안 된 컴포넌트가
+ * Tailwind 유틸리티를 쓰므로 @import "tailwindcss"와 아래 @custom-variant/@theme는
+ * 마지막 커밋(자체 reset 도입)에서 함께 제거한다. reset은 그때 Preflight와 스왑.
+ */
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/base.css";
+@import "../styles/utilities.css";
+@import "../styles/components/button.css";
+@import "../styles/components/card.css";
+@import "../styles/components/badge.css";
+@import "../styles/components/gradients.css";
+@import "../styles/components/motion.css";
 
 /*
  * 다크모드는 OS 설정 자동추종(미디어쿼리)이 아니라 .dark 클래스 기반으로 동작한다.
  * next-themes(attribute="class")가 <html>에 .dark 를 붙였다 떼며 토글한다.
- * 이 커스텀 variant 덕분에 dark:* 유틸리티가 .dark 하위에서만 적용된다.
  */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Tailwind 유틸리티(bg-primary 등)가 토큰을 참조하기 위한 브리지 — 전환 완료 시 삭제 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -17,111 +34,4 @@
   --color-muted: var(--muted);
   --color-surface: var(--surface);
   --color-danger: var(--danger);
-}
-
-/* 라이트(기본): 따뜻한 흰 배경 + 테라코타 포인트 */
-:root {
-  --background: #fdfbf7; /* warm white */
-  --foreground: #2b2622; /* warm near-black */
-  --primary: #c2613d; /* terracotta */
-  --primary-hover: #a84f30;
-  --primary-foreground: #ffffff;
-  --border: #e7e5e4; /* stone-200 — 보더·구분선 공통 */
-  --muted: #78716c; /* stone-500 — 보조 텍스트 */
-  --surface: #f5f0e8; /* 배경보다 반 톤 어두운 웜 — 안내 박스 등 면 요소 */
-  --danger: #dc2626; /* red-600 — 에러 텍스트 */
-}
-
-/* 다크: 라이트와 같은 웜 톤의 다크 브라운 + 밝은 테라코타 포인트 */
-.dark {
-  --background: #1c1917; /* stone-900 — 따뜻한 다크 브라운 */
-  --foreground: #e7e5e4; /* stone-200 — 웜 오프화이트 */
-  --primary: #d97757; /* 밝은 테라코타 — 다크에서도 브랜드 컬러 유지 */
-  --primary-hover: #e08d6e; /* 다크 테마 hover는 밝아지는 방향 */
-  --primary-foreground: #211510; /* 밝은 버튼 위 웜 니어블랙 */
-  --border: #44403c; /* stone-700 */
-  --muted: #a8a29e; /* stone-400 */
-  --surface: #292524; /* stone-800 */
-  --danger: #f87171; /* red-400 — 다크 배경에서 대비 확보 */
-}
-
-/*
- * CSS 초기화
- * 기본 리셋은 Tailwind 내장 Preflight(modern-normalize 기반)가 담당한다.
- * (box-sizing: border-box, margin 0, heading/list 스타일 제거, border 리셋 등)
- * 아래 @layer base 에는 Preflight 위에 실무에서 자주 보강하는 항목만 추가한다.
- */
-@layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    /* 한국어 서비스용 한글 친화 시스템 폰트 스택. 웹폰트(Pretendard 등)는 추후 next/font로 연동 */
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-      "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
-  }
-
-  body {
-    min-height: 100dvh;
-    background: var(--background);
-    color: var(--foreground);
-  }
-
-  /* 미디어 요소 기본값 보정 */
-  img,
-  picture,
-  video,
-  canvas,
-  svg {
-    display: block;
-    max-width: 100%;
-  }
-
-  /* 폼 요소가 부모 폰트/색을 상속하도록 */
-  input,
-  button,
-  textarea,
-  select {
-    font: inherit;
-    color: inherit;
-  }
-
-  /* 긴 단어/URL 줄바꿈 보정 */
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    overflow-wrap: break-word;
-  }
-
-  /* 키보드 포커스 공통 링 (outline-none 유틸리티를 쓴 요소는 각자 대체 표시를 가진다) */
-  :focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-}
-
-/*
- * 스크롤 리빌 (ScrollReveal 컴포넌트 전용).
- * 숨김 스타일을 (scripting: enabled)로 게이트해 no-JS·크롤러 환경에서는
- * 콘텐츠가 항상 즉시 보인다 — 초기 HTML 인덱싱(SEO)에 영향 없음.
- * reduced-motion 사용자는 애니메이션 없이 바로 표시.
- */
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(16px);
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s ease;
-    transition-delay: var(--reveal-delay, 0ms);
-  }
-
-  .reveal.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

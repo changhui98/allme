@@ -1,0 +1,33 @@
+/*
+ * 공용 뱃지/필 블록.
+ * .pill — 카테고리 표시(중성 회색), .badge--verified — 인증 표시(에메랄드).
+ * 크기 차이가 나는 사용처는 자기 블록 엘리먼트로 덮어쓴다.
+ */
+.pill {
+  border-radius: calc(infinity * 1px);
+  background-color: var(--stone-100);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: var(--stone-600);
+}
+
+.dark .pill {
+  background-color: var(--stone-800);
+  color: var(--stone-300);
+}
+
+.badge--verified {
+  border-radius: calc(infinity * 1px);
+  background-color: var(--emerald-50);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: var(--emerald-700);
+}
+
+.dark .badge--verified {
+  background-color: var(--emerald-950);
+  color: var(--emerald-400);
+}

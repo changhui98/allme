@@ -1,0 +1,139 @@
+/*
+ * CSS 리셋 — 구 Tailwind Preflight를 대체하는 자체 리셋.
+ * 앱이 실제로 의존하던 Preflight 규칙만 같은 시맨틱으로 재현한다
+ * (box-sizing·margin/padding 0·border 0 solid·heading/list/link 무력화 등).
+ * normalize.css 같은 별도 reset 라이브러리를 추가로 도입하지 말 것.
+ */
+
+/*
+ * border: 0 solid 가 핵심 — 보더를 쓰는 쪽은 width(예: border-bottom-width: 1px)만
+ * 지정해도 스타일(solid)이 여기서 공급된다. 빠지면 모든 구분선이 사라진다.
+ */
+*,
+::before,
+::after,
+::backdrop {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+html {
+  /* 1.5가 앱 전반의 기준 행간 — 누락 시 전 페이지 행간이 무너진다 */
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  tab-size: 4;
+}
+
+/* 제목은 본문과 동일 크기/굵기에서 시작 — 크기는 각 블록이 정한다 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* 링크 기본 파란색/밑줄 제거 — 색·밑줄은 각 블록이 정한다 */
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* 목록 마커 제거 — 번호가 필요한 목록(법률 문서 등)은 블록에서 복원한다 */
+ol,
+ul,
+menu {
+  list-style: none;
+}
+
+/* 미디어·임베드는 블록 요소로 (인라인 베이스라인 여백 제거) */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+  vertical-align: middle;
+}
+
+table {
+  border-collapse: collapse;
+  border-color: inherit;
+  text-indent: 0;
+}
+
+/* 폼 컨트롤: 브라우저 기본 스타일 제거, 부모 폰트/색 상속 */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+}
+
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  appearance: button;
+}
+
+textarea {
+  resize: vertical;
+}
+
+::placeholder {
+  opacity: 1;
+}
+
+summary {
+  display: list-item;
+}
+
+:-moz-focusring {
+  outline: auto;
+}
+
+/* flex/grid 컨테이너 안에서도 hidden 속성이 항상 이기도록 */
+[hidden]:where(:not([hidden="until-found"])) {
+  display: none !important;
+}

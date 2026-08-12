@@ -1,0 +1,45 @@
+/*
+ * 범용 헬퍼 — 특정 블록에 속하지 않는 최소한의 공용 클래스.
+ * 유틸리티 클래스 남용 금지: 여기 추가하기 전에 블록 소속이 맞는지 먼저 의심할 것.
+ */
+
+/* 스크린 리더 전용 텍스트 (구 Tailwind sr-only와 동일 규칙) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 페이지 본문 공통 컨테이너 (구: mx-auto w-full max-w-6xl flex-1 px-4 py-8) */
+.page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  flex: 1;
+  padding: 2rem 1rem;
+}
+
+/* 카드 목록 공통 그리드 (구: mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3) */
+.card-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

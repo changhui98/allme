@@ -1,0 +1,29 @@
+/*
+ * 공용 카드 블록 — 보더 박스. 패딩·내부 배치는 사용처 블록(service-card 등)이 정한다.
+ */
+.card {
+  border-width: 1px;
+  border-color: var(--stone-200);
+  border-radius: 0.5rem;
+}
+
+.dark .card {
+  border-color: var(--stone-800);
+}
+
+/* 목록에서 통째로 클릭/호버되는 카드 */
+.card--interactive {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.card--interactive:hover {
+  border-color: var(--stone-300);
+  background-color: var(--stone-50);
+}
+
+.dark .card--interactive:hover {
+  border-color: var(--stone-700);
+  background-color: color-mix(in oklab, var(--stone-800) 60%, transparent);
+}
