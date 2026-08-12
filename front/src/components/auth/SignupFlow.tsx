@@ -1,16 +1,36 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import AuthHeading from "@/components/auth/AuthHeading";
 import ConsentStep from "@/components/auth/ConsentStep";
 import IdentityVerificationStep from "@/components/auth/IdentityVerificationStep";
 import SignupForm from "@/components/auth/SignupForm";
+import SignupStepper from "@/components/auth/SignupStepper";
 import {
   verifyIdentityOnServer,
   type VerifiedCustomer,
 } from "@/lib/identity-verification";
 
+export type SignupStep = "consent" | "verify" | "form";
+
 /** redirect 복귀로 state가 사라져도 동의(마케팅 선택) 여부를 복원하기 위한 키 */
 const CONSENT_STORAGE_KEY = "allme.signup.consent";
+
+/** 스텝별 제목/안내 — AuthShell 대신 스텝이 바뀔 때마다 여기서 갈아끼운다 */
+const STEP_META: Record<SignupStep, { title: string; description: string }> = {
+  consent: {
+    title: "약관 동의",
+    description: "올미 이용을 위해 약관을 확인하고 동의해주세요.",
+  },
+  verify: {
+    title: "본인인증",
+    description: "안전한 거래를 위해 본인인증이 필요해요.",
+  },
+  form: {
+    title: "정보 입력",
+    description: "마지막 단계예요. 로그인에 사용할 정보를 입력해주세요.",
+  },
+};
 
 type SignupFlowProps = {
   /** 모바일 redirect 복귀 시 쿼리로 전달된 본인인증 건 ID */
@@ -29,7 +49,7 @@ export default function SignupFlow({
   initialVerificationId,
   initialError,
 }: SignupFlowProps) {
-  const [step, setStep] = useState<"consent" | "verify" | "form">(
+  const [step, setStep] = useState<SignupStep>(
     // redirect 복귀(인증 ID 또는 인증 실패)면 동의는 끝난 상태
     initialVerificationId || initialError ? "verify" : "consent",
   );
@@ -92,19 +112,32 @@ export default function SignupFlow({
     }
   }, [initialVerificationId, runVerification]);
 
-  if (step === "consent") {
-    return <ConsentStep onAgreed={handleAgreed} />;
-  }
-
-  if (step === "form" && customer) {
-    return <SignupForm name={customer.name} marketingConsent={marketingConsent} />;
-  }
+  // form이지만 검증 결과가 아직 없으면 기존처럼 인증 화면을 유지한다
+  const visibleStep: SignupStep =
+    step === "form" && !customer ? "verify" : step;
 
   return (
-    <IdentityVerificationStep
-      onVerified={handleVerified}
-      externalError={error}
-      busy={checking}
-    />
+    <div>
+      <SignupStepper current={visibleStep} />
+      <div className="mt-8">
+        <AuthHeading {...STEP_META[visibleStep]} />
+      </div>
+      <div className="mt-8">
+        {visibleStep === "consent" ? (
+          <ConsentStep onAgreed={handleAgreed} />
+        ) : visibleStep === "form" && customer ? (
+          <SignupForm
+            name={customer.name}
+            marketingConsent={marketingConsent}
+          />
+        ) : (
+          <IdentityVerificationStep
+            onVerified={handleVerified}
+            externalError={error}
+            busy={checking}
+          />
+        )}
+      </div>
+    </div>
   );
 }
