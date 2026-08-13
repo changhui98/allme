@@ -1,61 +1,48 @@
 /*
- * 프로젝트 공통 base 스타일 — 리셋(reset.css) 위에 얹는 보강분.
- * (전환 기간에는 Tailwind Preflight가 리셋을 담당하므로, Preflight와 같은
- *  base 레이어에 합류하도록 @layer base로 감싼다. 유틸리티보다 항상 약한 우선순위 유지.)
+ * 프로젝트 공통 base 스타일 — 리셋(reset.css) 위에 얹는 요소 단위 보강분.
+ * 블록 클래스보다 특이도가 낮아 컴포넌트 스타일이 항상 이긴다.
  */
-@layer base {
-  html {
-    height: 100%;
-    -webkit-text-size-adjust: 100%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    /* 한국어 서비스용 한글 친화 시스템 폰트 스택. 웹폰트(Pretendard 등)는 추후 next/font로 연동 */
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
-      "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
-  }
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 한국어 서비스용 한글 친화 시스템 폰트 스택. 웹폰트(Pretendard 등)는 추후 next/font로 연동 */
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+}
 
-  /* 앱 프레임: 헤더-본문-푸터 세로 배치, 본문(flex:1)이 남은 높이를 채운다 */
-  body {
-    display: flex;
-    min-height: 100%;
-    flex-direction: column;
-    background: var(--background);
-    color: var(--foreground);
-  }
+/* 앱 프레임: 헤더-본문-푸터 세로 배치, 본문(flex:1)이 남은 높이를 채운다 */
+body {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--foreground);
+}
 
-  /* 미디어 요소 기본값 보정 */
-  img,
-  picture,
-  video,
-  canvas,
-  svg {
-    display: block;
-    max-width: 100%;
-  }
+/* 미디어 요소 기본값 보정 (display:block 등 기본은 reset.css가 담당) */
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
 
-  /* 폼 요소가 부모 폰트/색을 상속하도록 */
-  input,
-  button,
-  textarea,
-  select {
-    font: inherit;
-    color: inherit;
-  }
+/* 긴 단어/URL 줄바꿈 보정 */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
 
-  /* 긴 단어/URL 줄바꿈 보정 */
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    overflow-wrap: break-word;
-  }
-
-  /* 키보드 포커스 공통 링 (outline 제거한 요소는 각자 대체 표시를 가진다) */
-  :focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
+/* 키보드 포커스 공통 링 (outline 제거한 요소는 각자 대체 표시를 가진다) */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

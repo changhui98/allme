@@ -1,5 +1,4 @@
 # Next 16 요구사항: Node >= 20.9
-# Tailwind v4 네이티브 바이너리(lightningcss/oxide)의 musl 호환 리스크를 피해 slim(glibc) 사용
 FROM node:22-slim AS base
 WORKDIR /app
 

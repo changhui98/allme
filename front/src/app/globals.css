@@ -1,13 +1,17 @@
 /*
  * 전역 스타일 매니페스트 — 모든 CSS 파일은 여기서만 import한다 (root layout 1곳 로드).
  * 실제 정의는 src/styles/ 하위 파일에 있고, 이 파일은 순서만 책임진다.
- * 순서: (전환 기간: Tailwind) → 토큰 → base → 공용 블록 → 페이지 → 유틸.
  *
- * [전환 기간 주의] Tailwind 제거 작업이 진행 중이다. 아직 전환 안 된 컴포넌트가
- * Tailwind 유틸리티를 쓰므로 @import "tailwindcss"와 아래 @custom-variant/@theme는
- * 마지막 커밋(자체 reset 도입)에서 함께 제거한다. reset은 그때 Preflight와 스왑.
+ * [순서가 곧 우선순위다 — 함부로 바꾸지 말 것]
+ * reset(리셋) → tokens(변수) → base(요소 보강) → utilities(공용 헬퍼)
+ * → components(공용 블록) → pages(페이지 블록)
+ * 동일 특이도 충돌은 나중 선언이 이기므로, 페이지 블록이 공용 블록/헬퍼를
+ * 덮어쓰는 구조(.page-container ← .provider-page 등)가 이 순서에 의존한다.
+ *
+ * 다크모드는 next-themes(attribute="class")가 <html>에 토글하는 .dark 클래스 기반 —
+ * 각 파일이 `.dark .블록 { }` 셀렉터와 tokens.css의 변수 재정의로 대응한다.
  */
-@import "tailwindcss";
+@import "../styles/reset.css";
 @import "../styles/tokens.css";
 @import "../styles/base.css";
 @import "../styles/utilities.css";
@@ -25,22 +29,3 @@
 @import "../styles/pages/auth.css";
 @import "../styles/pages/legal.css";
 @import "../styles/pages/not-found.css";
-
-/*
- * 다크모드는 OS 설정 자동추종(미디어쿼리)이 아니라 .dark 클래스 기반으로 동작한다.
- * next-themes(attribute="class")가 <html>에 .dark 를 붙였다 떼며 토글한다.
- */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* Tailwind 유틸리티(bg-primary 등)가 토큰을 참조하기 위한 브리지 — 전환 완료 시 삭제 */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-surface: var(--surface);
-  --color-danger: var(--danger);
-}
