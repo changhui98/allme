@@ -92,11 +92,56 @@
 }
 
 .brand-panel__logo {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: #ffffff;
+  display: block;
+  width: fit-content;
+}
+
+.brand-panel__logo-img {
+  height: 2rem; /* SVG 원본 310×80 → 124×32 */
+  width: auto;
+}
+
+/* 중앙 앰비언트 심볼 + 점 3개 — 콘텐츠(z-index:10)보다 뒤에 깔리는 톤온톤 장식 */
+.brand-panel__art {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  width: min(60%, 26rem);
+}
+
+.brand-panel__art-symbol {
+  width: 100%;
+  height: auto;
+  opacity: 0.15;
+}
+
+.brand-panel__art-dots {
+  position: absolute;
+  left: 4%;
+  bottom: -3rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.brand-panel__dot {
+  border-radius: calc(infinity * 1px);
+  background-color: color-mix(in oklab, var(--bp-white) 30%, transparent);
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.brand-panel__dot:nth-child(2) {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: color-mix(in oklab, var(--bp-white) 45%, transparent);
+}
+
+.brand-panel__dot:nth-child(3) {
+  width: 1.125rem;
+  height: 1.125rem;
+  background-color: color-mix(in oklab, var(--bp-white) 60%, transparent);
 }
 
 .brand-panel__copy {

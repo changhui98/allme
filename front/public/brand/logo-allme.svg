@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="310" height="80" viewBox="0 0 310 80">
+  <circle cx="32" cy="40" r="30" fill="rgba(255,255,255,0.92)"/>
+  <rect x="54" y="12" width="56" height="56" rx="11" fill="#FFFFFF"/>
+  <circle cx="82" cy="40" r="11" fill="#B86042"/>
+  <text x="138" y="61" font-family="'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-weight="700" font-size="58" letter-spacing="-2" fill="#FFFFFF">allme</text>
+</svg>
