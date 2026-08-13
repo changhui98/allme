@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 /**
  * 해드려요 — 업체가 등록한 서비스 목록.
  * 카테고리 필터(?category=)와 검색어(?q=)를 쿼리로 표현하고 서버에서 필터링해 SSR한다.
+ * 스타일: styles/pages/board.css
  */
 export default async function ServicesPage({
   searchParams,
@@ -31,23 +32,23 @@ export default async function ServicesPage({
   const posts = getServicePosts(active, query);
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <h1 className="text-2xl font-bold tracking-tight">해드려요</h1>
-      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+    <main className="page-container board-page">
+      <h1 className="board-page__title">해드려요</h1>
+      <p className="board-page__subtitle">
         업체들이 등록한 서비스를 둘러보고 마음에 드는 곳에 예약을 요청하세요.
       </p>
 
-      <div className="mt-6">
+      <div className="board-page__section">
         <AdBannerCarousel banners={getAdBanners()} />
       </div>
 
-      <div className="mt-6">
+      <div className="board-page__section">
         <CategoryTabs basePath="/services" active={active} />
       </div>
 
       {query && (
-        <p className="mt-6 text-sm text-stone-500 dark:text-stone-400">
-          <span className="font-semibold text-stone-700 dark:text-stone-200">
+        <p className="board-page__result-line">
+          <span className="board-page__result-query">
             &lsquo;{query}&rsquo;
           </span>{" "}
           검색 결과 {posts.length}건
@@ -55,13 +56,13 @@ export default async function ServicesPage({
       )}
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-stone-500 dark:text-stone-400">
+        <p className="board-page__empty">
           {query
             ? "검색 결과가 없어요. 다른 검색어로 시도해 보세요."
             : "이 카테고리에 등록된 서비스가 아직 없어요."}
         </p>
       ) : (
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="card-grid">
           {posts.map((post) => (
             <li key={post.id}>
               <ServiceCard post={post} />

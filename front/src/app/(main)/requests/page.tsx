@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 /**
  * 해주세요 — 사용자가 올린 요청 글 목록. 업체가 둘러보고 제안한다.
  * 카테고리 필터는 ?category= 쿼리로 표현하고 서버에서 필터링해 SSR한다.
+ * 스타일: styles/pages/board.css
  */
 export default async function RequestsPage({
   searchParams,
@@ -28,22 +29,22 @@ export default async function RequestsPage({
   const posts = getRequestPosts(active);
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <h1 className="text-2xl font-bold tracking-tight">해주세요</h1>
-      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+    <main className="page-container board-page">
+      <h1 className="board-page__title">해주세요</h1>
+      <p className="board-page__subtitle">
         필요한 일을 올려두면 업체들이 확인하고 제안을 보내드려요.
       </p>
 
-      <div className="mt-6">
+      <div className="board-page__section">
         <CategoryTabs basePath="/requests" active={active} />
       </div>
 
       {posts.length === 0 ? (
-        <p className="mt-16 text-center text-stone-500 dark:text-stone-400">
+        <p className="board-page__empty">
           이 카테고리에 올라온 요청이 아직 없어요.
         </p>
       ) : (
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="card-grid">
           {posts.map((post) => (
             <li key={post.id}>
               <RequestCard post={post} />

@@ -10,6 +10,7 @@ const ROTATE_INTERVAL_MS = 4000;
  * 해드려요 페이지 상단의 광고 배너 캐러셀.
  * 4초 간격 자동 롤링, hover·키보드 포커스 시 일시정지.
  * 데이터는 서버 페이지에서 내려주고 이 컴포넌트는 표시만 담당한다.
+ * 스타일: styles/pages/board.css
  */
 export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
   const [index, setIndex] = useState(0);
@@ -33,7 +34,7 @@ export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="광고 배너"
-      className="relative"
+      className="ad-carousel"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -46,20 +47,14 @@ export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
        */}
       <Link
         href={banner.href}
-        className={`flex aspect-[2/1] flex-col justify-center rounded-lg px-14 text-white sm:aspect-[4/1] sm:px-16 ${banner.themeClass}`}
+        className={`ad-carousel__banner ${banner.themeClass}`}
       >
-        <span className="flex items-center gap-2 text-xs text-white/70">
-          <span className="rounded border border-white/40 px-1 font-semibold leading-4">
-            AD
-          </span>
+        <span className="ad-carousel__ad-row">
+          <span className="ad-carousel__ad-chip">AD</span>
           {banner.advertiserName}
         </span>
-        <strong className="mt-1.5 text-xl leading-snug sm:text-2xl">
-          {banner.headline}
-        </strong>
-        <span className="mt-1 text-sm text-white/80 sm:text-base">
-          {banner.subcopy}
-        </span>
+        <strong className="ad-carousel__headline">{banner.headline}</strong>
+        <span className="ad-carousel__subcopy">{banner.subcopy}</span>
       </Link>
 
       {banners.length > 1 && (
@@ -70,7 +65,7 @@ export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
             onClick={() =>
               setIndex((i) => (i - 1 + banners.length) % banners.length)
             }
-            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-white/70 hover:bg-white/15 hover:text-white"
+            className="ad-carousel__arrow ad-carousel__arrow--prev"
           >
             <ArrowIcon direction="left" />
           </button>
@@ -78,12 +73,12 @@ export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
             type="button"
             aria-label="다음 광고"
             onClick={() => setIndex((i) => (i + 1) % banners.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-white/70 hover:bg-white/15 hover:text-white"
+            className="ad-carousel__arrow ad-carousel__arrow--next"
           >
             <ArrowIcon direction="right" />
           </button>
 
-          <div className="absolute bottom-3 right-4 flex items-center gap-1.5">
+          <div className="ad-carousel__dots">
             {banners.map((b, i) => (
               <button
                 key={b.id}
@@ -91,8 +86,8 @@ export default function AdBannerCarousel({ banners }: { banners: AdBanner[] }) {
                 aria-label={`${i + 1}번째 광고 보기`}
                 aria-current={i === index}
                 onClick={() => setIndex(i)}
-                className={`h-2 w-2 rounded-full transition-colors ${
-                  i === index ? "bg-white" : "bg-white/40 hover:bg-white/60"
+                className={`ad-carousel__dot${
+                  i === index ? " ad-carousel__dot--active" : ""
                 }`}
               />
             ))}
