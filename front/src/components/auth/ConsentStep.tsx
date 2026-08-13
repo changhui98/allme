@@ -39,6 +39,7 @@ const CONSENT_ITEMS: ConsentItem[] = [
  * 회원가입 스텝 1: 약관 동의.
  * 필수 항목(만 14세·이용약관·개인정보)을 모두 체크해야 다음 스텝(본인인증)으로
  * 넘어갈 수 있고, 마케팅 수신(선택) 여부는 onAgreed로 전달한다.
+ * 스타일: styles/pages/auth.css
  */
 export default function ConsentStep({
   onAgreed,
@@ -67,40 +68,38 @@ export default function ConsentStep({
   }
 
   return (
-    <div className="flex flex-col">
-      <label className="flex items-center gap-2 border-b border-border pb-4 font-semibold">
+    <div className="consent-step">
+      <label className="consent-step__all">
         <input
           type="checkbox"
           checked={allChecked}
           onChange={toggleAll}
-          className="accent-primary"
+          className="consent-step__checkbox"
         />
         전체 동의
       </label>
 
-      <ul className="mt-4 flex flex-col gap-3">
+      <ul className="consent-step__items">
         {CONSENT_ITEMS.map((item) => (
           <li key={item.key}>
-            <label className="flex items-start gap-2 text-sm text-muted">
+            <label className="consent-step__item-label">
               <input
                 type="checkbox"
                 checked={checked[item.key]}
                 onChange={() => toggle(item.key)}
-                className="mt-0.5 accent-primary"
+                className="consent-step__checkbox consent-step__checkbox--item"
               />
               <span>
                 <span
-                  className={
-                    item.required
-                      ? "font-medium text-primary"
-                      : "text-muted/70"
-                  }
+                  className={`consent-step__tag consent-step__tag--${
+                    item.required ? "required" : "optional"
+                  }`}
                 >
                   [{item.required ? "필수" : "선택"}]
                 </span>{" "}
                 {item.label}
                 {item.description && (
-                  <span className="mt-0.5 block text-xs text-muted/70">
+                  <span className="consent-step__desc">
                     {item.description}
                   </span>
                 )}
@@ -108,11 +107,9 @@ export default function ConsentStep({
             </label>
 
             {item.doc && (
-              <details className="mt-1 pl-6">
-                <summary className="cursor-pointer text-xs text-muted underline hover:text-foreground">
-                  전문 보기
-                </summary>
-                <div className="mt-2 max-h-64 overflow-y-auto rounded-lg border border-border p-4">
+              <details className="consent-step__details">
+                <summary className="consent-step__summary">전문 보기</summary>
+                <div className="consent-step__doc">
                   <LegalDocBody doc={item.doc} compact />
                 </div>
               </details>
@@ -125,7 +122,7 @@ export default function ConsentStep({
         type="button"
         onClick={() => onAgreed({ marketing: checked.marketing })}
         disabled={!requiredChecked}
-        className={`mt-8 ${PRIMARY_CTA}`}
+        className={`consent-step__submit ${PRIMARY_CTA}`}
       >
         동의하고 계속하기
       </button>

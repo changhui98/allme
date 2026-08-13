@@ -21,6 +21,7 @@ type IdentityVerificationStepProps = {
  * 회원가입 스텝 1: 본인인증.
  * 버튼 클릭 시 포트원 통합인증 창(카카오톡·네이버·PASS 등)을 연다.
  * 모바일은 redirect 방식이라 인증 후 /signup 쿼리 파라미터로 복귀한다.
+ * 스타일: styles/pages/auth.css
  */
 export default function IdentityVerificationStep({
   onVerified,
@@ -48,8 +49,8 @@ export default function IdentityVerificationStep({
   }
 
   return (
-    <div className="flex flex-col">
-      <ul className="flex flex-col gap-2 text-sm text-muted">
+    <div className="identity-step">
+      <ul className="identity-step__list">
         <li>· 안전한 거래를 위해 가입 전 본인인증이 필요해요.</li>
         <li>· 본인 명의의 인증서(네이버·PASS·토스 등)로 인증할 수 있어요.</li>
         <li>· 인증한 이름은 가입 정보에 그대로 사용돼요.</li>
@@ -60,15 +61,15 @@ export default function IdentityVerificationStep({
           type="button"
           onClick={handleClick}
           disabled={opening || busy}
-          className={`mt-6 ${PRIMARY_CTA}`}
+          className={`identity-step__submit ${PRIMARY_CTA}`}
         >
           {opening || busy ? "인증 확인 중..." : "휴대폰 본인인증"}
         </button>
       ) : (
-        <p className="mt-6 rounded-lg border border-border bg-surface p-4 text-center text-sm text-muted">
+        <p className="identity-step__notice">
           본인인증 준비 중입니다. 잠시 후 다시 이용해주세요.
           {process.env.NODE_ENV === "development" && (
-            <span className="mt-1 block text-xs text-muted/70">
+            <span className="identity-step__notice-dev">
               (개발용 안내: front/.env.local에 NEXT_PUBLIC_PORTONE_STORE_ID,
               NEXT_PUBLIC_PORTONE_CHANNEL_KEY를 설정하세요)
             </span>
@@ -77,7 +78,7 @@ export default function IdentityVerificationStep({
       )}
 
       {error && (
-        <p role="alert" className="mt-3 text-center text-sm text-danger">
+        <p role="alert" className="identity-step__error">
           {error}
         </p>
       )}

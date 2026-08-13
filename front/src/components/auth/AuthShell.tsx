@@ -8,6 +8,7 @@ import AuthHeading from "@/components/auth/AuthHeading";
  * 로고는 모바일 전용 — 데스크톱은 좌측 BrandPanel 로고가 대신한다.
  * title/description을 생략하면 제목 영역 없이 본문만 렌더한다
  * (회원가입은 SignupFlow가 스텝별 제목을 직접 그린다).
+ * 스타일: styles/pages/auth.css
  */
 type AuthShellProps = {
   title?: string;
@@ -25,24 +26,20 @@ export default function AuthShell({
   footer,
 }: AuthShellProps) {
   return (
-    <main className="w-full max-w-sm sm:max-w-md">
-      <Link
-        href="/"
-        className="block text-center text-3xl font-bold tracking-tight text-primary lg:hidden"
-        aria-label="올미 홈"
-      >
+    <main className="auth-shell">
+      <Link href="/" className="auth-shell__logo" aria-label="올미 홈">
         올미
       </Link>
 
       {title && description && (
-        <div className="mt-6 lg:mt-0">
+        <div className="auth-shell__heading">
           <AuthHeading title={title} description={description} />
         </div>
       )}
 
-      <div className="mt-10">{children}</div>
+      <div className="auth-shell__body">{children}</div>
 
-      <div className="mt-8 text-center text-sm text-muted">{footer}</div>
+      <div className="auth-shell__footer">{footer}</div>
     </main>
   );
 }

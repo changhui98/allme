@@ -44,6 +44,7 @@ type SignupFlowProps = {
  * 인증 결과는 컴포넌트 state로만 관리 — redirect로 state가 날아가도
  * 쿼리의 identityVerificationId만 있으면 서버 검증으로 복원된다.
  * (redirect 복귀는 동의를 이미 거친 상태이므로 동의 스텝을 건너뛴다.)
+ * 스타일: styles/pages/auth.css
  */
 export default function SignupFlow({
   initialVerificationId,
@@ -117,12 +118,12 @@ export default function SignupFlow({
     step === "form" && !customer ? "verify" : step;
 
   return (
-    <div>
+    <div className="signup-flow">
       <SignupStepper current={visibleStep} />
-      <div className="mt-8">
+      <div className="signup-flow__heading">
         <AuthHeading {...STEP_META[visibleStep]} />
       </div>
-      <div className="mt-8">
+      <div className="signup-flow__body">
         {visibleStep === "consent" ? (
           <ConsentStep onAgreed={handleAgreed} />
         ) : visibleStep === "form" && customer ? (

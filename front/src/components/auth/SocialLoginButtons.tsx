@@ -5,6 +5,7 @@
  * - Google: 4색 G 로고 + 「Google로 로그인/계속하기」
  * - Apple: Apple 로고(currentColor로 테마 반전) + 「Apple로 로그인/가입하기」
  * 아직 UI 레이아웃 단계라 클릭 동작은 없다 — OAuth 연동 시 핸들러를 붙인다.
+ * 스타일: styles/pages/auth.css
  */
 type SocialLoginButtonsProps = {
   /** 페이지 성격에 따라 브랜드 가이드가 허용하는 문구로 분기한다 */
@@ -24,41 +25,35 @@ const LABELS = {
   },
 } as const;
 
-const BUTTON_BASE =
-  "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors";
-
 export default function SocialLoginButtons({ variant }: SocialLoginButtonsProps) {
   const labels = LABELS[variant];
 
   return (
-    <div className="mt-6">
-      <div
-        aria-hidden="true"
-        className="flex items-center gap-3 text-xs text-muted"
-      >
-        <span className="h-px flex-1 bg-border" />
+    <div className="social-login">
+      <div aria-hidden="true" className="social-login__divider">
+        <span className="social-login__divider-line" />
         또는
-        <span className="h-px flex-1 bg-border" />
+        <span className="social-login__divider-line" />
       </div>
 
-      <div className="mt-6 flex flex-col gap-2">
+      <div className="social-login__buttons">
         <button
           type="button"
-          className={`${BUTTON_BASE} bg-[#FEE500] text-black/85 hover:bg-[#f2da00]`}
+          className="social-login__btn social-login__btn--kakao"
         >
           <KakaoIcon />
           {labels.kakao}
         </button>
         <button
           type="button"
-          className={`${BUTTON_BASE} border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700`}
+          className="social-login__btn social-login__btn--google"
         >
           <GoogleIcon />
           {labels.google}
         </button>
         <button
           type="button"
-          className={`${BUTTON_BASE} bg-black text-white hover:bg-stone-900 dark:bg-white dark:text-black dark:hover:bg-stone-100`}
+          className="social-login__btn social-login__btn--apple"
         >
           <AppleIcon />
           {labels.apple}
@@ -73,7 +68,7 @@ function KakaoIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-4 w-4 shrink-0"
+      className="social-login__icon"
       aria-hidden="true"
     >
       <path
@@ -89,7 +84,7 @@ function GoogleIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-4 w-4 shrink-0"
+      className="social-login__icon"
       aria-hidden="true"
     >
       <path
@@ -117,7 +112,7 @@ function AppleIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-4 w-4 shrink-0"
+      className="social-login__icon"
       aria-hidden="true"
     >
       <path

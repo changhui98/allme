@@ -1,0 +1,675 @@
+/*
+ * 인증(로그인·회원가입) 영역 블록 — auth-layout(스플릿 스크린 골격) · brand-panel(좌측 브랜드 패널) ·
+ * auth-shell(폼 컬럼 셸) · auth-heading(제목) · form-field(플로팅 라벨 인풋) · social-login(소셜 버튼) ·
+ * signup-flow/signup-form/signup-stepper/consent-step/identity-step(회원가입 스텝) ·
+ * login-page/signup-page(페이지 고유 요소). CTA는 공용 .btn 블록을 조합한다.
+ */
+
+/* ---------- auth-layout: 헤더/푸터 없는 몰입형 스플릿 스크린 골격 ---------- */
+
+.auth-layout {
+  display: flex;
+  min-height: 100dvh;
+  flex: 1;
+}
+
+/* 우측 폼 영역 — 폼 컬럼(auth-shell)의 세로/가로 중앙 정렬 담당 */
+.auth-layout__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+/* ---------- brand-panel: 좌측 브랜드 패널 (lg 이상에서만 표시) ---------- */
+
+.brand-panel {
+  /* 테라코타 그라데이션·반투명 흰색은 반드시 var를 거친다 — 리터럴을 쓰면 빌드 시
+     lab()으로 사전 계산되어, 브라우저 런타임 계산(구 Tailwind 산출물)과 1~2/255 수준의
+     렌더링 차이가 생긴다. (board.css의 .ad-carousel과 같은 이슈) */
+  --bp-from: #c2613d;
+  --bp-to: #a84f30;
+  --bp-white: #ffffff;
+  position: relative;
+  display: none;
+  overflow: hidden;
+  background-image: linear-gradient(
+    to bottom right in oklab,
+    var(--bp-from),
+    var(--bp-to)
+  );
+}
+
+/* 다크 모드에서도 테라코타 패널을 유지하되 반 톤 낮춰 눈부심을 줄인다 */
+.dark .brand-panel {
+  --bp-from: #9a4a2c;
+  --bp-to: #7e3a21;
+}
+
+/* 장식: 블러 원 2개 */
+.brand-panel__glow {
+  position: absolute;
+  border-radius: calc(infinity * 1px);
+  background-color: color-mix(in oklab, var(--bp-white) 10%, transparent);
+  filter: blur(64px);
+}
+
+.brand-panel__glow--top {
+  top: -6rem;
+  right: -6rem;
+  width: 24rem;
+  height: 24rem;
+}
+
+.brand-panel__glow--bottom {
+  bottom: 8rem;
+  left: -4rem;
+  width: 16rem;
+  height: 16rem;
+}
+
+/* 장식: 동심원 스트로크 (stroke=currentColor라 color로 제어) */
+.brand-panel__rings {
+  position: absolute;
+  right: -6rem;
+  bottom: -6rem;
+  width: 24rem;
+  height: 24rem;
+  color: color-mix(in oklab, var(--bp-white) 10%, transparent);
+}
+
+/* 패널 위 텍스트는 white 계열 고정 — var(--primary-foreground)는
+   다크에서 니어블랙으로 뒤집혀 배경에 묻힌다 */
+.brand-panel__content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+}
+
+.brand-panel__logo {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+.brand-panel__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand-panel__slogan {
+  font-size: 1.875rem;
+  line-height: 1.375;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.brand-panel__subcopy {
+  max-width: 28rem;
+  font-size: 15px;
+  line-height: 1.625;
+  color: color-mix(in oklab, var(--bp-white) 80%, transparent);
+}
+
+/* 신뢰 포인트 한 줄 */
+.brand-panel__trust {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: color-mix(in oklab, var(--bp-white) 60%, transparent);
+}
+
+@media (min-width: 64rem) {
+  .brand-panel {
+    display: flex;
+    width: 50%;
+  }
+}
+
+@media (min-width: 80rem) {
+  .brand-panel__slogan {
+    font-size: 2.25rem;
+  }
+}
+
+/* ---------- auth-shell: 로그인·회원가입 공용 폼 컬럼 셸 ---------- */
+
+.auth-shell {
+  width: 100%;
+  max-width: 24rem;
+}
+
+/* 로고는 모바일 전용 — 데스크톱은 brand-panel 로고가 대신한다 */
+.auth-shell__logo {
+  display: block;
+  text-align: center;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--primary);
+}
+
+.auth-shell__heading {
+  margin-top: 1.5rem;
+}
+
+.auth-shell__body {
+  margin-top: 2.5rem;
+}
+
+/* 최하단 보조 링크 영역 */
+.auth-shell__footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+@media (min-width: 40rem) {
+  .auth-shell {
+    max-width: 28rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .auth-shell__logo {
+    display: none;
+  }
+
+  .auth-shell__heading {
+    margin-top: 0;
+  }
+}
+
+/* ---------- auth-heading: 인증 페이지 제목 + 안내 문구 ---------- */
+
+.auth-heading {
+  text-align: center;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.auth-heading__desc {
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+/* ---------- form-field: 밑줄형 플로팅 라벨 인풋 ---------- */
+
+.form-field {
+  position: relative;
+  padding-top: 1.25rem;
+}
+
+.form-field__input {
+  width: 100%;
+  border-bottom-width: 1px;
+  border-color: var(--border);
+  background-color: transparent;
+  padding-block: 0.5rem;
+  font-size: 15px;
+  outline: none;
+}
+
+/* 본인인증 프리필처럼 수정 불가로 보여줄 때 */
+.form-field__input:read-only {
+  color: var(--muted);
+}
+
+.form-field__label {
+  pointer-events: none;
+  position: absolute;
+  top: 27px;
+  left: 0;
+  font-size: 15px;
+  color: var(--muted);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* 라벨 부상 판정 = :focus 또는 값 있음(:not(:placeholder-shown) — placeholder는 공백 한 칸) */
+.form-field__input:focus ~ .form-field__label,
+.form-field__input:not(:placeholder-shown) ~ .form-field__label {
+  top: 0;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.form-field__input:focus ~ .form-field__label {
+  color: var(--primary);
+}
+
+/* 포인트 밑줄(2px) — 기본 보더(1px) 위에 겹치는 절대 배치라 레이아웃 밀림이 없고,
+   포커스 시 중앙에서 좌우로 퍼진다 */
+.form-field__underline {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 0.125rem;
+  transform-origin: 50%;
+  scale: 0 1;
+  background-color: var(--primary);
+  transition-property: transform, translate, scale, rotate;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.form-field__input:focus ~ .form-field__underline {
+  scale: 1 1;
+}
+
+/* ---------- social-login: "또는" 구분선 + 소셜 로그인 버튼 3종 ---------- */
+
+.social-login {
+  /* 카카오 버튼의 반투명 검정 텍스트용 — 리터럴 color-mix 사전 계산 차단 (위 brand-panel 주석 참고) */
+  --sl-black: #000000;
+  margin-top: 1.5rem;
+}
+
+.social-login__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--muted);
+}
+
+.social-login__divider-line {
+  height: 1px;
+  flex: 1;
+  background-color: var(--border);
+}
+
+.social-login__buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.social-login__btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* 카카오 — 브랜드 가이드에 따라 #FEE500 배경은 다크 모드에서도 유지 */
+.social-login__btn--kakao {
+  background-color: #fee500;
+  color: color-mix(in oklab, var(--sl-black) 85%, transparent);
+}
+
+.social-login__btn--kakao:hover {
+  background-color: #f2da00;
+}
+
+.social-login__btn--google {
+  border-width: 1px;
+  border-color: var(--stone-300);
+  background-color: #ffffff;
+  color: var(--stone-700);
+}
+
+.social-login__btn--google:hover {
+  background-color: var(--stone-50);
+}
+
+.dark .social-login__btn--google {
+  border-color: var(--stone-600);
+  background-color: var(--stone-800);
+  color: var(--stone-200);
+}
+
+.dark .social-login__btn--google:hover {
+  background-color: var(--stone-700);
+}
+
+/* 애플 — 로고가 currentColor라 버튼 텍스트 색을 따라 테마 반전된다 */
+.social-login__btn--apple {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.social-login__btn--apple:hover {
+  background-color: var(--stone-900);
+}
+
+.dark .social-login__btn--apple {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.dark .social-login__btn--apple:hover {
+  background-color: var(--stone-100);
+}
+
+.social-login__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* ---------- signup-flow: 회원가입 스텝 플로우 골격 (스테퍼 아래 제목·본문 간격) ---------- */
+
+.signup-flow__heading,
+.signup-flow__body {
+  margin-top: 2rem;
+}
+
+/* ---------- signup-form: 정보 입력 폼 (스텝 3) ---------- */
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* CTA 자체는 공용 .btn .btn--primary .btn--block — 여기는 배치 여백만 */
+.signup-form__submit {
+  margin-top: 1.5rem;
+}
+
+/* ---------- signup-stepper: ①약관동의 ─ ②본인인증 ─ ③정보입력 진행 스테퍼 ---------- */
+
+.signup-stepper {
+  display: flex;
+  align-items: center;
+}
+
+.signup-stepper__step {
+  display: flex;
+  align-items: center;
+}
+
+/* 마지막 스텝만 연결선이 없어 늘어나지 않는다 */
+.signup-stepper__step:not(:last-child) {
+  flex: 1;
+}
+
+.signup-stepper__dot {
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.signup-stepper__dot--done {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* 숫자 굵기는 기본(600) 유지 — 구 마크업의 font-bold는 Tailwind 산출 순서상
+   font-semibold에 밀려 실효가 없었다(픽셀 등가 유지를 위해 700로 올리지 않음) */
+.signup-stepper__dot--current {
+  border-width: 2px;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.signup-stepper__dot--todo {
+  border-width: 1px;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.signup-stepper__check {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.signup-stepper__label {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.signup-stepper__label--done {
+  color: var(--foreground);
+}
+
+.signup-stepper__label--current {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.signup-stepper__label--todo {
+  color: var(--muted);
+}
+
+/* 스텝 사이 연결선 — 지나온 구간만 포인트색 */
+.signup-stepper__line {
+  margin-inline: 0.75rem;
+  height: 1px;
+  flex: 1;
+  background-color: var(--border);
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.signup-stepper__line--done {
+  background-color: var(--primary);
+}
+
+/* ---------- consent-step: 약관 동의 (스텝 1) ---------- */
+
+.consent-step {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 전체 동의 — 아래 개별 항목과 구분선 */
+.consent-step__all {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom-width: 1px;
+  border-color: var(--border);
+  padding-bottom: 1rem;
+  font-weight: 600;
+}
+
+.consent-step__checkbox {
+  accent-color: var(--primary);
+}
+
+/* 개별 항목 체크박스 — 첫 줄 텍스트와 수직 정렬 보정 */
+.consent-step__checkbox--item {
+  margin-top: 0.125rem;
+}
+
+.consent-step__items {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.consent-step__item-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+/* [필수]/[선택] 태그 */
+.consent-step__tag--required {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.consent-step__tag--optional {
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.consent-step__desc {
+  margin-top: 0.125rem;
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+/* 전문 펼쳐보기 (details/summary) */
+.consent-step__details {
+  margin-top: 0.25rem;
+  padding-left: 1.5rem;
+}
+
+.consent-step__summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--muted);
+  text-decoration-line: underline;
+}
+
+.consent-step__summary:hover {
+  color: var(--foreground);
+}
+
+/* 전문 스크롤 박스 — 본문은 legal-doc__body--compact가 그린다 */
+.consent-step__doc {
+  margin-top: 0.5rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--border);
+  padding: 1rem;
+}
+
+/* CTA 자체는 공용 .btn — 여기는 배치 여백만 */
+.consent-step__submit {
+  margin-top: 2rem;
+}
+
+/* ---------- identity-step: 본인인증 (스텝 2) ---------- */
+
+.identity-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.identity-step__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+/* CTA 자체는 공용 .btn — 여기는 배치 여백만 */
+.identity-step__submit {
+  margin-top: 1.5rem;
+}
+
+/* env 미설정 시 "준비 중" 안내 박스 */
+.identity-step__notice {
+  margin-top: 1.5rem;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--border);
+  background-color: var(--surface);
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+.identity-step__notice-dev {
+  margin-top: 0.25rem;
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.identity-step__error {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+
+/* ---------- login-page: 로그인 페이지 고유 요소 ---------- */
+
+.login-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* CTA 자체는 공용 .btn — 여기는 배치 여백만 */
+.login-page__submit {
+  margin-top: 2rem;
+}
+
+/* 하단 보조 링크(비밀번호 찾기 · 회원가입) — 사이 세로 구분선 */
+.login-page__links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.login-page__link:hover {
+  color: var(--foreground);
+}
+
+.login-page__divider {
+  height: 0.75rem;
+  width: 1px;
+  background-color: var(--border);
+}
+
+/* ---------- signup-page: 회원가입 페이지 고유 요소 ---------- */
+
+.signup-page__login-link {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.signup-page__login-link:hover {
+  text-decoration-line: underline;
+}

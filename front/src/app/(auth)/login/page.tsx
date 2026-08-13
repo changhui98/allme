@@ -15,6 +15,7 @@ export const metadata: Metadata = {
  * 로그인 페이지. (서버 컴포넌트)
  * 아직 UI 레이아웃 단계 — 아이디 로그인 제출과 소셜 OAuth 연동은
  * 백엔드 user 도메인 구현 후 붙인다. /forgot-password는 계획된 경로 플레이스홀더.
+ * 스타일: styles/pages/auth.css
  */
 export default function LoginPage() {
   return (
@@ -22,21 +23,18 @@ export default function LoginPage() {
       title="로그인"
       description="올미에 오신 것을 환영해요."
       footer={
-        <nav
-          aria-label="계정 보조 링크"
-          className="flex items-center justify-center gap-3"
-        >
-          <Link href="/forgot-password" className="hover:text-foreground">
+        <nav aria-label="계정 보조 링크" className="login-page__links">
+          <Link href="/forgot-password" className="login-page__link">
             비밀번호 찾기
           </Link>
-          <span aria-hidden="true" className="h-3 w-px bg-border" />
-          <Link href="/signup" className="hover:text-foreground">
+          <span aria-hidden="true" className="login-page__divider" />
+          <Link href="/signup" className="login-page__link">
             회원가입
           </Link>
         </nav>
       }
     >
-      <form className="flex flex-col gap-2">
+      <form className="login-page__form">
         <FormField
           id="login-id"
           label="아이디"
@@ -49,7 +47,7 @@ export default function LoginPage() {
           type="password"
           autoComplete="current-password"
         />
-        <button type="submit" className={`mt-8 ${PRIMARY_CTA}`}>
+        <button type="submit" className={`login-page__submit ${PRIMARY_CTA}`}>
           로그인
         </button>
       </form>

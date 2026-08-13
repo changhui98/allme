@@ -6,6 +6,7 @@ import { PRIMARY_CTA } from "@/lib/button-styles";
  * 이름은 본인인증 결과로 프리필하고 수정 불가 — 인증된 실명을 그대로 쓴다.
  * 약관 동의는 스텝 1에서 이미 받았고, 마케팅 수신 여부만 hidden으로 실어 보낸다.
  * 가입 제출은 백엔드 user 도메인 구현 후 붙인다.
+ * 스타일: styles/pages/auth.css
  */
 export default function SignupForm({
   name,
@@ -15,7 +16,7 @@ export default function SignupForm({
   marketingConsent: boolean;
 }) {
   return (
-    <form className="flex flex-col gap-2">
+    <form className="signup-form">
       <input
         type="hidden"
         name="marketing-consent"
@@ -48,7 +49,7 @@ export default function SignupForm({
         autoComplete="new-password"
       />
 
-      <button type="submit" className={`mt-6 ${PRIMARY_CTA}`}>
+      <button type="submit" className={`signup-form__submit ${PRIMARY_CTA}`}>
         가입하기
       </button>
     </form>

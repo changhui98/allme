@@ -1,0 +1,63 @@
+/*
+ * 커스텀 404 블록 — not-found-page(중앙 정렬 안내 + 홈 복귀 CTA).
+ * 헤더/푸터는 공용 컴포넌트가 감싸고, 본문(flex:1)이 남은 높이를 채운다.
+ */
+
+.not-found-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-inline: 1.5rem;
+  text-align: center;
+}
+
+.not-found-page__code {
+  font-size: 3.75rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--primary);
+}
+
+.not-found-page__title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.not-found-page__desc {
+  max-width: 28rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--stone-500);
+}
+
+.dark .not-found-page__desc {
+  color: var(--stone-400);
+}
+
+.not-found-page__home {
+  margin-top: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: var(--primary);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--primary-foreground);
+}
+
+.not-found-page__home:hover {
+  background-color: var(--primary-hover);
+}
+
+@media (min-width: 40rem) {
+  .not-found-page__title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}

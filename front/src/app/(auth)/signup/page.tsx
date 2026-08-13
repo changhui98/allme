@@ -16,6 +16,7 @@ export const metadata: Metadata = {
  * 제목/안내는 SignupFlow가 스텝별로 그리므로 AuthShell에는 넘기지 않는다(h1 중복 방지).
  * 가입 제출·소셜 OAuth 연동은 백엔드 user 도메인 구현 후 붙인다.
  * 계정 1개=다중 역할 원칙에 따라 업체 여부는 여기서 받지 않는다(가입 후 역할 전환).
+ * 스타일: styles/pages/auth.css
  */
 export default async function SignupPage({
   searchParams,
@@ -39,10 +40,7 @@ export default async function SignupPage({
       footer={
         <>
           이미 계정이 있으신가요?{" "}
-          <Link
-            href="/login"
-            className="font-medium text-primary hover:underline"
-          >
+          <Link href="/login" className="signup-page__login-link">
             로그인
           </Link>
         </>

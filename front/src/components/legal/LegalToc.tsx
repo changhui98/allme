@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
  * IntersectionObserver로 현재 읽고 있는 장을 감지해 하이라이트한다.
  * 링크 자체는 일반 앵커(#id)라 no-JS·크롤러 환경에서도 이동은 그대로 동작하며,
  * JS는 하이라이트만 담당한다 — ScrollReveal과 같은 점진적 향상 원칙.
+ * 스타일: styles/pages/legal.css
  */
 export default function LegalToc({
   items,
@@ -37,10 +38,8 @@ export default function LegalToc({
 
   return (
     <nav aria-label="문서 목차">
-      <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-        목차
-      </h2>
-      <ul className="mt-3 flex flex-col gap-1 border-l border-stone-200 dark:border-stone-800">
+      <h2 className="legal-toc__title">목차</h2>
+      <ul className="legal-toc__list">
         {items.map((item) => {
           const active = item.id === activeId;
           return (
@@ -48,10 +47,8 @@ export default function LegalToc({
               <a
                 href={`#${item.id}`}
                 aria-current={active ? "location" : undefined}
-                className={`-ml-px block border-l-2 py-1 pl-3 text-sm transition-colors ${
-                  active
-                    ? "border-primary font-medium text-primary"
-                    : "border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-900 dark:text-stone-400 dark:hover:border-stone-600 dark:hover:text-white"
+                className={`legal-toc__link${
+                  active ? " legal-toc__link--active" : ""
                 }`}
               >
                 {item.title}
