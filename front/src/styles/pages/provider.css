@@ -1,0 +1,682 @@
+/*
+ * 업체 상세 페이지 블록 — provider-page(2컬럼 골격·섹션들) · provider-hero(프로필 히어로) ·
+ * portfolio-grid(포트폴리오 타일) · review-list(리뷰 목록) · provider-cta(예약/문의 CTA).
+ * 컨테이너·필/뱃지는 공용 블록(page-container, pill, badge--verified)을 조합한다.
+ */
+
+/* ---------- provider-page: 상세 페이지 골격 (하단 고정바 공간·2컬럼·섹션들) ---------- */
+
+/* 공용 .page-container 위에 모바일 하단 고정바 공간(pb)만 덮어쓴다 */
+.provider-page {
+  padding-bottom: 8rem;
+}
+
+/* 본문(1fr) + 사이드 CTA(320px) — lg 미만에선 일반 흐름(사이드는 자체 숨김) */
+.provider-page__layout {
+  margin-top: 2rem;
+}
+
+.provider-page__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.provider-page__heading {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+/* 제목 옆 개수 표시 (제공 서비스·리뷰) */
+.provider-page__count {
+  font-weight: 500;
+  color: var(--stone-400);
+}
+
+.dark .provider-page__count {
+  color: var(--stone-500);
+}
+
+.provider-page__bio {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.provider-page__paragraph {
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--stone-600);
+}
+
+.dark .provider-page__paragraph {
+  color: var(--stone-300);
+}
+
+/* 섹션 제목과 본문(포트폴리오·리뷰) 사이 간격 */
+.provider-page__section-body {
+  margin-top: 0.75rem;
+}
+
+/* 제공 서비스 목록 — 항목 사이 구분선(구 divide-y) */
+.provider-page__services {
+  margin-top: 0.75rem;
+}
+
+.provider-page__services > :not(:last-child) {
+  border-bottom-width: 1px;
+  border-color: var(--stone-200);
+}
+
+.dark .provider-page__services > :not(:last-child) {
+  border-color: var(--stone-800);
+}
+
+.provider-page__service {
+  padding-block: 1rem;
+}
+
+.provider-page__service:first-child {
+  padding-top: 0;
+}
+
+.provider-page__service:last-child {
+  padding-bottom: 0;
+}
+
+.provider-page__service-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.provider-page__service-title {
+  font-weight: 600;
+  line-height: 1.375;
+}
+
+/* 카테고리 배지 — 공용 .pill을 더 작은 패딩·인라인 배치로 덮어쓴다 (업체가 다분야일 때만 노출) */
+.provider-page__service-badge {
+  margin-left: 0.5rem;
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  vertical-align: middle;
+}
+
+.provider-page__service-desc {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--stone-600);
+}
+
+.dark .provider-page__service-desc {
+  color: var(--stone-300);
+}
+
+/* 소요 시간 줄 — 시계 아이콘 + 텍스트 */
+.provider-page__service-duration {
+  margin-top: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-500);
+}
+
+.dark .provider-page__service-duration {
+  color: var(--stone-400);
+}
+
+.provider-page__clock-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.provider-page__service-price {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+@media (min-width: 64rem) {
+  .provider-page {
+    padding-bottom: 2rem;
+  }
+
+  .provider-page__layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+    gap: 2rem;
+  }
+}
+
+/* ---------- provider-hero: 프로필 히어로 (아바타·상호·뱃지·지표 3종) ---------- */
+
+.provider-hero__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* 아바타 — 배경 그라데이션은 mock 데이터의 grad grad--br-* 클래스가 공급 */
+.provider-hero__avatar {
+  display: flex;
+  width: 4rem;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.provider-hero__body {
+  min-width: 0;
+}
+
+.provider-hero__name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.provider-hero__name {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* 사업자 인증 뱃지 — 공용 .badge--verified에 배치·패딩만 보강 */
+.provider-hero__verified {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+}
+
+.provider-hero__verified-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.provider-hero__tagline {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--stone-500);
+}
+
+.dark .provider-hero__tagline {
+  color: var(--stone-400);
+}
+
+/* 카테고리 필(공용 .pill)·지역·평점 한 줄 */
+.provider-hero__meta {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.provider-hero__region {
+  color: var(--stone-500);
+}
+
+.dark .provider-hero__region {
+  color: var(--stone-400);
+}
+
+.provider-hero__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--stone-600);
+}
+
+.dark .provider-hero__rating {
+  color: var(--stone-300);
+}
+
+.provider-hero__star {
+  color: var(--amber-500);
+}
+
+.provider-hero__rating-value {
+  font-weight: 500;
+}
+
+.provider-hero__review-count {
+  color: var(--stone-400);
+}
+
+.dark .provider-hero__review-count {
+  color: var(--stone-500);
+}
+
+/* 신뢰 지표 3종 — 3열 그리드 + 칸 사이 세로 구분선(구 divide-x) */
+.provider-hero__stats {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--stone-200);
+  padding-block: 1rem;
+  text-align: center;
+}
+
+.provider-hero__stats > :not(:last-child) {
+  border-inline-end-width: 1px;
+  border-color: var(--stone-200);
+}
+
+.dark .provider-hero__stats,
+.dark .provider-hero__stats > :not(:last-child) {
+  border-color: var(--stone-800);
+}
+
+.provider-hero__stat-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-500);
+}
+
+.dark .provider-hero__stat-label {
+  color: var(--stone-400);
+}
+
+.provider-hero__stat-value {
+  margin-top: 0.25rem;
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .provider-hero__head {
+    gap: 1.25rem;
+  }
+
+  .provider-hero__avatar {
+    width: 5rem;
+    height: 5rem;
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .provider-hero__name {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+/* ---------- portfolio-grid: 포트폴리오 타일 그리드 ---------- */
+
+.portfolio-grid {
+  /* 반투명 검정은 반드시 var를 거쳐 color-mix한다 — 리터럴(#000000)을 쓰면 빌드 시
+     lab()으로 사전 계산되어, 브라우저 런타임 계산(구 Tailwind 산출물)과 1~2/255 수준의
+     렌더링 차이가 생긴다. (board.css의 .ad-carousel과 같은 이슈) */
+  --pg-black: #000000;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+/* 타일 — 배경 그라데이션은 mock 데이터의 grad grad--br-* 클래스가 공급 */
+.portfolio-grid__item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+/* 하단 텍스트 오버레이 — 아래에서 위로 스러지는 검정 그라데이션 */
+.portfolio-grid__overlay {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  background-image: linear-gradient(
+    to top in oklab,
+    color-mix(in oklab, var(--pg-black) 60%, transparent),
+    transparent
+  );
+  padding: 2rem 0.75rem 0.75rem;
+  color: #ffffff;
+}
+
+.portfolio-grid__category {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.portfolio-grid__title {
+  margin-top: 0.125rem;
+  font-size: 0.875rem;
+  line-height: 1.375;
+  font-weight: 600;
+}
+
+.portfolio-grid__summary {
+  margin-top: 0.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  opacity: 0.8;
+}
+
+@media (min-width: 40rem) {
+  .portfolio-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- review-list: 리뷰 목록 + "모두 보기" 토글 ---------- */
+
+/* 리뷰 항목 사이 구분선 (구 divide-y) */
+.review-list__items > :not(:last-child) {
+  border-bottom-width: 1px;
+  border-color: var(--stone-200);
+}
+
+.dark .review-list__items > :not(:last-child) {
+  border-color: var(--stone-800);
+}
+
+.review-list__item {
+  padding-block: 1rem;
+}
+
+.review-list__item:first-child {
+  padding-top: 0;
+}
+
+.review-list__item:last-child {
+  padding-bottom: 0;
+}
+
+/* 별점·작성자·날짜 한 줄 */
+.review-list__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+}
+
+.review-list__stars {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--amber-500);
+}
+
+/* 5점 만점 중 비어 있는 별 */
+.review-list__stars-empty {
+  color: var(--stone-300);
+}
+
+.dark .review-list__stars-empty {
+  color: var(--stone-700);
+}
+
+.review-list__author {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.review-list__date {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-400);
+}
+
+.dark .review-list__date {
+  color: var(--stone-500);
+}
+
+.review-list__service {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-500);
+}
+
+.dark .review-list__service {
+  color: var(--stone-400);
+}
+
+.review-list__content {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  color: var(--stone-600);
+}
+
+.dark .review-list__content {
+  color: var(--stone-300);
+}
+
+/* "리뷰 N개 모두 보기" 버튼 */
+.review-list__more {
+  margin-top: 1rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--stone-300);
+  padding-block: 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--stone-700);
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.review-list__more:hover {
+  background-color: var(--stone-50);
+}
+
+.dark .review-list__more {
+  border-color: var(--stone-700);
+  color: var(--stone-200);
+}
+
+.dark .review-list__more:hover {
+  background-color: color-mix(in oklab, var(--stone-800) 60%, transparent);
+}
+
+/* ---------- provider-cta: 예약/문의 CTA — 데스크톱 사이드바 / 모바일 하단 고정 바 ---------- */
+
+/* 사이드바 변형 — lg에서만 보이는 sticky 보더 박스 */
+.provider-cta--sidebar {
+  position: sticky;
+  top: 5rem;
+  display: none;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--stone-200);
+  padding: 1.25rem;
+}
+
+.dark .provider-cta--sidebar {
+  border-color: var(--stone-800);
+}
+
+/* 하단 고정 바 변형 — lg에서 숨긴다 */
+.provider-cta--bottom-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 10;
+  border-top-width: 1px;
+  border-color: var(--stone-200);
+  background-color: var(--background);
+  padding: 0.75rem 1rem;
+}
+
+.dark .provider-cta--bottom-bar {
+  border-color: var(--stone-800);
+}
+
+.provider-cta__label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-500);
+}
+
+.dark .provider-cta__label {
+  color: var(--stone-400);
+}
+
+.provider-cta__price {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+/* 사이드바의 큰 시작가 */
+.provider-cta__price--lg {
+  margin-top: 0.125rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+/* 하단 바 — 시작가 + 버튼 한 줄 (본문 컨테이너와 같은 max-w로 정렬) */
+.provider-cta__bar-row {
+  margin-inline: auto;
+  display: flex;
+  max-width: 72rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.provider-cta__bar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.provider-cta__side-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 공통 버튼 — 비활성 opacity가 공용 .btn(0.6)과 달라(0.5) 자체 정의한다 */
+.provider-cta__btn {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.provider-cta__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.provider-cta__btn--primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.provider-cta__btn--primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.provider-cta__btn--secondary {
+  border-width: 1px;
+  border-color: var(--stone-300);
+  color: var(--stone-700);
+}
+
+.provider-cta__btn--secondary:hover {
+  background-color: var(--stone-50);
+}
+
+.dark .provider-cta__btn--secondary {
+  border-color: var(--stone-700);
+  color: var(--stone-200);
+}
+
+.dark .provider-cta__btn--secondary:hover {
+  background-color: color-mix(in oklab, var(--stone-800) 60%, transparent);
+}
+
+/* "오픈 준비 중" 안내 문구 */
+.provider-cta__notice {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-400);
+}
+
+.dark .provider-cta__notice {
+  color: var(--stone-500);
+}
+
+.provider-cta__notice--bar {
+  margin-inline: auto;
+  margin-top: 0.375rem;
+  max-width: 72rem;
+}
+
+.provider-cta__notice--side {
+  margin-top: 0.75rem;
+}
+
+/* 평균 응답률 안내 — 위 구분선 */
+.provider-cta__response {
+  margin-top: 1rem;
+  border-top-width: 1px;
+  border-color: var(--stone-200);
+  padding-top: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--stone-500);
+}
+
+.dark .provider-cta__response {
+  border-color: var(--stone-800);
+  color: var(--stone-400);
+}
+
+.provider-cta__response-rate {
+  font-weight: 600;
+  color: var(--stone-700);
+}
+
+.dark .provider-cta__response-rate {
+  color: var(--stone-200);
+}
+
+@media (min-width: 64rem) {
+  .provider-cta--sidebar {
+    display: block;
+  }
+
+  .provider-cta--bottom-bar {
+    display: none;
+  }
+}

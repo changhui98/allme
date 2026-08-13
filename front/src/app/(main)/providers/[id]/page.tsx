@@ -28,6 +28,7 @@ export async function generateMetadata({
   };
 }
 
+/** 스타일: styles/pages/provider.css */
 export default async function ProviderDetailPage({
   params,
 }: {
@@ -42,19 +43,16 @@ export default async function ProviderDetailPage({
   const showServiceCategory = provider.categories.length > 1;
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-32 lg:pb-8">
+    <main className="page-container provider-page">
       <ProviderHero provider={provider} />
 
-      <div className="mt-8 lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
-        <div className="flex flex-col gap-10">
+      <div className="provider-page__layout">
+        <div className="provider-page__main">
           <section>
-            <h2 className="text-lg font-bold">소개</h2>
-            <div className="mt-3 flex flex-col gap-3">
+            <h2 className="provider-page__heading">소개</h2>
+            <div className="provider-page__bio">
               {provider.bio.map((paragraph, i) => (
-                <p
-                  key={i}
-                  className="text-sm leading-relaxed text-stone-600 dark:text-stone-300"
-                >
+                <p key={i} className="provider-page__paragraph">
                   {paragraph}
                 </p>
               ))}
@@ -62,32 +60,30 @@ export default async function ProviderDetailPage({
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">
+            <h2 className="provider-page__heading">
               제공 서비스{" "}
-              <span className="font-medium text-stone-400 dark:text-stone-500">
-                {services.length}
-              </span>
+              <span className="provider-page__count">{services.length}</span>
             </h2>
-            <ul className="mt-3 divide-y divide-stone-200 dark:divide-stone-800">
+            <ul className="provider-page__services">
               {services.map((service) => (
-                <li key={service.id} className="py-4 first:pt-0 last:pb-0">
-                  <div className="flex items-start justify-between gap-4">
+                <li key={service.id} className="provider-page__service">
+                  <div className="provider-page__service-row">
                     <div>
-                      <h3 className="font-semibold leading-snug">
+                      <h3 className="provider-page__service-title">
                         {service.title}
                         {showServiceCategory && (
-                          <span className="ml-2 inline-block rounded-full bg-stone-100 px-2 py-0.5 align-middle text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-300">
+                          <span className="pill provider-page__service-badge">
                             {getCategoryLabel(service.category)}
                           </span>
                         )}
                       </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+                      <p className="provider-page__service-desc">
                         {service.description}
                       </p>
-                      <p className="mt-1.5 flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                      <p className="provider-page__service-duration">
                         <svg
                           aria-hidden="true"
-                          className="size-3.5"
+                          className="provider-page__clock-icon"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -100,7 +96,7 @@ export default async function ProviderDetailPage({
                         소요 {service.duration}
                       </p>
                     </div>
-                    <p className="shrink-0 text-base font-bold">
+                    <p className="provider-page__service-price">
                       {formatPriceFrom(service.priceFrom)}
                     </p>
                   </div>
@@ -110,20 +106,20 @@ export default async function ProviderDetailPage({
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">포트폴리오</h2>
-            <div className="mt-3">
+            <h2 className="provider-page__heading">포트폴리오</h2>
+            <div className="provider-page__section-body">
               <PortfolioGrid items={provider.portfolio} />
             </div>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">
+            <h2 className="provider-page__heading">
               리뷰{" "}
-              <span className="font-medium text-stone-400 dark:text-stone-500">
+              <span className="provider-page__count">
                 {provider.reviewCount}
               </span>
             </h2>
-            <div className="mt-3">
+            <div className="provider-page__section-body">
               <ReviewList
                 reviews={provider.reviews}
                 totalCount={provider.reviewCount}
