@@ -39,6 +39,8 @@ const CONSENT_ITEMS: ConsentItem[] = [
  * 회원가입 스텝 1: 약관 동의.
  * 필수 항목(만 14세·이용약관·개인정보)을 모두 체크해야 다음 스텝(본인인증)으로
  * 넘어갈 수 있고, 마케팅 수신(선택) 여부는 onAgreed로 전달한다.
+ * 체크박스는 네이티브 input을 시각적으로 숨기고(접근성·포커스는 그대로 담당)
+ * 바로 뒤의 원형 체크(consent-step__check)를 :checked 형제 셀렉터로 그린다.
  * 스타일: styles/pages/auth.css
  */
 export default function ConsentStep({
@@ -76,6 +78,9 @@ export default function ConsentStep({
           onChange={toggleAll}
           className="consent-step__checkbox"
         />
+        <span aria-hidden="true" className="consent-step__check">
+          <CheckIcon />
+        </span>
         전체 동의
       </label>
 
@@ -87,8 +92,11 @@ export default function ConsentStep({
                 type="checkbox"
                 checked={checked[item.key]}
                 onChange={() => toggle(item.key)}
-                className="consent-step__checkbox consent-step__checkbox--item"
+                className="consent-step__checkbox"
               />
+              <span aria-hidden="true" className="consent-step__check">
+                <CheckIcon />
+              </span>
               <span>
                 <span
                   className={`consent-step__tag consent-step__tag--${
@@ -127,5 +135,21 @@ export default function ConsentStep({
         동의하고 계속하기
       </button>
     </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="consent-step__check-icon"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
   );
 }
