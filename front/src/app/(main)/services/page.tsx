@@ -7,7 +7,7 @@ import { getAdBanners } from "@/lib/mock/ad-banners";
 import { getServicePosts } from "@/lib/mock/service-posts";
 
 export const metadata: Metadata = {
-  title: "해드려요 | 올미",
+  title: "해드려요",
   description:
     "청소, 인테리어, 페인트·도장, 웹·디자인 제작 — 검증된 업체들의 서비스를 둘러보고 예약하세요.",
 };

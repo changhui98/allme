@@ -2,10 +2,25 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
 
+// 배포 시 NEXT_PUBLIC_SITE_URL을 실제 도메인으로 교체 — OG 이미지 절대 URL의 기준이 된다
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+
 export const metadata: Metadata = {
-  title: "올미 - 통합 서비스 마켓플레이스",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "올미 — 통합 서비스 마켓플레이스",
+    template: "%s | 올미",
+  },
   description:
     "웹 제작·페인트·청소·인테리어 등 모든 분야의 서비스 업체를 한곳에서 찾고, 예약부터 결제까지 한 번에.",
+  // title/description/images를 비워두면 각 페이지의 resolved 값과
+  // opengraph-image.png 파일 컨벤션이 자동 적용된다(페이지마다 og:title이 달라짐)
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    siteName: "올미",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({

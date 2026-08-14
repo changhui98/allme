@@ -4,7 +4,7 @@ import AuthShell from "@/components/auth/AuthShell";
 import SignupFlow from "@/components/auth/SignupFlow";
 
 export const metadata: Metadata = {
-  title: "회원가입 | 올미",
+  title: "회원가입",
   description:
     "올미에 가입하고 청소·인테리어·웹제작 등 필요한 서비스를 예약부터 결제까지 한번에 해결하세요.",
 };

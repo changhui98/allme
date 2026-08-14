@@ -21,9 +21,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const provider = getProvider(id);
-  if (!provider) return { title: "업체를 찾을 수 없어요 | 올미" };
+  if (!provider) return { title: "업체를 찾을 수 없어요" };
   return {
-    title: `${provider.name} | 올미`,
+    title: provider.name,
     description: `${provider.tagline} — ${provider.region} · 평점 ${provider.rating}점 리뷰 ${provider.reviewCount}개`,
   };
 }

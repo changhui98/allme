@@ -5,7 +5,7 @@ import { isCategoryId } from "@/lib/categories";
 import { getRequestPosts } from "@/lib/mock/request-posts";
 
 export const metadata: Metadata = {
-  title: "해주세요 | 올미",
+  title: "해주세요",
   description:
     "필요한 서비스를 요청 글로 올려보세요. 청소, 인테리어, 페인트·도장, 웹·디자인 제작 업체들이 제안을 보냅니다.",
 };

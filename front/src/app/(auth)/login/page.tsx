@@ -6,7 +6,7 @@ import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import { PRIMARY_CTA } from "@/lib/button-styles";
 
 export const metadata: Metadata = {
-  title: "로그인 | 올미",
+  title: "로그인",
   description:
     "올미 계정으로 로그인하고 서비스 탐색부터 예약·결제까지 한곳에서 이용하세요.",
 };
