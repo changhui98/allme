@@ -34,6 +34,8 @@ export async function requestIdentityVerification(): Promise<string> {
     channelKey: CHANNEL_KEY!,
     identityVerificationId: `identity-verification-${crypto.randomUUID()}`,
     redirectUrl: `${window.location.origin}/signup`,
+    // 미지정 시 브라우저 기본 위치(왼쪽 위)에 뜬다. 크기는 이니시스 고정값이라 위치만 제어 가능.
+    popup: { center: true },
     bypass: {
       // 이니시스 통합인증. 카카오 인증서(CI 미제공) 제외는 이니시스 계약·콘솔의
       // 노출 인증사 설정으로 처리하고, 백엔드도 CI 없는 건은 거부한다(U005).
