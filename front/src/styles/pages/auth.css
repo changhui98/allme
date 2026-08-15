@@ -341,6 +341,34 @@
   height: 1.125rem;
 }
 
+/* 트레일링 버튼(아이디 중복확인 등)이 겹치지 않도록 우측 여백 확보 */
+.form-field__input--trailing {
+  padding-right: 6rem;
+}
+
+.form-field__input.is-invalid {
+  border-color: var(--danger);
+}
+
+.form-field__input.is-invalid:focus {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--danger) 15%, transparent);
+}
+
+/* 인풋 박스 아래 검증 결과 한 줄 메시지 */
+.form-field__message {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}
+
+.form-field__message--error {
+  color: var(--danger);
+}
+
+.form-field__message--success {
+  color: var(--success);
+}
+
 /* ---------- social-login: "또는" 구분선 + 소셜 로그인 버튼 3종 ---------- */
 
 .social-login {
@@ -461,6 +489,67 @@
 /* CTA 자체는 공용 .btn .btn--primary .btn--block — 여기는 배치 여백만 */
 .signup-form__submit {
   margin-top: 1.5rem;
+}
+
+/* 아이디 인풋 박스 우측의 중복확인 버튼 — 토글 버튼과 같은 절대 배치 패턴.
+   인풋 내장형 소형 버튼이라 공용 .btn 크기 체계와 달라 signup-form 스코프로 둔다 */
+.signup-form__dup-check {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  translate: 0 -50%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--foreground);
+  background-color: var(--surface);
+  transition-property: border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.signup-form__dup-check:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+.signup-form__dup-check:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- password-checklist: 비밀번호 규칙 실시간 체크리스트 ---------- */
+
+.password-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.password-checklist__item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: color-mix(in oklab, var(--muted) 85%, transparent);
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.password-checklist__item.is-met {
+  color: var(--success);
+}
+
+.password-checklist__icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
 }
 
 /* ---------- signup-stepper: ①약관동의 ─ ②본인인증 ─ ③정보입력 진행 스테퍼 ---------- */
