@@ -277,5 +277,5 @@
 .dark .legal-toc__link--active:hover {
   border-color: var(--primary);
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
 }

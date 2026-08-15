@@ -32,6 +32,13 @@ export default function RootLayout({
     // html/body 프레임 스타일(height·flex column)은 styles/base.css가 담당
     <html lang="ko" suppressHydrationWarning>
       <body>
+        {/* 컬러 테마(data-accent) 복원 — next-themes는 모드(.dark)만 다루므로,
+            액센트는 첫 페인트 전에 이 동기 스크립트로 붙여 FOUC를 막는다 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var a=localStorage.getItem("accent");if(a)document.documentElement.setAttribute("data-accent",a)}catch(e){}`,
+          }}
+        />
         {/* 헤더/푸터는 (main) 그룹 레이아웃 소관 — 인증 페이지((auth))는 독립 레이아웃을 쓴다 */}
         <ThemeProvider>{children}</ThemeProvider>
       </body>

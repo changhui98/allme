@@ -482,7 +482,7 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .how-it-works__step-title {
@@ -550,7 +550,7 @@
 
 .trust__icon--primary {
   background-color: color-mix(in oklab, var(--primary) 10%, transparent);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .trust__icon--emerald {

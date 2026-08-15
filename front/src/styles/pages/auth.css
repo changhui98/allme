@@ -26,11 +26,12 @@
 /* ---------- brand-panel: 좌측 브랜드 패널 (lg 이상에서만 표시) ---------- */
 
 .brand-panel {
-  /* 테라코타 그라데이션·반투명 흰색은 반드시 var를 거친다 — 리터럴을 쓰면 빌드 시
+  /* 그라데이션·반투명 흰색은 반드시 var를 거친다 — 리터럴을 쓰면 빌드 시
      lab()으로 사전 계산되어, 브라우저 런타임 계산(구 Tailwind 산출물)과 1~2/255 수준의
-     렌더링 차이가 생긴다. (board.css의 .ad-carousel과 같은 이슈) */
-  --bp-from: #c2613d;
-  --bp-to: #a84f30;
+     렌더링 차이가 생긴다. (board.css의 .ad-carousel과 같은 이슈)
+     primary 토큰을 참조하므로 컬러 테마(data-accent) 변경을 자동 추종한다. */
+  --bp-from: var(--primary);
+  --bp-to: var(--primary-hover);
   --bp-white: #ffffff;
   position: relative;
   display: none;
@@ -42,10 +43,11 @@
   );
 }
 
-/* 다크 모드에서도 테라코타 패널을 유지하되 반 톤 낮춰 눈부심을 줄인다 */
+/* 다크 모드에서도 브랜드 컬러 패널을 유지하되, primary를 어두운 쪽으로 섞어
+   눈부심을 줄인다 (다크의 primary 토큰은 밝은 단계라 그대로 쓰면 패널이 번쩍인다) */
 .dark .brand-panel {
-  --bp-from: #9a4a2c;
-  --bp-to: #7e3a21;
+  --bp-from: color-mix(in oklab, var(--primary) 70%, var(--stone-950));
+  --bp-to: color-mix(in oklab, var(--primary) 52%, var(--stone-950));
 }
 
 /* 장식: 블러 원 2개 */
@@ -199,7 +201,7 @@
   line-height: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.025em;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .auth-shell__heading {
@@ -505,7 +507,7 @@
   position: relative;
   border-width: 2px;
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* 현재 스텝 펄스 링 — 원 주변으로 반투명 파동이 퍼지며 사라지기를 반복해 시선을 유도.
@@ -682,7 +684,7 @@
 /* [필수]/[선택] 태그 */
 .consent-step__tag--required {
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .consent-step__tag--optional {
@@ -824,7 +826,7 @@
 
 .signup-page__login-link {
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .signup-page__login-link:hover {

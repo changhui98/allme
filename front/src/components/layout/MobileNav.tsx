@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import ThemeMenu from "@/components/theme/ThemeMenu";
 
 /**
  * 모바일(<md) 전용 네비. 햄버거 버튼으로 주요 메뉴/검색/로그인 패널을 토글한다.
@@ -99,9 +99,9 @@ export default function MobileNav() {
             </ul>
           </nav>
 
-          {/* 테마 토글 + 로그인/회원가입 */}
+          {/* 테마 메뉴 + 로그인/회원가입 */}
           <div className="mobile-nav__footer">
-            <ThemeToggle />
+            <ThemeMenu />
             <Link
               href={AUTH_LINKS.login.href}
               onClick={() => setOpen(false)}

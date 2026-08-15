@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
 import MobileNav from "./MobileNav";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import ThemeMenu from "@/components/theme/ThemeMenu";
 
 /**
  * 모든 페이지 공통 헤더 (서버 컴포넌트). 스타일: styles/components/header.css
@@ -59,9 +59,9 @@ export default function Header() {
           />
         </form>
 
-        {/* 테마 토글 + 로그인/회원가입 (데스크탑) */}
+        {/* 테마 메뉴 + 로그인/회원가입 (데스크탑) */}
         <div className="header__actions">
-          <ThemeToggle />
+          <ThemeMenu />
           <Link href={AUTH_LINKS.login.href} className="header__login">
             {AUTH_LINKS.login.label}
           </Link>
