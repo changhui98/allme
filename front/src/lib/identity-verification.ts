@@ -21,6 +21,63 @@ export function isPortOneConfigured(): boolean {
   return Boolean(STORE_ID && CHANNEL_KEY);
 }
 
+/** 이니시스 기본 팝업이 작아, SDK가 여는 창 크기를 이 배율로 확대한다. */
+const POPUP_SCALE = 1.3;
+
+/**
+ * SDK 호출 동안만 window.open을 래핑해 포트원 팝업("PortOne" 창)의
+ * width/height를 확대하고 화면 중앙으로 재배치한다.
+ * 팝업 크기는 포트원 서버가 PG별 고정값으로 내려줘 SDK 옵션으로는 못 바꾼다.
+ */
+async function withEnlargedPopup<T>(fn: () => Promise<T>): Promise<T> {
+  const originalOpen = window.open.bind(window);
+
+  window.open = ((url?: string | URL, target?: string, features?: string) => {
+    if (target !== "PortOne" || typeof features !== "string") {
+      return originalOpen(url, target, features);
+    }
+
+    const parsed = new Map(
+      features.split(",").map((pair) => {
+        const [key, value] = pair.split("=");
+        return [key.trim(), value?.trim()] as const;
+      }),
+    );
+    const width = Number(parsed.get("width"));
+    const height = Number(parsed.get("height"));
+    if (width > 0 && height > 0) {
+      const newWidth = Math.min(
+        Math.round(width * POPUP_SCALE),
+        window.screen.availWidth,
+      );
+      const newHeight = Math.min(
+        Math.round(height * POPUP_SCALE),
+        window.screen.availHeight,
+      );
+      parsed.set("width", String(newWidth));
+      parsed.set("height", String(newHeight));
+      parsed.set(
+        "left",
+        String(Math.max(0, (window.outerWidth - newWidth) / 2 + window.screenX)),
+      );
+      parsed.set(
+        "top",
+        String(Math.max(0, (window.outerHeight - newHeight) / 2 + window.screenY)),
+      );
+      features = [...parsed]
+        .map(([key, value]) => (value === undefined ? key : `${key}=${value}`))
+        .join(",");
+    }
+    return originalOpen(url, target, features);
+  }) as typeof window.open;
+
+  try {
+    return await fn();
+  } finally {
+    window.open = originalOpen;
+  }
+}
+
 /**
  * 포트원 본인인증 창을 열고, 완료되면 identityVerificationId를 반환한다.
  * 모바일 등 redirect 방식에서는 반환 전에 페이지가 이탈되고
@@ -29,19 +86,21 @@ export function isPortOneConfigured(): boolean {
 export async function requestIdentityVerification(): Promise<string> {
   const PortOne = await import("@portone/browser-sdk/v2");
 
-  const response = await PortOne.requestIdentityVerification({
-    storeId: STORE_ID!,
-    channelKey: CHANNEL_KEY!,
-    identityVerificationId: `identity-verification-${crypto.randomUUID()}`,
-    redirectUrl: `${window.location.origin}/signup`,
-    // 미지정 시 브라우저 기본 위치(왼쪽 위)에 뜬다. 크기는 이니시스 고정값이라 위치만 제어 가능.
-    popup: { center: true },
-    bypass: {
-      // 이니시스 통합인증. 카카오 인증서(CI 미제공) 제외는 이니시스 계약·콘솔의
-      // 노출 인증사 설정으로 처리하고, 백엔드도 CI 없는 건은 거부한다(U005).
-      inicisUnified: { flgFixedUser: "N" },
-    },
-  });
+  const response = await withEnlargedPopup(() =>
+    PortOne.requestIdentityVerification({
+      storeId: STORE_ID!,
+      channelKey: CHANNEL_KEY!,
+      identityVerificationId: `identity-verification-${crypto.randomUUID()}`,
+      redirectUrl: `${window.location.origin}/signup`,
+      // 미지정 시 브라우저 기본 위치(왼쪽 위)에 뜬다. 크기는 withEnlargedPopup이 확대·재중앙 정렬.
+      popup: { center: true },
+      bypass: {
+        // 이니시스 통합인증. 카카오 인증서(CI 미제공) 제외는 이니시스 계약·콘솔의
+        // 노출 인증사 설정으로 처리하고, 백엔드도 CI 없는 건은 거부한다(U005).
+        inicisUnified: { flgFixedUser: "N" },
+      },
+    }),
+  );
 
   if (!response) {
     throw new Error("본인인증이 완료되지 않았습니다. 다시 시도해주세요.");
