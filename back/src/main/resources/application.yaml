@@ -17,5 +17,12 @@ portone:
   base-url: https://api.portone.io
   api-secret: ${PORTONE_API_SECRET:}
 
+# 개인정보 필드 암호화 키 (base64 32바이트). 기본값은 개발 전용 —
+# 호스트 bootRun과 도커 back이 같은 dev DB를 공유하므로 .env.dev와 반드시 같은 값을 유지할 것.
+# 운영은 .env.prod에서 별도 키 주입 (openssl rand -base64 32 로 생성).
+crypto:
+  enc-key: ${CRYPTO_ENC_KEY:7/LN5CZZYTbY+AKSgzJsxNWxQFQGBkUT+Ule6dz15XE=}
+  hmac-key: ${CRYPTO_HMAC_KEY:XjwgjAJa+V8JwtyfOX0KyAKwV2S9vnlVqvfg3C3/4Hw=}
+
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3001}
