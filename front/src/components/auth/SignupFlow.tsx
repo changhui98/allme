@@ -1,11 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import AuthHeading from "@/components/auth/AuthHeading";
 import ConsentStep from "@/components/auth/ConsentStep";
 import IdentityVerificationStep from "@/components/auth/IdentityVerificationStep";
 import SignupForm from "@/components/auth/SignupForm";
 import SignupStepper from "@/components/auth/SignupStepper";
+import Modal from "@/components/common/Modal";
+import { ApiError } from "@/lib/api";
+import { PRIMARY_CTA } from "@/lib/button-styles";
 import {
   verifyIdentityOnServer,
   type VerifiedCustomer,
@@ -50,13 +54,18 @@ export default function SignupFlow({
   initialVerificationId,
   initialError,
 }: SignupFlowProps) {
+  const router = useRouter();
   const [step, setStep] = useState<SignupStep>(
     // redirect 복귀(인증 ID 또는 인증 실패)면 동의는 끝난 상태
     initialVerificationId || initialError ? "verify" : "consent",
   );
+  // 본인인증 결과 이미 가입된 계정(U009) — 3단계로 보내지 않고 모달로 로그인 유도
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [checking, setChecking] = useState(Boolean(initialVerificationId));
   const [error, setError] = useState<string | null>(initialError ?? null);
   const [customer, setCustomer] = useState<VerifiedCustomer | null>(null);
+  // 가입 제출 시 백엔드가 이 ID로 포트원을 재조회한다 (개인정보는 프론트에서 보내지 않음)
+  const [verificationId, setVerificationId] = useState<string | null>(null);
   // 가입 완료 API 연동 시 함께 전송할 값 — redirect 복귀 시 sessionStorage에서 복원
   // (렌더에 영향 없는 값이라 lazy init의 서버/클라이언트 차이는 hydration에 무해)
   const [marketingConsent, setMarketingConsent] = useState(() => {
@@ -83,13 +92,19 @@ export default function SignupFlow({
     try {
       const verified = await verifyIdentityOnServer(identityVerificationId);
       setCustomer(verified);
+      setVerificationId(identityVerificationId);
       setStep("form");
       // redirect 복귀 쿼리가 주소창에 남지 않게 정리 (새로고침 시 재검증 방지)
       window.history.replaceState(null, "", "/signup");
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "본인인증 확인에 실패했습니다.",
-      );
+      if (e instanceof ApiError && e.code === "U009") {
+        setAlreadyRegistered(true);
+        window.history.replaceState(null, "", "/signup");
+      } else {
+        setError(
+          e instanceof Error ? e.message : "본인인증 확인에 실패했습니다.",
+        );
+      }
     } finally {
       setChecking(false);
     }
@@ -115,7 +130,7 @@ export default function SignupFlow({
 
   // form이지만 검증 결과가 아직 없으면 기존처럼 인증 화면을 유지한다
   const visibleStep: SignupStep =
-    step === "form" && !customer ? "verify" : step;
+    step === "form" && (!customer || !verificationId) ? "verify" : step;
 
   return (
     <div className="signup-flow">
@@ -126,9 +141,10 @@ export default function SignupFlow({
       <div className="signup-flow__body">
         {visibleStep === "consent" ? (
           <ConsentStep onAgreed={handleAgreed} />
-        ) : visibleStep === "form" && customer ? (
+        ) : visibleStep === "form" && customer && verificationId ? (
           <SignupForm
             name={customer.name}
+            identityVerificationId={verificationId}
             marketingConsent={marketingConsent}
           />
         ) : (
@@ -139,6 +155,23 @@ export default function SignupFlow({
           />
         )}
       </div>
+
+      <Modal
+        open={alreadyRegistered}
+        title="이미 가입된 계정"
+        onClose={() => router.push("/login")}
+        actions={
+          <button
+            type="button"
+            className={PRIMARY_CTA}
+            onClick={() => router.push("/login")}
+          >
+            로그인하러 가기
+          </button>
+        }
+      >
+        이미 가입된 계정이 있습니다. 로그인 후 이용해주세요.
+      </Modal>
     </div>
   );
 }

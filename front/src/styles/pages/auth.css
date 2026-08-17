@@ -491,6 +491,15 @@
   margin-top: 1.5rem;
 }
 
+/* 가입 제출 실패 안내 — identity-step__error와 같은 톤 */
+.signup-form__error {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+
 /* 아이디 인풋 박스 우측의 중복확인 버튼 — 토글 버튼과 같은 절대 배치 패턴.
    인풋 내장형 소형 버튼이라 공용 .btn 크기 체계와 달라 signup-form 스코프로 둔다 */
 .signup-form__dup-check {

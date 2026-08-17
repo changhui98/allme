@@ -16,7 +16,12 @@ export type PasswordRule = {
 };
 
 export const PASSWORD_RULES: PasswordRule[] = [
-  { id: "length", label: "8자 이상", test: (pw) => pw.length >= 8 },
+  // 상한 64자: BCrypt는 72바이트 초과 입력을 거부하므로 여유를 두고 제한 (백엔드 U008과 동일)
+  {
+    id: "length",
+    label: "8~64자",
+    test: (pw) => pw.length >= 8 && pw.length <= 64,
+  },
   { id: "upper", label: "대문자 포함", test: (pw) => /[A-Z]/.test(pw) },
   { id: "lower", label: "소문자 포함", test: (pw) => /[a-z]/.test(pw) },
   { id: "digit", label: "숫자 포함", test: (pw) => /[0-9]/.test(pw) },

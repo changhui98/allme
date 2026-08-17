@@ -5,6 +5,8 @@
  * - API Secret을 쓰는 실제 검증은 백엔드(/api/identity-verifications/verify)에서만 수행
  */
 
+import { API_BASE_URL, ApiError } from "@/lib/api";
+
 export type VerifiedCustomer = {
   name: string;
   birthDate: string;
@@ -14,8 +16,6 @@ export type VerifiedCustomer = {
 
 const STORE_ID = process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
 const CHANNEL_KEY = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 export function isPortOneConfigured(): boolean {
   return Boolean(STORE_ID && CHANNEL_KEY);
@@ -127,11 +127,11 @@ export async function verifyIdentityOnServer(
   }
 
   if (!res.ok) {
-    const message = await res
+    // code를 보존해 호출부가 U009(이미 가입된 계정) 등으로 분기할 수 있게 한다
+    const body = (await res
       .json()
-      .then((body: { message?: string }) => body.message)
-      .catch(() => undefined);
-    throw new Error(message ?? "본인인증 확인에 실패했습니다.");
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(body?.message ?? "본인인증 확인에 실패했습니다.", body?.code);
   }
   return res.json();
 }
