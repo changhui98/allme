@@ -14,7 +14,9 @@ public interface IdentityVerificationPort {
 
     /**
      * 본인인증 조회 결과. status가 VERIFIED일 때만 나머지 필드가 채워진다.
-     * ci는 중복가입 체크용으로 서버 내부에서만 쓰고 프론트로 내리지 않는다.
+     * ci·di는 서버 내부에서만 쓰고(중복가입 체크·가입 저장) 프론트로 내리지 않는다.
+     * di는 인증 수단에 따라 미제공일 수 있다 — 특히 현재 쓰는 KG이니시스 통합인증은
+     * DI를 제공하지 않는다(포트원 공식). 다날 SMS 인증 등 추가 시에만 채워진다.
      */
     record IdentityVerificationResult(
         String status,
@@ -22,7 +24,8 @@ public interface IdentityVerificationPort {
         String birthDate,
         String phoneNumber,
         String gender,
-        String ci
+        String ci,
+        String di
     ) {
 
         public boolean isVerified() {

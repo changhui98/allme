@@ -15,6 +15,8 @@ import org.springframework.web.client.RestClientException;
 /**
  * 포트원 V2 본인인증 단건 조회 어댑터.
  * GET {base-url}/identity-verifications/{id} + "Authorization: PortOne {API_SECRET}"
+ * 주의: KG이니시스 통합인증은 verifiedCustomer.di를 내려주지 않는다(포트원 헬프센터 공식).
+ * users.di가 null인 것은 정상이며, DI를 주는 인증 수단(다날 SMS 등) 추가 시 채워진다.
  */
 @Slf4j
 @Component
@@ -59,7 +61,7 @@ public class PortOneIdentityVerificationAdapter implements IdentityVerificationP
 
         VerifiedCustomer customer = response.verifiedCustomer() != null
             ? response.verifiedCustomer()
-            : new VerifiedCustomer(null, null, null, null, null);
+            : new VerifiedCustomer(null, null, null, null, null, null);
 
         return new IdentityVerificationResult(
             response.status(),
@@ -67,7 +69,8 @@ public class PortOneIdentityVerificationAdapter implements IdentityVerificationP
             customer.birthDate(),
             customer.phoneNumber(),
             customer.gender(),
-            customer.ci()
+            customer.ci(),
+            customer.di()
         );
     }
 
@@ -75,6 +78,8 @@ public class PortOneIdentityVerificationAdapter implements IdentityVerificationP
     record PortOneResponse(String status, VerifiedCustomer verifiedCustomer) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record VerifiedCustomer(String name, String birthDate, String phoneNumber, String gender, String ci) {}
+    record VerifiedCustomer(
+        String name, String birthDate, String phoneNumber, String gender, String ci, String di
+    ) {}
 
 }
