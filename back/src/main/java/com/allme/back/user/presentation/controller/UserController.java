@@ -12,8 +12,10 @@ import com.allme.back.user.presentation.dto.response.UserSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/users")
@@ -63,7 +66,17 @@ public class UserController {
         }
         httpRequest.getSession(true).setAttribute("userId", user.getId());
 
-        return UserSummaryResponse.from(user);
+        return summaryOf(user);
+    }
+
+    /** 로그아웃 — 세션이 있으면 무효화하고, 없어도 성공으로 응답한다(멱등). */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
     }
 
     /**
@@ -72,12 +85,64 @@ public class UserController {
      */
     @GetMapping("/me")
     public UserSummaryResponse me(HttpServletRequest httpRequest) {
+        return summaryOf(userService.getById(sessionUserId(httpRequest)));
+    }
+
+    /**
+     * 프로필 이미지 업로드(교체). multipart "image" 파트, 5MB·jpg/jpeg/png/webp 제한.
+     * 확장자는 원본 파일명에서만 취하고 저장 파일명은 서버가 생성한다(원본명은 파일 테이블에 보관).
+     */
+    @PostMapping("/me/profile-image")
+    public UserSummaryResponse uploadProfileImage(
+        @RequestParam("image") MultipartFile image, HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionUserId(httpRequest);
+
+        byte[] content;
+        try {
+            content = image.getBytes();
+        } catch (IOException e) {
+            throw new AppException(UserErrorCode.PROFILE_IMAGE_INVALID);
+        }
+        String originalFilename = image.getOriginalFilename();
+        userService.updateProfileImage(userId, content, extensionOf(originalFilename), originalFilename);
+
+        return summaryOf(userService.getById(userId));
+    }
+
+    /** 회원탈퇴 — soft delete + 개인정보 익명화 후 세션을 무효화한다. */
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void withdraw(HttpServletRequest httpRequest) {
+        userService.withdraw(sessionUserId(httpRequest));
+
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+    }
+
+    /** 회원 요약 응답 조립 — 프로필 이미지 경로는 파일 테이블에서 조회한다. */
+    private UserSummaryResponse summaryOf(User user) {
+        return UserSummaryResponse.from(user, userService.getProfileImagePath(user));
+    }
+
+    /** 세션에서 userId를 꺼낸다. 없으면 U011 — 로그인 필요 API 공통 가드. */
+    private Long sessionUserId(HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
         Object userId = session != null ? session.getAttribute("userId") : null;
         if (!(userId instanceof Long id)) {
             throw new AppException(UserErrorCode.UNAUTHORIZED);
         }
-        return UserSummaryResponse.from(userService.getById(id));
+        return id;
+    }
+
+    private String extensionOf(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        int dot = filename.lastIndexOf('.');
+        return dot >= 0 ? filename.substring(dot + 1) : null;
     }
 
 }
