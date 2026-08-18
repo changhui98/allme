@@ -902,6 +902,15 @@
   margin-top: 1.5rem;
 }
 
+/* 로그인 실패 안내 — signup-form__error와 같은 톤 */
+.login-page__error {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+
 /* 하단 보조 링크(비밀번호 찾기 · 회원가입) — 사이 세로 구분선 */
 .login-page__links {
   display: flex;

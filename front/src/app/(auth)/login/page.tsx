@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
-import FormField from "@/components/auth/FormField";
+import LoginForm from "@/components/auth/LoginForm";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
-import { PRIMARY_CTA } from "@/lib/button-styles";
 
 export const metadata: Metadata = {
   title: "로그인",
@@ -12,9 +11,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * 로그인 페이지. (서버 컴포넌트)
- * 아직 UI 레이아웃 단계 — 아이디 로그인 제출과 소셜 OAuth 연동은
- * 백엔드 user 도메인 구현 후 붙인다. /forgot-password는 계획된 경로 플레이스홀더.
+ * 로그인 페이지. (서버 컴포넌트 — metadata 유지, 폼은 LoginForm으로 분리)
+ * 소셜 OAuth 연동은 백엔드 구현 후 붙인다. /forgot-password는 계획된 경로 플레이스홀더.
  * 스타일: styles/pages/auth.css
  */
 export default function LoginPage() {
@@ -34,23 +32,7 @@ export default function LoginPage() {
         </nav>
       }
     >
-      <form className="login-page__form">
-        <FormField
-          id="login-id"
-          label="아이디"
-          type="text"
-          autoComplete="username"
-        />
-        <FormField
-          id="password"
-          label="비밀번호"
-          type="password"
-          autoComplete="current-password"
-        />
-        <button type="submit" className={`login-page__submit ${PRIMARY_CTA}`}>
-          로그인
-        </button>
-      </form>
+      <LoginForm />
 
       <SocialLoginButtons variant="login" />
     </AuthShell>
