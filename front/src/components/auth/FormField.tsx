@@ -3,9 +3,11 @@
 import { useState } from "react";
 
 /**
- * 로그인·회원가입 폼의 박스형 인풋. (클라이언트 컴포넌트)
- * 정적 라벨(위) + 라운드 박스 인풋(아래) 구조로, 포커스 시 포인트색 보더 + 링이 뜬다.
- * password 타입은 우측의 눈 모양 토글로 표시/숨김을 전환한다(이 상태 때문에 클라이언트).
+ * 로그인·회원가입 폼의 박스형 인풋 + 플로팅 라벨. (클라이언트 컴포넌트)
+ * 빈 상태에선 라벨이 인풋 안(placeholder 자리)에 있다가, 포커스되거나 값이 있으면
+ * 박스 테두리 왼쪽 위로 떠올라 걸친다(is-floated 클래스, notched outline 스타일).
+ * placeholder는 라벨과 자리가 겹치므로 포커스 중에만 실제로 노출한다.
+ * password 타입은 우측의 눈 모양 토글로 표시/숨김을 전환한다.
  * value/onChange를 주면 제어 컴포넌트로 동작하고(이때 defaultValue는 넘기지 말 것),
  * error/success는 박스 아래 한 줄 메시지, trailing은 박스 우측 슬롯(중복확인 버튼 등).
  * 스타일: styles/pages/auth.css
@@ -51,6 +53,13 @@ export default function FormField({
   describedById,
 }: FormFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [focused, setFocused] = useState(false);
+  // 비제어 사용처(defaultValue)의 값 유무 판정용 — 제어면 value로 직접 판정
+  const [innerHasValue, setInnerHasValue] = useState(() =>
+    Boolean(defaultValue),
+  );
+  const hasValue = value !== undefined ? value !== "" : innerHasValue;
+  const floated = focused || hasValue;
 
   const isPassword = type === "password";
   const inputType = isPassword && showPassword ? "text" : type;
@@ -70,25 +79,31 @@ export default function FormField({
     .join(" ");
 
   return (
-    <div className="form-field">
-      <label htmlFor={id} className="form-field__label">
-        {label}
-      </label>
+    <div className={`form-field${floated ? " is-floated" : ""}`}>
       <div className="form-field__box">
         <input
           id={id}
           name={id}
           type={inputType}
           autoComplete={autoComplete}
-          placeholder={placeholder}
+          placeholder={focused ? placeholder : undefined}
           defaultValue={defaultValue}
           readOnly={readOnly}
           value={value}
-          onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+          onChange={(e) => {
+            if (onChange) onChange(e.target.value);
+            else setInnerHasValue(e.target.value !== "");
+          }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={inputClassName}
         />
+        {/* 라벨은 absolute 플로팅 — input 뒤에 둬야 :focus/:autofill ~ 라벨 셀렉터가 성립 */}
+        <label htmlFor={id} className="form-field__label">
+          {label}
+        </label>
         {isPassword && (
           <button
             type="button"

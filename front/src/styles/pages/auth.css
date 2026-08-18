@@ -257,7 +257,7 @@
   color: var(--muted);
 }
 
-/* ---------- form-field: 박스형 인풋 (정적 라벨 + 라운드 박스) ---------- */
+/* ---------- form-field: 박스형 인풋 (플로팅 라벨 + 라운드 박스) ---------- */
 
 .form-field {
   /* 인풋 배경 — 크림색 페이지 배경(--background)과 구분되도록 라이트는 흰색,
@@ -269,15 +269,54 @@
   --ff-bg: var(--surface);
 }
 
+/* 평상시(빈 값·비포커스): 인풋 안 placeholder 자리에 겹쳐 놓는다 */
 .form-field__label {
-  display: block;
-  margin-bottom: 0.375rem;
-  font-size: 0.8125rem;
-  line-height: 1.125rem;
-  font-weight: 500;
+  position: absolute;
+  top: 50%;
+  left: 0.75rem; /* 인풋 padding 1rem - 라벨 좌우 padding 0.25rem */
+  translate: 0 -50%;
+  padding: 0 0.25rem;
+  font-size: 15px;
+  line-height: 1.25rem;
+  color: color-mix(in oklab, var(--muted) 70%, transparent); /* placeholder와 동일 색 */
+  pointer-events: none;
+  transition-property: top, font-size, color, background;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
-/* 비밀번호 토글 버튼 절대 배치 기준 */
+/* 떠오른 상태(포커스·값 있음·자동완성): 박스 상단 보더 왼쪽 위에 걸친다.
+   배경을 상하 분할 그라데이션으로 — 상반부는 페이지 배경, 하반부는 인풋 배경이라
+   보더 선만 자연스럽게 끊긴다(라이트의 크림색 vs 흰색 차이 흡수, 다크도 변수로 자동 대응).
+   :autofill은 React state 없이도 라벨을 띄우는 폴백 — :is()의 forgiving 파싱으로
+   미지원 브라우저에서 규칙 전체가 무효화되지 않는다 */
+.form-field.is-floated .form-field__label,
+.form-field__input:is(:autofill, :-webkit-autofill) ~ .form-field__label {
+  top: 0;
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: linear-gradient(to bottom, var(--background) 50%, var(--ff-bg) 50%);
+}
+
+/* 포커스 시 라벨도 포인트색으로 (보더 색과 동기화) */
+.form-field__input:focus ~ .form-field__label {
+  color: var(--primary-text);
+}
+
+/* 검증 실패 시 라벨도 danger로 (:focus 규칙보다 뒤에 둬 포커스 중에도 유지) */
+.form-field__input.is-invalid ~ .form-field__label {
+  color: var(--danger);
+}
+
+/* read-only(이름 프리필): 인풋 배경이 --surface라 라벨 하반부 색을 맞춘다 */
+.form-field.is-floated .form-field__input:read-only ~ .form-field__label {
+  color: var(--muted);
+  background: linear-gradient(to bottom, var(--background) 50%, var(--surface) 50%);
+}
+
+/* 비밀번호 토글 버튼·플로팅 라벨의 절대 배치 기준 */
 .form-field__box {
   position: relative;
 }
