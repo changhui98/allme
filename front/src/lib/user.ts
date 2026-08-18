@@ -38,6 +38,8 @@ export type JoinUserInput = {
 export type LoginUserResult = {
   loginId: string;
   name: string;
+  /** 프로필 이미지 서빙 경로(/images/...) — API_BASE_URL을 붙여 사용. 미설정이면 null */
+  profileImageUrl: string | null;
 };
 
 /**
@@ -85,6 +87,68 @@ export async function fetchMe(): Promise<LoginUserResult | null> {
   }
   if (!res.ok) return null;
   return res.json();
+}
+
+/** 프로필 이미지 업로드(교체). 성공 시 갱신된 회원 요약을 반환한다. */
+export async function uploadProfileImage(
+  file: File,
+): Promise<LoginUserResult> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/profile-image`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(
+      body?.message ?? "프로필 이미지 업로드에 실패했습니다.",
+      body?.code,
+    );
+  }
+  return res.json();
+}
+
+/** 회원탈퇴 — soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
+export async function withdrawUser(): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(body?.message ?? "회원탈퇴에 실패했습니다.", body?.code);
+  }
+}
+
+/** 로그아웃 — 세션 무효화. 호출 후에는 풀 리로드로 useMe 캐시를 초기화할 것. */
+export async function logoutUser(): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/api/users/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch {
+    // 서버 접속 불가여도 리로드 후 비로그인 취급되므로 조용히 넘어간다
+  }
 }
 
 /**

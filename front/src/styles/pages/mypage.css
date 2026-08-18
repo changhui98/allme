@@ -1,0 +1,643 @@
+/*
+ * 마이페이지 (/mypage/*): 공용 Header/Footer 없는 전용 대시보드 셸.
+ * mypage-shell(골격: 상단 바 + 사이드바 + 본문) · mypage-topbar · mypage-sidebar ·
+ * avatar · mypage-page(본문 제목) · mypage-dashboard(요약 카드) ·
+ * mypage-profile(내 정보) · mypage-empty(빈 상태).
+ * 모바일(<48rem)에서는 사이드바가 본문 위 가로 스크롤 메뉴로 접힌다.
+ */
+
+/* ---------- mypage-shell: 페이지 골격 ---------- */
+
+.mypage-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background-color: var(--background);
+}
+
+.mypage-shell--pending {
+  /* 세션 확인·리다이렉트 동안 빈 화면 유지 */
+}
+
+/* 관리자 콘솔형 — 사이드바가 화면 왼쪽에 붙고, 본문은 그 오른쪽 영역을 쓴다 */
+.mypage-shell__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mypage-shell__main {
+  flex: 1;
+  min-width: 0;
+  max-width: 56rem; /* 글줄 길이 제한 — 중앙 정렬 없이 좌측 기준 */
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+@media (min-width: 48rem) {
+  .mypage-shell__body {
+    flex-direction: row;
+  }
+
+  .mypage-shell__main {
+    padding: 2rem;
+  }
+}
+
+/* ---------- mypage-topbar: 상단 바 (로고 / 홈으로·프로필) ---------- */
+
+.mypage-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* 높이·좌측 패딩은 메인 헤더(.header__inner: 4rem/1rem)와 동일 — 로고 위치 일치 */
+  height: 4rem;
+  padding-inline: 1rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--background);
+}
+
+.mypage-topbar__logo {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--primary-text);
+}
+
+/* 아바타·홈 아이콘 그룹 — 데스크톱 전용 (모바일은 햄버거 패널이 대체) */
+.mypage-topbar__actions {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .mypage-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+/* 햄버거 토글 — 모바일 전용 */
+.mypage-topbar__menu-btn {
+  display: inline-flex;
+}
+
+@media (min-width: 48rem) {
+  .mypage-topbar__menu-btn {
+    display: none;
+  }
+}
+
+/* 홈 이동 — 테두리 없는 아이콘 전용 버튼 (공용 .icon-btn과 같은 톤) */
+.mypage-topbar__home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: calc(infinity * 1px);
+  color: var(--muted);
+  transition-property: background-color, color;
+  transition-duration: 150ms;
+}
+
+.mypage-topbar__home:hover {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+.mypage-topbar__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: calc(infinity * 1px);
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+
+.mypage-topbar__profile:hover {
+  background-color: var(--surface);
+}
+
+.mypage-topbar__login-id {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* ---------- mypage-menu-panel: 모바일 드롭다운 (메인 mobile-nav__panel과 같은 방식) ---------- */
+
+.mypage-menu-panel {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--background);
+  padding: 1rem;
+  box-shadow:
+    0 1px 3px 0 #0000001a,
+    0 1px 2px -1px #0000001a;
+}
+
+@media (min-width: 48rem) {
+  .mypage-menu-panel {
+    display: none;
+  }
+}
+
+/* 패널 상단 프로필 — 아바타 + 이름·아이디 */
+.mypage-menu-panel__profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mypage-menu-panel__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mypage-menu-panel__name {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+}
+
+.mypage-menu-panel__login-id {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.mypage-menu-panel__nav {
+  margin-top: 0.75rem;
+}
+
+/* 패널 하단 — 홈으로·로그아웃 */
+.mypage-menu-panel__footer {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.mypage-menu-panel__footer-link {
+  flex: 1;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.mypage-menu-panel__footer-link:hover {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+/* ---------- mypage-sidebar: 좌측 고정 메뉴 (데스크톱 전용) ---------- */
+
+.mypage-sidebar {
+  display: none;
+  flex-shrink: 0;
+}
+
+.mypage-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mypage-sidebar__item {
+  flex-shrink: 0;
+}
+
+.mypage-sidebar__link {
+  display: block;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition-property: background-color, color;
+  transition-duration: 150ms;
+}
+
+.mypage-sidebar__link:hover {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+/* 활성 메뉴 — 프라이머리 배경 */
+.mypage-sidebar__link--active,
+.mypage-sidebar__link--active:hover {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* 위험 메뉴(회원탈퇴) — 버튼 요소로도 쓰이므로 전체 폭 좌측 정렬 */
+.mypage-sidebar__link--danger {
+  width: 100%;
+  text-align: left;
+  color: var(--danger);
+}
+
+.mypage-sidebar__link--danger:hover {
+  background-color: color-mix(in oklab, var(--danger) 8%, transparent);
+  color: var(--danger);
+}
+
+/* 사이드바 하단 — 회원탈퇴·로그아웃 (mt auto로 바닥에 붙는다) */
+.mypage-sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 1rem 0;
+}
+
+.mypage-sidebar__footer-link {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.mypage-sidebar__footer-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mypage-sidebar__footer-link--danger {
+  color: var(--danger);
+}
+
+@media (min-width: 48rem) {
+  /* 화면 왼쪽에 붙는 고정 사이드바 — 좌측 패딩이 상단 바 로고와 같은 라인(1rem) */
+  .mypage-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 14rem;
+    padding: 1.25rem 0.75rem 1.5rem 1rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .mypage-sidebar__link {
+    padding: 0.625rem 1rem;
+  }
+}
+
+/* ---------- avatar: 프로필 아바타 (이미지 또는 이니셜) ---------- */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: calc(infinity * 1px);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.avatar--sm {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.875rem;
+}
+
+.avatar--md {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.125rem;
+}
+
+.avatar--lg {
+  width: 5rem;
+  height: 5rem;
+  font-size: 1.875rem;
+}
+
+.avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar__initial {
+  font-weight: 600;
+}
+
+/* ---------- mypage-page: 본문 공통 제목 ---------- */
+
+.mypage-page__title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.mypage-page__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+/* ---------- mypage-stats: 대시보드 스탯 로우 (박스 없는 플랫 수치) ---------- */
+
+.mypage-stats {
+  display: flex;
+  margin-top: 2.5rem;
+}
+
+.mypage-stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-right: 2.5rem;
+}
+
+/* 항목 사이 얇은 세로 구분선 */
+.mypage-stats__item + .mypage-stats__item {
+  border-left: 1px solid var(--border);
+  padding-left: 2.5rem;
+}
+
+.mypage-stats__label {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.mypage-stats__value {
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  transition-property: color;
+  transition-duration: 150ms;
+}
+
+.mypage-stats__item:hover .mypage-stats__value {
+  color: var(--primary-text);
+}
+
+/* ---------- mypage-section: 본문 하위 섹션 (hairline 구분) ---------- */
+
+.mypage-section {
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.mypage-section__title {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+}
+
+.mypage-section__empty {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---------- mypage-profile: 내 정보 (플랫 — 박스 없이 구분선만) ---------- */
+
+.mypage-profile {
+  margin-top: 2rem;
+}
+
+.mypage-profile__head {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.mypage-profile__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.mypage-profile__name {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.mypage-profile__login-id {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+/* 사진 변경 — 테두리 없는 텍스트 버튼 */
+.mypage-profile__upload {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--primary-text);
+}
+
+.mypage-profile__upload:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mypage-profile__upload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mypage-profile__error {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--danger);
+}
+
+.mypage-profile__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.mypage-profile__fact {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.mypage-profile__fact-label {
+  width: 4rem;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+.mypage-profile__fact-value {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+
+/* ---------- mypage-empty: 빈 상태 (게시판 API 연동 전) ---------- */
+
+.mypage-empty {
+  margin-top: 4rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.mypage-empty__message {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.mypage-empty__cta {
+  display: inline-block;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition-property: border-color, color;
+  transition-duration: 150ms;
+}
+
+.mypage-empty__cta:hover {
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+/* ---------- withdraw-page: 회원탈퇴 (유의사항·동의 체크 후 탈퇴) ---------- */
+
+.withdraw-page__notices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.withdraw-page__notice {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.withdraw-page__error {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+
+.withdraw-page__actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.withdraw-page__stay,
+.withdraw-page__submit {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+}
+
+/* ---------- withdraw-consent: 동의 체크 (consent-step과 같은 원형 체크 패턴) ---------- */
+
+.withdraw-consent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.withdraw-consent__label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  cursor: pointer;
+}
+
+/* 네이티브 체크박스는 시각적으로만 숨긴다 — 클릭·포커스·:checked 상태는 그대로 담당 */
+.withdraw-consent__checkbox {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 원형 커스텀 체크 — 체크 SVG는 currentColor라 미체크 시 transparent로 숨긴다 */
+.withdraw-consent__check {
+  display: flex;
+  width: 1.375rem;
+  height: 1.375rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  border: 1.5px solid var(--border);
+  color: transparent;
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.withdraw-consent__check-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.withdraw-consent__checkbox:checked + .withdraw-consent__check {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* 키보드 포커스 링은 숨긴 input 대신 커스텀 체크에 표시 */
+.withdraw-consent__checkbox:focus-visible + .withdraw-consent__check {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}

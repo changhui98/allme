@@ -25,6 +25,27 @@
   background-color: var(--primary-hover);
 }
 
+/* 보조 액션 (모달 취소 등) — 보더형 */
+.btn--outline {
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+.btn--outline:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+/* 위험 액션 (회원탈퇴 등) — danger 배경 */
+.btn--danger {
+  background-color: var(--danger);
+  color: #ffffff;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--danger) 85%, black);
+}
+
 /* 폼 하단 풀폭 CTA (구 PRIMARY_CTA: w-full py-3 text-[15px]) */
 .btn--block {
   width: 100%;
