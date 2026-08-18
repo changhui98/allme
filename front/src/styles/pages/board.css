@@ -184,6 +184,11 @@
 
 .category-tabs {
   overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none; /* Chrome·Safari·삼성인터넷 */
 }
 
 .category-tabs__list {
