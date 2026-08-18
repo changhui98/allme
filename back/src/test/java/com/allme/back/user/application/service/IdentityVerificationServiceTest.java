@@ -39,6 +39,16 @@ class IdentityVerificationServiceTest {
             }
 
             @Override
+            public java.util.Optional<User> findById(Long id) {
+                return java.util.Optional.empty();
+            }
+
+            @Override
+            public java.util.Optional<User> findByLoginId(String loginId) {
+                return java.util.Optional.empty();
+            }
+
+            @Override
             public User save(User user) {
                 return user;
             }

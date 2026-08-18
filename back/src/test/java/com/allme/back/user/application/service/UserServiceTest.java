@@ -25,10 +25,16 @@ class UserServiceTest {
     private static final String VALID_PASSWORD = "Abcdef1!";
 
     private UserService serviceWith(boolean loginIdExists) {
-        return serviceWith(loginIdExists, false);
+        return serviceWith(loginIdExists, false, null);
     }
 
     private UserService serviceWith(boolean loginIdExists, boolean ciExists) {
+        return serviceWith(loginIdExists, ciExists, null);
+    }
+
+    private UserService serviceWith(
+        boolean loginIdExists, boolean ciExists, User existingUser
+    ) {
         UserRepository stubRepository = new UserRepository() {
             @Override
             public boolean existsByLoginId(String loginId) {
@@ -38,6 +44,16 @@ class UserServiceTest {
             @Override
             public boolean existsByCiHash(String ciHash) {
                 return ciExists;
+            }
+
+            @Override
+            public java.util.Optional<User> findById(Long id) {
+                return java.util.Optional.ofNullable(existingUser);
+            }
+
+            @Override
+            public java.util.Optional<User> findByLoginId(String loginId) {
+                return java.util.Optional.ofNullable(existingUser);
             }
 
             @Override
@@ -118,6 +134,79 @@ class UserServiceTest {
             .isInstanceOf(AppException.class)
             .extracting(e -> ((AppException) e).getErrorCode())
             .isEqualTo(UserErrorCode.PASSWORD_INVALID_FORMAT);
+    }
+
+    private User userWithPassword(String rawPassword) {
+        return User.create(
+            "allme123", new BCryptPasswordEncoder().encode(rawPassword),
+            "홍길동", "ci-value", "ci-hash", null, "01012345678", true);
+    }
+
+    @Test
+    @DisplayName("아이디·비밀번호가 맞으면 회원을 반환한다")
+    void login_success() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThat(serviceWith(true, false, user).login("allme123", VALID_PASSWORD))
+            .isSameAs(user);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 아이디면 LOGIN_FAILED 예외를 던진다")
+    void login_unknownLoginId() {
+        assertThatThrownBy(() -> serviceWith(false).login("nouser1", VALID_PASSWORD))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.LOGIN_FAILED);
+    }
+
+    @Test
+    @DisplayName("비밀번호가 틀리면 LOGIN_FAILED 예외를 던진다")
+    void login_wrongPassword() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThatThrownBy(
+            () -> serviceWith(true, false, user).login("allme123", "Wrong999!"))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.LOGIN_FAILED);
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원이면 비밀번호가 맞아도 LOGIN_FAILED 예외를 던진다")
+    void login_deletedUser() {
+        User user = userWithPassword(VALID_PASSWORD);
+        user.delete();
+
+        assertThatThrownBy(
+            () -> serviceWith(true, false, user).login("allme123", VALID_PASSWORD))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.LOGIN_FAILED);
+    }
+
+    @Test
+    @DisplayName("세션 userId로 회원을 조회한다")
+    void getById_success() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThat(serviceWith(true, false, user).getById(1L)).isSameAs(user);
+    }
+
+    @Test
+    @DisplayName("없는 회원이거나 탈퇴한 회원이면 UNAUTHORIZED 예외를 던진다")
+    void getById_unauthorized() {
+        User deleted = userWithPassword(VALID_PASSWORD);
+        deleted.delete();
+
+        assertThatThrownBy(() -> serviceWith(false).getById(1L))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.UNAUTHORIZED);
+        assertThatThrownBy(() -> serviceWith(true, false, deleted).getById(1L))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.UNAUTHORIZED);
     }
 
     @Test

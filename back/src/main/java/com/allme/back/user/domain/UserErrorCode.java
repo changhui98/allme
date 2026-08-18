@@ -18,7 +18,9 @@ public enum UserErrorCode implements ErrorCode {
     LOGIN_ID_DUPLICATED(HttpStatus.CONFLICT, "U007", "이미 사용 중인 아이디입니다."),
     PASSWORD_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "U008",
         "비밀번호는 8~64자로, 대문자·소문자·숫자·특수문자를 모두 포함해야 합니다."),
-    ALREADY_REGISTERED(HttpStatus.CONFLICT, "U009", "이미 가입된 계정이 있습니다.")
+    ALREADY_REGISTERED(HttpStatus.CONFLICT, "U009", "이미 가입된 계정이 있습니다."),
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "U010", "아이디 또는 비밀번호가 올바르지 않습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "U011", "로그인이 필요합니다.")
     ;
 
     private final HttpStatus status;

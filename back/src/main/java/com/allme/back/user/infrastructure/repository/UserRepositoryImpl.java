@@ -2,6 +2,7 @@ package com.allme.back.user.infrastructure.repository;
 
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.domain.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByCiHash(String ciHash) {
         return userJpaRepository.existsByCiHash(ciHash);
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userJpaRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByLoginId(String loginId) {
+        return userJpaRepository.findByLoginId(loginId);
     }
 
     /**

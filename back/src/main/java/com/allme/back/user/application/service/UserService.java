@@ -9,6 +9,7 @@ import com.allme.back.user.domain.repository.UserRepository;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,12 @@ public class UserService {
     private static final Pattern PASSWORD_LOWER = Pattern.compile("[a-z]");
     private static final Pattern PASSWORD_DIGIT = Pattern.compile("[0-9]");
     private static final Pattern PASSWORD_SPECIAL = Pattern.compile("[^A-Za-z0-9\\s]");
+
+    /**
+     * 존재하지 않는 아이디일 때도 BCrypt 비교를 수행하기 위한 더미 해시.
+     * 아이디 유무에 따라 응답 시간이 달라져 계정 존재가 노출되는 것(타이밍 공격)을 막는다.
+     */
+    private static final String DUMMY_PASSWORD_HASH = new BCryptPasswordEncoder().encode("dummy");
 
     private final UserRepository userRepository;
     private final IdentityVerificationService identityVerificationService;
@@ -94,6 +101,37 @@ public class UserService {
         }
 
         return user.getLoginId();
+    }
+
+    /**
+     * 아이디·비밀번호를 검증하고 회원을 반환한다.
+     * 실패 사유(미존재 아이디/비밀번호 불일치/탈퇴 회원)를 구분하지 않고
+     * 모두 U010 하나로 응답한다 — 계정 존재 여부를 노출하지 않기 위함.
+     */
+    public User login(String loginId, String rawPassword) {
+        if (loginId == null || rawPassword == null) {
+            throw new AppException(UserErrorCode.LOGIN_FAILED);
+        }
+
+        User user = userRepository.findByLoginId(loginId).orElse(null);
+
+        String storedHash = user != null ? user.getPassword() : DUMMY_PASSWORD_HASH;
+        boolean matches = passwordEncoder.matches(rawPassword, storedHash);
+
+        if (user == null || !matches || user.isDeleted()) {
+            throw new AppException(UserErrorCode.LOGIN_FAILED);
+        }
+        return user;
+    }
+
+    /** 세션의 userId로 회원을 조회한다. 탈퇴했거나 없는 회원이면 U011(로그인 필요). */
+    public User getById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AppException(UserErrorCode.UNAUTHORIZED));
+        if (user.isDeleted()) {
+            throw new AppException(UserErrorCode.UNAUTHORIZED);
+        }
+        return user;
     }
 
     private boolean isPasswordValid(String password) {
