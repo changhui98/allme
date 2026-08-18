@@ -3,6 +3,11 @@
   position: absolute;
   inset-inline: 0;
   top: 100%;
+  /* 짧은 화면(가로 모드 등)에서 패널이 뷰포트를 넘치면 내부 스크롤 (헤더 4rem 제외) */
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-bottom-width: 1px;
   border-color: var(--stone-200);
   background-color: var(--background);
