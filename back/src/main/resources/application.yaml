@@ -1,6 +1,10 @@
 spring:
   application:
     name: back
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:allme}
     username: ${DB_USERNAME:allme}
@@ -12,6 +16,14 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
+
+# 탈퇴 회원 보관 전용 DB (본 DB와 물리 분리) — 탈퇴 시 개인정보 이관처.
+# JPA 미사용(JdbcClient 단순 INSERT) — global/config/ArchiveDataSourceConfig 참조.
+archive:
+  datasource:
+    url: jdbc:postgresql://${ARCHIVE_DB_HOST:localhost}:${ARCHIVE_DB_PORT:5434}/${ARCHIVE_DB_NAME:allme_archive}
+    username: ${ARCHIVE_DB_USERNAME:allme}
+    password: ${ARCHIVE_DB_PASSWORD:allme}
 
 portone:
   base-url: https://api.portone.io
@@ -26,3 +38,8 @@ crypto:
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3001}
+
+app:
+  # 업로드 이미지 루트 — 저장소 루트의 images/ (front·back과 나란히).
+  # 호스트 bootRun은 back/이 작업 디렉터리라 ../images, 도커는 볼륨 마운트된 /images.
+  images-root: ${IMAGES_ROOT:../images}

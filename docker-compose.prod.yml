@@ -14,14 +14,39 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # 탈퇴 회원 보관 전용 DB — 본 DB와 물리 분리. 외부 노출 불필요(컴포즈 네트워크 내부 접속)
+  db-archive:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${ARCHIVE_POSTGRES_DB:-allme_archive}
+      POSTGRES_USER: ${ARCHIVE_POSTGRES_USER:-allme}
+      POSTGRES_PASSWORD: ${ARCHIVE_POSTGRES_PASSWORD:?}
+    volumes:
+      - db-archive-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   back:
     build:
       context: ./back
     ports:
       - "8080:8080"
     env_file: ./back/.env.prod
+    environment:
+      IMAGES_ROOT: /images
+      ARCHIVE_DB_HOST: db-archive
+      ARCHIVE_DB_PORT: 5432
+    volumes:
+      # 업로드 이미지 — 서버에서도 front·back·images 구조 그대로 유지
+      - ./images:/images
     depends_on:
       db:
+        condition: service_healthy
+      db-archive:
         condition: service_healthy
     restart: unless-stopped
 
@@ -35,3 +60,4 @@ services:
 
 volumes:
   db-data:
+  db-archive-data:

@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -52,6 +55,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse("VALIDATION_ERROR", message, null));
+    }
+
+    /** 멀티파트가 아니거나 필수 파트가 빠진 업로드 요청 — 클라이언트 잘못이므로 400 */
+    @ExceptionHandler({MissingServletRequestPartException.class, MultipartException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidMultipartRequest(
+        Exception e, HttpServletRequest request
+    ) {
+
+        log.info("[InvalidMultipart] {} {} -> {}",
+            request.getMethod(), request.getRequestURI(), e.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.from(ApiErrorCode.INVALID_REQUEST));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(
+        MaxUploadSizeExceededException e, HttpServletRequest request
+    ) {
+
+        log.info("[UploadTooLarge] {} {}", request.getMethod(), request.getRequestURI());
+
+        return ResponseEntity
+            .status(HttpStatus.PAYLOAD_TOO_LARGE)
+            .body(ErrorResponse.from(ApiErrorCode.PAYLOAD_TOO_LARGE));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

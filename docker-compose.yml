@@ -17,14 +17,42 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # 탈퇴 회원 보관 전용 DB — 본 DB와 물리 분리 (탈퇴 시 개인정보 이관처)
+  db-archive:
+    image: postgres:16-alpine
+    ports:
+      # 호스트 5434 → 컨테이너 5432 (5432 사귐·5433 본 DB와 충돌 방지)
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${ARCHIVE_POSTGRES_DB:-allme_archive}
+      POSTGRES_USER: ${ARCHIVE_POSTGRES_USER:-allme}
+      POSTGRES_PASSWORD: ${ARCHIVE_POSTGRES_PASSWORD:-allme}
+    volumes:
+      - db-archive-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   back:
     build:
       context: ./back
     ports:
       - "8080:8080"
     env_file: ./back/.env.dev
+    environment:
+      IMAGES_ROOT: /images
+      ARCHIVE_DB_HOST: db-archive
+      ARCHIVE_DB_PORT: 5432
+    volumes:
+      # 업로드 이미지 — 저장소 루트 images/를 그대로 사용 (front·back·images 구조 유지)
+      - ./images:/images
     depends_on:
       db:
+        condition: service_healthy
+      db-archive:
         condition: service_healthy
     # 소스 수정하며 개발할 때는 호스트에서 ./gradlew bootRun 사용 (localhost:5433).
     # 이 서비스는 전체 스택을 한 번에 띄울 때 쓰며, 코드 반영은 --build 재빌드 필요.
@@ -48,3 +76,4 @@ services:
 
 volumes:
   db-data:
+  db-archive-data:
