@@ -193,10 +193,12 @@
   max-width: 24rem;
 }
 
-/* 로고는 모바일 전용 — 데스크톱은 brand-panel 로고가 대신한다 */
+/* 로고는 모바일 전용 — 데스크톱은 brand-panel 로고가 대신한다.
+   width: fit-content로 클릭 영역을 텍스트 폭으로 제한(컬럼 전체가 홈 링크가 되지 않게) */
 .auth-shell__logo {
   display: block;
-  text-align: center;
+  width: fit-content;
+  margin-inline: auto;
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 700;
