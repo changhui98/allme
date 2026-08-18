@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { AUTH_LINKS, BOARD_LINKS, MEMBER_LINKS } from "./nav-items";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
+import { useOutsideClose } from "@/lib/use-outside-close";
 
 /**
  * 모바일(<md) 전용 네비. 햄버거 버튼으로 주요 메뉴/검색/로그인 패널을 토글한다.
@@ -15,19 +16,13 @@ import { useMe } from "@/lib/use-me";
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
   const { me } = useMe();
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  // ESC로 닫기
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  // ESC·바깥 클릭으로 닫기 (버튼+패널이 rootRef 안이라 토글 버튼 클릭은 outside가 아님)
+  useOutsideClose(open, () => setOpen(false), [rootRef]);
 
   return (
-    <div className="mobile-nav">
+    <div ref={rootRef} className="mobile-nav">
       <button
         type="button"
         aria-label={open ? "메뉴 닫기" : "메뉴 열기"}

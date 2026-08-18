@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
+import { useOutsideClose } from "@/lib/use-outside-close";
 
 /** 서버/최초 클라 렌더에선 false, 하이드레이션 이후 true. (setState-in-effect 없이 마운트 감지) */
 function useHydrated() {
@@ -54,23 +55,7 @@ export default function ThemeMenu() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   // ESC + 바깥 클릭으로 닫기
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    const onPointerDown = (e: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, [open]);
+  useOutsideClose(open, () => setOpen(false), [rootRef]);
 
   const selectAccent = (key: string) => {
     setAccent(key);
