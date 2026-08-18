@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
+import { AUTH_LINKS, BOARD_LINKS, MEMBER_LINKS } from "./nav-items";
 import ThemeMenu from "@/components/theme/ThemeMenu";
+import { useMe } from "@/lib/use-me";
 
 /**
  * 모바일(<md) 전용 네비. 햄버거 버튼으로 주요 메뉴/검색/로그인 패널을 토글한다.
@@ -13,6 +14,7 @@ import ThemeMenu from "@/components/theme/ThemeMenu";
  */
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const { me } = useMe();
 
   // ESC로 닫기
   useEffect(() => {
@@ -99,23 +101,44 @@ export default function MobileNav() {
             </ul>
           </nav>
 
-          {/* 테마 메뉴 + 로그인/회원가입 */}
+          {/* 테마 메뉴 + 인증 영역 (로그인 상태면 마이페이지·설정) */}
           <div className="mobile-nav__footer">
             <ThemeMenu />
-            <Link
-              href={AUTH_LINKS.login.href}
-              onClick={() => setOpen(false)}
-              className="mobile-nav__login"
-            >
-              {AUTH_LINKS.login.label}
-            </Link>
-            <Link
-              href={AUTH_LINKS.signup.href}
-              onClick={() => setOpen(false)}
-              className="mobile-nav__signup"
-            >
-              {AUTH_LINKS.signup.label}
-            </Link>
+            {me ? (
+              <>
+                <Link
+                  href={MEMBER_LINKS.mypage.href}
+                  onClick={() => setOpen(false)}
+                  className="mobile-nav__login"
+                >
+                  {MEMBER_LINKS.mypage.label}
+                </Link>
+                <Link
+                  href={MEMBER_LINKS.settings.href}
+                  onClick={() => setOpen(false)}
+                  className="mobile-nav__signup"
+                >
+                  {MEMBER_LINKS.settings.label}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href={AUTH_LINKS.login.href}
+                  onClick={() => setOpen(false)}
+                  className="mobile-nav__login"
+                >
+                  {AUTH_LINKS.login.label}
+                </Link>
+                <Link
+                  href={AUTH_LINKS.signup.href}
+                  onClick={() => setOpen(false)}
+                  className="mobile-nav__signup"
+                >
+                  {AUTH_LINKS.signup.label}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

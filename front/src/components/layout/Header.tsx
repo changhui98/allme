@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { AUTH_LINKS, BOARD_LINKS } from "./nav-items";
+import { BOARD_LINKS } from "./nav-items";
+import HeaderAuth from "./HeaderAuth";
 import MobileNav from "./MobileNav";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 
 /**
  * 모든 페이지 공통 헤더 (서버 컴포넌트). 스타일: styles/components/header.css
- * 구성: 로고 / 주요 메뉴(해드려요·해주세요) / 검색 / 로그인·회원가입.
+ * 구성: 로고 / 주요 메뉴(해드려요·해주세요) / 검색 / 인증 영역(HeaderAuth).
+ * 인증 영역은 세션 상태에 따라 로그인·회원가입 또는 마이페이지·설정 아이콘.
  * 모바일에서는 네비·검색·로그인을 MobileNav(햄버거)로 접는다.
  */
 export default function Header() {
@@ -59,15 +61,10 @@ export default function Header() {
           />
         </form>
 
-        {/* 테마 메뉴 + 로그인/회원가입 (데스크탑) */}
+        {/* 테마 메뉴 + 인증 영역 (데스크탑) */}
         <div className="header__actions">
           <ThemeMenu />
-          <Link href={AUTH_LINKS.login.href} className="header__login">
-            {AUTH_LINKS.login.label}
-          </Link>
-          <Link href={AUTH_LINKS.signup.href} className="header__signup">
-            {AUTH_LINKS.signup.label}
-          </Link>
+          <HeaderAuth />
         </div>
 
         {/* 모바일 햄버거 (md 미만) */}
