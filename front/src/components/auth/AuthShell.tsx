@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import AuthHeading from "@/components/auth/AuthHeading";
+import AllmeWordmark from "@/components/brand/AllmeWordmark";
 
 /**
  * 로그인·회원가입 페이지 공용 셸. (서버 컴포넌트)
@@ -28,7 +29,7 @@ export default function AuthShell({
   return (
     <main className="auth-shell">
       <Link href="/" className="auth-shell__logo" aria-label="올미 홈">
-        올미
+        <AllmeWordmark className="auth-shell__logo-mark" />
       </Link>
 
       {title && description && (
