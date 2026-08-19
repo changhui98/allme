@@ -43,6 +43,9 @@ export default async function SignupPage({
           <Link href="/login" className="signup-page__login-link">
             로그인
           </Link>
+          <Link href="/" className="signup-page__home-link">
+            홈으로
+          </Link>
         </>
       }
     >

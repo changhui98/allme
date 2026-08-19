@@ -29,6 +29,10 @@ export default function LoginPage() {
           <Link href="/signup" className="login-page__link">
             회원가입
           </Link>
+          <span aria-hidden="true" className="login-page__divider" />
+          <Link href="/" className="login-page__link">
+            홈으로
+          </Link>
         </nav>
       }
     >

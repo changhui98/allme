@@ -194,16 +194,19 @@
 }
 
 /* 로고는 모바일 전용 — 데스크톱은 brand-panel 로고가 대신한다.
-   width: fit-content로 클릭 영역을 텍스트 폭으로 제한(컬럼 전체가 홈 링크가 되지 않게) */
+   width: fit-content로 클릭 영역을 워드마크 폭으로 제한(컬럼 전체가 홈 링크가 되지 않게).
+   color는 워드마크 SVG(currentColor)가 상속 — 컬러 테마·다크모드 자동 연동 */
 .auth-shell__logo {
   display: block;
   width: fit-content;
   margin-inline: auto;
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
   color: var(--primary-text);
+}
+
+.auth-shell__logo-mark {
+  display: block;
+  height: 2.25rem; /* 기존 텍스트 로고 line-height와 동일한 자리 크기 */
+  width: auto;
 }
 
 .auth-shell__heading {
@@ -900,6 +903,11 @@
   margin-top: 1.5rem;
 }
 
+/* 이전 스텝(약관 동의) 복귀 — 공용 .btn--outline, 여기는 배치 여백만 */
+.identity-step__back {
+  margin-top: 0.5rem;
+}
+
 /* env 미설정 시 "준비 중" 안내 박스 */
 .identity-step__notice {
   margin-top: 1.5rem;
@@ -975,6 +983,17 @@
 .signup-page__login-link {
   font-weight: 500;
   color: var(--primary-text);
+}
+
+/* 하단 홈 복귀 링크 — 로그인 문장 아래 한 줄 (색은 .auth-shell__footer의 muted 상속) */
+.signup-page__home-link {
+  display: block;
+  width: fit-content;
+  margin: 0.75rem auto 0;
+}
+
+.signup-page__home-link:hover {
+  color: var(--foreground);
 }
 
 .signup-page__login-link:hover {

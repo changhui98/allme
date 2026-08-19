@@ -11,6 +11,8 @@ import {
 type IdentityVerificationStepProps = {
   /** 인증 창에서 인증을 마쳤을 때 (데스크톱 팝업 방식) */
   onVerified: (identityVerificationId: string) => void;
+  /** 이전 스텝(약관 동의)으로 돌아가기 */
+  onBack: () => void;
   /** 상위(redirect 복귀·서버 검증)에서 내려온 에러 */
   externalError: string | null;
   /** 서버 검증 진행 중 여부 — 버튼 비활성화 */
@@ -25,6 +27,7 @@ type IdentityVerificationStepProps = {
  */
 export default function IdentityVerificationStep({
   onVerified,
+  onBack,
   externalError,
   busy,
 }: IdentityVerificationStepProps) {
@@ -76,6 +79,15 @@ export default function IdentityVerificationStep({
           )}
         </p>
       )}
+
+      <button
+        type="button"
+        onClick={onBack}
+        disabled={opening || busy}
+        className="identity-step__back btn btn--outline btn--block"
+      >
+        이전
+      </button>
 
       {error && (
         <p role="alert" className="identity-step__error">

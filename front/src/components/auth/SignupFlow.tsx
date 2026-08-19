@@ -150,6 +150,7 @@ export default function SignupFlow({
         ) : (
           <IdentityVerificationStep
             onVerified={handleVerified}
+            onBack={() => setStep("consent")}
             externalError={error}
             busy={checking}
           />
