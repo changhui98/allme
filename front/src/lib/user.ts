@@ -153,6 +153,12 @@ export async function logoutUser(): Promise<void> {
   }
 }
 
+/** 로그아웃 후 홈으로 풀 리로드 — useMe 모듈 캐시 초기화 목적 */
+export async function logoutAndGoHome(): Promise<void> {
+  await logoutUser();
+  window.location.assign("/");
+}
+
 /**
  * 회원가입. 이름 등 개인정보는 보내지 않는다 —
  * 백엔드가 identityVerificationId로 포트원을 재조회해 확보·암호화 저장한다.

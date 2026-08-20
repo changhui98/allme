@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { AUTH_LINKS, MEMBER_LINKS } from "./nav-items";
 import { useMe } from "@/lib/use-me";
+import { logoutAndGoHome } from "@/lib/user";
 
 /**
  * 헤더 우측 인증 영역 (데스크톱). 세션 확인(/me) 결과에 따라
- * 비로그인: 로그인·회원가입 텍스트 링크 / 로그인: 마이페이지·설정 아이콘.
+ * 비로그인: 로그인·회원가입 텍스트 링크 / 로그인: 마이페이지·로그아웃 아이콘.
  * 확인 중에는 아무것도 그리지 않아 "로그인 → 아이콘" 깜빡임을 피한다.
  * 상태가 필요한 부분만 분리해 Header는 서버 컴포넌트로 유지한다.
  * 스타일: styles/components/header.css
@@ -39,14 +40,15 @@ export default function HeaderAuth() {
       >
         <UserIcon />
       </Link>
-      <Link
-        href={MEMBER_LINKS.settings.href}
-        aria-label={MEMBER_LINKS.settings.label}
-        title={MEMBER_LINKS.settings.label}
+      <button
+        type="button"
+        aria-label="로그아웃"
+        title="로그아웃"
+        onClick={logoutAndGoHome}
         className="icon-btn"
       >
-        <SettingsIcon />
-      </Link>
+        <LogoutIcon />
+      </button>
     </>
   );
 }
@@ -70,7 +72,7 @@ export function UserIcon() {
   );
 }
 
-export function SettingsIcon() {
+export function LogoutIcon() {
   return (
     <svg
       width="20"
@@ -83,8 +85,9 @@ export function SettingsIcon() {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
     </svg>
   );
 }
