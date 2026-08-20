@@ -14,7 +14,7 @@ export default function RequestCard({ post }: { post: RequestPost }) {
         <span className="request-card__date">{post.createdAt}</span>
       </div>
 
-      <div>
+      <div className="request-card__body">
         <h2 className="request-card__title">{post.title}</h2>
         <p className="request-card__meta">
           {post.authorNickname} · {post.region}

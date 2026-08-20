@@ -417,30 +417,49 @@
   color: var(--stone-200);
 }
 
-/* ---------- 모바일(<40rem) 미니 카드 — 게시판 목록을 2열로 압축 ----------
+/* ---------- 모바일(<40rem) 플랫 리스트 — 카드 chrome을 걷어내고 hairline 목록으로 ----------
    utilities.css의 .card-grid 브레이크포인트를 특이도(.board-page .card-grid)로
    전 구간 덮어쓰지 않도록, 예외적으로 max-width 쿼리로 모바일 구간만 한정한다. */
 
 @media (max-width: 39.9375rem) {
   .board-page .card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+    margin-top: 0.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 
+  .board-page .card-grid > li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  /* 카드 chrome 제거 — 타이포그래피와 hairline 구분선만 남긴다 */
   .request-card,
   .service-card__inner {
-    gap: 0.5rem;
-    padding: 0.875rem;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    gap: 0.375rem;
+    padding: 1rem 0.25rem;
   }
 
+  /* pill → 텍스트 라벨 (좁은 폭의 박스 밀도를 줄인다) */
   .request-card .pill,
   .service-card__inner .pill {
-    overflow: hidden;
-    max-width: 100%;
-    padding: 0.1875rem 0.5rem;
-    font-size: 0.6875rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    border-radius: 0;
+    background-color: transparent;
+    padding: 0;
+    color: var(--stone-500);
+  }
+
+  .dark .request-card .pill,
+  .dark .service-card__inner .pill {
+    background-color: transparent;
+    color: var(--stone-400);
+  }
+
+  .request-card__head,
+  .service-card__head {
+    align-items: baseline;
   }
 
   .request-card__title,
@@ -449,30 +468,40 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
-    font-size: 0.875rem;
-    line-height: 1.375;
+    font-size: 0.9375rem;
+    line-height: 1.45;
   }
 
   .request-card__meta,
   .service-card__meta {
     overflow: hidden;
-    font-size: 0.75rem;
-    line-height: 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  /* 좁은 폭에서 pill과 공존 불가 — 날짜는 우선순위가 낮아 숨김 */
-  .request-card__date {
-    display: none;
+  /* 마지막 줄 — 예산·일정(좌)과 받은 제안(우)을 한 행에 배치하기 위한 row-wrap */
+  .request-card {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
   }
 
-  /* 라벨 열을 없애고 값만 세로로 — 값 자체(일정·예산)로 의미가 통한다 */
+  .request-card__head,
+  .request-card__body {
+    width: 100%;
+  }
+
   .request-card__facts {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.125rem;
-    font-size: 0.75rem;
-    line-height: 1.125rem;
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    column-gap: 0.375rem;
+    overflow: hidden;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    white-space: nowrap;
   }
 
   .request-card__fact-label {
@@ -482,35 +511,42 @@
   .request-card__fact-value {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
+  /* 예산이 줄 맨 앞의 앵커 — 뒤에 middot으로 일정과 구분 */
   .request-card__budget {
-    font-size: 0.875rem;
-    font-weight: 600;
+    order: -1;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .request-card__budget::after {
+    content: "·";
+    margin-left: 0.375rem;
+    font-weight: 400;
+    color: var(--stone-400);
   }
 
   .request-card__proposals {
+    margin-top: 0;
+    margin-left: auto;
     font-size: 0.75rem;
-    line-height: 1rem;
+    line-height: 1.25rem;
   }
 
-  .service-card__rating {
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
-
-  /* ★4.9만 남겨 pill과 별점이 head 한 줄에 공존하도록 */
-  .service-card__review-count {
-    display: none;
-  }
-
+  /* 해드려요 — 설명은 생략하고 가격이 앵커 */
   .service-card__desc {
     display: none;
   }
 
-  .service-card__price {
-    font-size: 0.875rem;
+  .service-card__rating {
+    font-size: 0.8125rem;
     line-height: 1.25rem;
+  }
+
+  .service-card__price {
+    margin-top: 0.125rem;
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
   }
 }

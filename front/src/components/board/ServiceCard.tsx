@@ -30,7 +30,7 @@ export default function ServiceCard({ post }: { post: ServicePost }) {
           </span>
         </div>
 
-        <div>
+        <div className="service-card__body">
           <h2 className="service-card__title">{post.title}</h2>
           <p className="service-card__meta">
             {post.providerName} · {post.region}
