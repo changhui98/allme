@@ -1,9 +1,11 @@
 package com.allme.back.global.config;
 
+import com.allme.back.global.auth.RoleGuardInterceptor;
 import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -12,13 +14,22 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final String[] allowedOrigins;
     private final String imagesRoot;
+    private final RoleGuardInterceptor roleGuardInterceptor;
 
     public WebConfig(
         @Value("${cors.allowed-origins}") String[] allowedOrigins,
-        @Value("${app.images-root}") String imagesRoot
+        @Value("${app.images-root}") String imagesRoot,
+        RoleGuardInterceptor roleGuardInterceptor
     ) {
         this.allowedOrigins = allowedOrigins;
         this.imagesRoot = imagesRoot;
+        this.roleGuardInterceptor = roleGuardInterceptor;
+    }
+
+    /** @RequireRole 역할 인가 가드 — 어노테이션 없는 API에는 아무 영향이 없다. */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(roleGuardInterceptor).addPathPatterns("/api/**");
     }
 
     @Override

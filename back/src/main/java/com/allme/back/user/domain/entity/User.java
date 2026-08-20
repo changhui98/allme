@@ -2,13 +2,20 @@ package com.allme.back.user.domain.entity;
 
 import com.allme.back.global.crypto.EncryptedStringConverter;
 import com.allme.back.global.entity.BaseEntity;
+import com.allme.back.user.domain.Role;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,6 +75,15 @@ public class User extends BaseEntity {
     @Column(name = "profile_image_file_id")
     private Long profileImageFileId;
 
+    /**
+     * 보유 역할(다중) — grantRole/revokeRole로만 조작한다.
+     * EAGER인 이유: open-in-view가 꺼져 있어 컨트롤러의 응답 조립(summaryOf)에서
+     * LAZY 접근 시 LazyInitializationException이 난다. 계정당 최대 4행이고
+     * 인증된 요청 대부분(로그인·me)에서 필요하므로 즉시 로딩이 실용적.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<UserRole> roles = new HashSet<>();
+
     private User(
         String loginId, String encodedPassword, String name,
         String ci, String ciHash, String di, String phoneNumber, boolean marketingConsent
@@ -86,6 +102,29 @@ public class User extends BaseEntity {
         this.profileImageFileId = profileImageFileId;
     }
 
+    /** 역할 부여 — 이미 보유한 역할이면 no-op(unique 제약 위반 방지). */
+    public void grantRole(Role role) {
+        if (!hasRole(role)) {
+            this.roles.add(UserRole.create(this, role));
+        }
+    }
+
+    /** 역할 회수 — orphanRemoval로 user_roles 행이 물리 삭제된다. 미보유 역할이면 no-op. */
+    public void revokeRole(Role role) {
+        this.roles.removeIf(userRole -> userRole.getRole() == role);
+    }
+
+    public boolean hasRole(Role role) {
+        return this.roles.stream().anyMatch(userRole -> userRole.getRole() == role);
+    }
+
+    /** 보유 역할을 Role 집합으로 반환한다(수동 정의라 Lombok의 Set&lt;UserRole&gt; getter를 대체). */
+    public Set<Role> getRoles() {
+        return this.roles.stream()
+            .map(UserRole::getRole)
+            .collect(() -> EnumSet.noneOf(Role.class), Set::add, Set::addAll);
+    }
+
     /**
      * 회원탈퇴 — soft delete 마킹 후 개인정보를 전부 비운다.
      * 본 DB에는 id·loginId·삭제일만 유의미하게 남는다(아이디 재사용 차단 유지).
@@ -94,6 +133,9 @@ public class User extends BaseEntity {
      */
     public void withdraw() {
         delete();
+        // 역할은 개인정보가 아니라 아카이브 이관 대상이 아니다. 전부 회수해 두면
+        // 잔존 세션이 있어도 인가 가드의 역할 조회가 빈 집합을 반환해 403이 된다.
+        this.roles.clear();
         this.password = null;
         this.name = null;
         this.ci = null;

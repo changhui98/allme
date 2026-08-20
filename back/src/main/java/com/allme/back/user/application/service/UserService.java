@@ -11,6 +11,7 @@ import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnUs
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Set;
+import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.domain.repository.UserRepository;
@@ -104,6 +105,8 @@ public class UserService {
             verification.phoneNumber(),
             marketingConsent
         );
+        // 기본 역할 — cascade라 아래 save(saveAndFlush)에서 user_roles 행이 함께 INSERT된다
+        user.grantRole(Role.USER);
 
         try {
             userRepository.save(user);
