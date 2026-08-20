@@ -4,15 +4,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Avatar from "@/components/mypage/Avatar";
+import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
-import { logoutUser } from "@/lib/user";
+import { hasRole, logoutAndGoHome, type UserRole } from "@/lib/user";
 
-/** 사이드바·모바일 패널 공용 메뉴 — 거래 루프 관리(사용자·업체 관점) + 내 정보 */
-const MENU_ITEMS = [
+/**
+ * 사이드바·모바일 패널 공용 메뉴 — 거래 루프 관리(사용자·업체 관점) + 내 정보.
+ * role이 지정된 항목은 해당 역할 보유 시에만 노출된다(숨김은 UX용 — 실질 보호는 백엔드 인가).
+ */
+const MENU_ITEMS: { href: string; label: string; role?: UserRole }[] = [
   { href: "/mypage", label: "대시보드" },
   { href: "/mypage/requests", label: "요청한 서비스" },
-  { href: "/mypage/received", label: "받은 요청" },
+  { href: "/mypage/received", label: "받은 요청", role: "PROVIDER" },
   { href: "/mypage/profile", label: "내 정보" },
 ];
 
@@ -50,14 +54,8 @@ export default function MypageShell({ children }: { children: ReactNode }) {
     return <div className="mypage-shell mypage-shell--pending" />;
   }
 
-  const handleLogout = async () => {
-    await logoutUser();
-    // 풀 리로드로 useMe 모듈 캐시 초기화
-    window.location.assign("/");
-  };
-
   const renderMenuLinks = (onNavigate?: () => void) =>
-    MENU_ITEMS.map((item) => {
+    MENU_ITEMS.filter((item) => !item.role || hasRole(me, item.role)).map((item) => {
       const isActive = pathname === item.href;
       return (
         <li key={item.href} className="mypage-sidebar__item">
@@ -92,6 +90,7 @@ export default function MypageShell({ children }: { children: ReactNode }) {
             <Avatar name={me.name} imageUrl={me.profileImageUrl} size="sm" />
             <span className="mypage-topbar__login-id">{me.loginId}</span>
           </Link>
+          <ThemeMenu />
           <Link
             href="/"
             className="mypage-topbar__home"
@@ -152,6 +151,7 @@ export default function MypageShell({ children }: { children: ReactNode }) {
             </nav>
 
             <div className="mypage-menu-panel__footer">
+              <ThemeMenu />
               <Link
                 href="/"
                 onClick={() => setMenuOpen(false)}
@@ -161,7 +161,7 @@ export default function MypageShell({ children }: { children: ReactNode }) {
               </Link>
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={logoutAndGoHome}
                 className="mypage-menu-panel__footer-link"
               >
                 로그아웃
@@ -176,19 +176,19 @@ export default function MypageShell({ children }: { children: ReactNode }) {
         <nav aria-label="마이페이지 메뉴" className="mypage-sidebar">
           <ul className="mypage-sidebar__list">{renderMenuLinks()}</ul>
           <div className="mypage-sidebar__footer">
+            <button
+              type="button"
+              onClick={logoutAndGoHome}
+              className="mypage-sidebar__footer-link"
+            >
+              로그아웃
+            </button>
             <Link
               href="/mypage/withdraw"
               className="mypage-sidebar__footer-link mypage-sidebar__footer-link--danger"
             >
               회원탈퇴
             </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="mypage-sidebar__footer-link"
-            >
-              로그아웃
-            </button>
           </div>
         </nav>
 

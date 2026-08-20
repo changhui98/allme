@@ -35,12 +35,27 @@ export type JoinUserInput = {
   marketingConsent: boolean;
 };
 
+/** 계정 역할 — 백엔드 Role enum name과의 계약(다중 보유 가능) */
+export type UserRole = "USER" | "PROVIDER" | "MANAGER" | "ADMIN";
+
 export type LoginUserResult = {
   loginId: string;
   name: string;
   /** 프로필 이미지 서빙 경로(/images/...) — API_BASE_URL을 붙여 사용. 미설정이면 null */
   profileImageUrl: string | null;
+  roles: UserRole[];
 };
+
+/**
+ * 역할 보유 여부 — 메뉴 노출·페이지 가드 등 프론트 분기용(실질 보호는 백엔드 인가).
+ * roles까지 옵셔널 체이닝하는 이유: roles 필드가 없는 구버전 백엔드 응답에도 죽지 않기 위함.
+ */
+export function hasRole(
+  me: LoginUserResult | null,
+  role: UserRole,
+): boolean {
+  return me?.roles?.includes(role) ?? false;
+}
 
 /**
  * 로그인. 성공 시 백엔드가 세션 쿠키(JSESSIONID)를 내려주므로
