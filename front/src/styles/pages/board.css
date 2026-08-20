@@ -229,14 +229,14 @@
   color: #ffffff;
 }
 
-/* 활성 탭 — 보더 없는 프라이머리 알약, hover 변화 없음 (hover 셀렉터까지 묶어 덮어쓴다) */
+/* 활성 탭 — 프라이머리 틴트 + 프라이머리 보더 알약, hover 변화 없음 (hover 셀렉터까지 묶어 덮어쓴다) */
 .category-tabs__tab--active,
 .category-tabs__tab--active:hover,
 .dark .category-tabs__tab--active,
 .dark .category-tabs__tab--active:hover {
-  border-width: 0;
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  border-color: var(--primary);
+  background-color: color-mix(in oklab, var(--primary) 8%, transparent);
+  color: var(--primary-text);
 }
 
 /* ---------- service-card: "해드려요" 목록 카드 — 공용 .card.card--interactive 조합 ---------- */
@@ -415,4 +415,102 @@
 
 .dark .request-card__proposal-count {
   color: var(--stone-200);
+}
+
+/* ---------- 모바일(<40rem) 미니 카드 — 게시판 목록을 2열로 압축 ----------
+   utilities.css의 .card-grid 브레이크포인트를 특이도(.board-page .card-grid)로
+   전 구간 덮어쓰지 않도록, 예외적으로 max-width 쿼리로 모바일 구간만 한정한다. */
+
+@media (max-width: 39.9375rem) {
+  .board-page .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .request-card,
+  .service-card__inner {
+    gap: 0.5rem;
+    padding: 0.875rem;
+  }
+
+  .request-card .pill,
+  .service-card__inner .pill {
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0.1875rem 0.5rem;
+    font-size: 0.6875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .request-card__title,
+  .service-card__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.875rem;
+    line-height: 1.375;
+  }
+
+  .request-card__meta,
+  .service-card__meta {
+    overflow: hidden;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* 좁은 폭에서 pill과 공존 불가 — 날짜는 우선순위가 낮아 숨김 */
+  .request-card__date {
+    display: none;
+  }
+
+  /* 라벨 열을 없애고 값만 세로로 — 값 자체(일정·예산)로 의미가 통한다 */
+  .request-card__facts {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+  }
+
+  .request-card__fact-label {
+    display: none;
+  }
+
+  .request-card__fact-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .request-card__budget {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .request-card__proposals {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .service-card__rating {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  /* ★4.9만 남겨 pill과 별점이 head 한 줄에 공존하도록 */
+  .service-card__review-count {
+    display: none;
+  }
+
+  .service-card__desc {
+    display: none;
+  }
+
+  .service-card__price {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }
