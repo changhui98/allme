@@ -31,10 +31,9 @@ export const AUTH_LINKS = {
   signup: { label: "회원가입", href: "/signup" },
 } as const;
 
-/** 로그인 상태의 헤더 우측 링크 — 페이지는 아직 계획된 경로 플레이스홀더 */
+/** 로그인 상태의 헤더 우측 링크 */
 export const MEMBER_LINKS = {
   mypage: { label: "마이페이지", href: "/mypage" },
-  settings: { label: "설정", href: "/settings" },
 } as const;
 
 /** 푸터 링크 그룹 */
