@@ -119,13 +119,15 @@ export async function uploadProfileImage(
   return res.json();
 }
 
-/** 회원탈퇴 — soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
-export async function withdrawUser(): Promise<void> {
+/** 회원탈퇴 — 비밀번호 재확인(U013) 후 soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
+export async function withdrawUser(password: string): Promise<void> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}/api/users/me`, {
       method: "DELETE",
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
+      body: JSON.stringify({ password }),
     });
   } catch {
     throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");

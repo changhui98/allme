@@ -6,6 +6,7 @@ import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.presentation.dto.request.UserJoinRequest;
 import com.allme.back.user.presentation.dto.request.UserLoginRequest;
+import com.allme.back.user.presentation.dto.request.UserWithdrawRequest;
 import com.allme.back.user.presentation.dto.response.LoginIdAvailabilityResponse;
 import com.allme.back.user.presentation.dto.response.UserJoinResponse;
 import com.allme.back.user.presentation.dto.response.UserSummaryResponse;
@@ -110,11 +111,13 @@ public class UserController {
         return summaryOf(userService.getById(userId));
     }
 
-    /** 회원탈퇴 — soft delete + 개인정보 익명화 후 세션을 무효화한다. */
+    /** 회원탈퇴 — 비밀번호 재확인 후 soft delete + 개인정보 익명화, 세션 무효화. */
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void withdraw(HttpServletRequest httpRequest) {
-        userService.withdraw(sessionUserId(httpRequest));
+    public void withdraw(
+        @Valid @RequestBody UserWithdrawRequest request, HttpServletRequest httpRequest
+    ) {
+        userService.withdraw(sessionUserId(httpRequest), request.password());
 
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {

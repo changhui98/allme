@@ -21,7 +21,8 @@ public enum UserErrorCode implements ErrorCode {
     ALREADY_REGISTERED(HttpStatus.CONFLICT, "U009", "이미 가입된 계정이 있습니다."),
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "U010", "아이디 또는 비밀번호가 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "U011", "로그인이 필요합니다."),
-    PROFILE_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "U012", "지원하지 않는 이미지 형식이거나 파일이 너무 큽니다.")
+    PROFILE_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "U012", "지원하지 않는 이미지 형식이거나 파일이 너무 큽니다."),
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U013", "비밀번호가 올바르지 않습니다.")
     ;
 
     private final HttpStatus status;

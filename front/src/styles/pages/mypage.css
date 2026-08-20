@@ -561,6 +561,12 @@
   color: var(--muted);
 }
 
+/* 비밀번호 재확인 — auth의 form-field(플로팅 라벨 박스)를 그대로 쓰고 폭만 제한 */
+.withdraw-page__password {
+  margin-top: 1.5rem;
+  max-width: 22rem;
+}
+
 .withdraw-page__error {
   margin-top: 1rem;
   font-size: 0.875rem;

@@ -204,10 +204,17 @@ public class UserService {
      * (1) 아카이브 실패 → 전체 실패, 원본 무손실 (2) 아카이브 성공 후 본 트랜잭션 실패 →
      * 아카이브 잔여 행만 남고 원본 무손실(재시도는 userId upsert로 안전).
      * 어떤 실패 모드에서도 데이터가 유실되지 않는다.
+     *
+     * 실행 전 비밀번호 재확인(U013) — 방치된 세션의 오·악용으로 계정이 파괴되는 것을 막는다.
      */
     @Transactional
-    public void withdraw(Long userId) {
+    public void withdraw(Long userId, String rawPassword) {
         User user = getById(userId);
+
+        if (rawPassword == null || user.getPassword() == null
+            || !passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new AppException(UserErrorCode.PASSWORD_MISMATCH);
+        }
 
         withdrawnUserArchivePort.archive(new WithdrawnUser(
             user.getId(),

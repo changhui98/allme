@@ -13,6 +13,7 @@ import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.port.IdentityVerificationPort.IdentityVerificationResult;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnUser;
+import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.domain.repository.UserRepository;
@@ -43,6 +44,9 @@ class UserServiceTest {
     private final FileService fileService = new FileService(
         fileRepository, tempRepository, fileStorage, Clock.system(ZoneId.of("Asia/Seoul")));
     private final StubWithdrawnUserArchive stubArchive = new StubWithdrawnUserArchive();
+
+    /** 가입 시 저장된 User를 검증하기 위한 기록 — 스텁 저장소의 save가 채운다 */
+    private final List<User> savedUsers = new ArrayList<>();
 
     private UserService serviceWith(boolean loginIdExists) {
         return serviceWith(loginIdExists, false, null);
@@ -78,6 +82,7 @@ class UserServiceTest {
 
             @Override
             public User save(User user) {
+                savedUsers.add(user);
                 return user;
             }
         };
@@ -139,10 +144,12 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("가입 성공 시 loginId를 반환한다")
+    @DisplayName("가입 성공 시 loginId를 반환하고 기본 역할 USER가 부여된다")
     void join_success() {
         assertThat(serviceWith(false).join("iv-1", "allme123", VALID_PASSWORD, true))
             .isEqualTo("allme123");
+        assertThat(savedUsers).hasSize(1);
+        assertThat(savedUsers.get(0).getRoles()).containsExactly(Role.USER);
     }
 
     @Test
@@ -304,13 +311,33 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("역할 부여는 중복 시 no-op이고 회수하면 사라진다")
+    void grantAndRevokeRole() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        user.grantRole(Role.USER);
+        user.grantRole(Role.USER); // 중복 부여 — no-op
+        user.grantRole(Role.PROVIDER);
+
+        assertThat(user.getRoles()).containsExactlyInAnyOrder(Role.USER, Role.PROVIDER);
+        assertThat(user.hasRole(Role.PROVIDER)).isTrue();
+        assertThat(user.hasRole(Role.ADMIN)).isFalse();
+
+        user.revokeRole(Role.PROVIDER);
+        user.revokeRole(Role.ADMIN); // 미보유 역할 회수 — no-op
+
+        assertThat(user.getRoles()).containsExactly(Role.USER);
+    }
+
+    @Test
     @DisplayName("탈퇴하면 아카이브로 이관한 뒤 본 DB에는 loginId·삭제일만 남고 개인정보·이미지가 비워진다")
     void withdraw_success() {
         User user = userWithPassword(VALID_PASSWORD);
+        user.grantRole(Role.USER);
         Long fileId = seedProfileImage(user, "old.png");
         String storedPath = fileRepository.store.get(fileId).getStoredPath();
 
-        serviceWith(true, false, user).withdraw(1L);
+        serviceWith(true, false, user).withdraw(1L, VALID_PASSWORD);
 
         // 아카이브에 원본 스냅샷 이관 (password는 이관 대상 아님 — record에 필드 자체가 없음)
         assertThat(stubArchive.archived).hasSize(1);
@@ -331,6 +358,7 @@ class UserServiceTest {
         assertThat(user.getDi()).isNull();
         assertThat(user.getPhoneNumber()).isNull();
         assertThat(user.getProfileImageFileId()).isNull();
+        assertThat(user.getRoles()).isEmpty();
         assertThat(fileRepository.store).isEmpty();
         assertThat(fileStorage.deleted).containsExactly(storedPath);
     }
@@ -341,7 +369,7 @@ class UserServiceTest {
         User user = userWithPassword(VALID_PASSWORD);
         stubArchive.failNext = true;
 
-        assertThatThrownBy(() -> serviceWith(true, false, user).withdraw(1L))
+        assertThatThrownBy(() -> serviceWith(true, false, user).withdraw(1L, VALID_PASSWORD))
             .isInstanceOf(IllegalStateException.class);
 
         assertThat(user.isDeleted()).isFalse();
@@ -356,10 +384,25 @@ class UserServiceTest {
         User user = userWithPassword(VALID_PASSWORD);
         user.delete();
 
-        assertThatThrownBy(() -> serviceWith(true, false, user).withdraw(1L))
+        assertThatThrownBy(() -> serviceWith(true, false, user).withdraw(1L, VALID_PASSWORD))
             .isInstanceOf(AppException.class)
             .extracting(e -> ((AppException) e).getErrorCode())
             .isEqualTo(UserErrorCode.UNAUTHORIZED);
+    }
+
+    @Test
+    @DisplayName("비밀번호가 틀리면 PASSWORD_MISMATCH 예외를 던지고 탈퇴가 진행되지 않는다")
+    void withdraw_passwordMismatch() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThatThrownBy(() -> serviceWith(true, false, user).withdraw(1L, "Wrong999!"))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.PASSWORD_MISMATCH);
+
+        assertThat(stubArchive.archived).isEmpty();
+        assertThat(user.isDeleted()).isFalse();
+        assertThat(user.getName()).isEqualTo("홍길동");
     }
 
     @Test

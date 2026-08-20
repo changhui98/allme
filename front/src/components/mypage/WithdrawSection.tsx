@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import FormField from "@/components/auth/FormField";
 import Modal from "@/components/common/Modal";
 import { useMe } from "@/lib/use-me";
 import { withdrawUser } from "@/lib/user";
@@ -14,8 +15,9 @@ const CONSENT_ITEMS: { key: ConsentKey; label: string }[] = [
 ];
 
 /**
- * 회원탈퇴 본문 — 리텐션 멘트 → 유의사항 → 동의 체크 2개(모두 필수) → 탈퇴.
- * 동의를 모두 체크해야 탈퇴 버튼이 활성화되고, 성공 시 완료 모달 후 홈으로 보낸다.
+ * 회원탈퇴 본문 — 리텐션 멘트 → 유의사항 → 동의 체크 2개(모두 필수) → 비밀번호 재확인 → 탈퇴.
+ * 동의를 모두 체크하고 비밀번호를 입력해야 탈퇴 버튼이 활성화되며(실제 검증은 백엔드 U013),
+ * 성공 시 완료 모달 후 홈으로 보낸다.
  * 체크박스는 ConsentStep과 같은 패턴(네이티브 input 숨김 + 원형 커스텀 체크).
  * 셸(MypageShell)이 세션을 보장하므로 me 유무만 가드한다.
  * 스타일: styles/pages/mypage.css (.withdraw-page·.withdraw-consent)
@@ -26,6 +28,7 @@ export default function WithdrawSection() {
     notice: false,
     deletion: false,
   });
+  const [password, setPassword] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -33,16 +36,17 @@ export default function WithdrawSection() {
   if (!me) return null;
 
   const allChecked = CONSENT_ITEMS.every((item) => checked[item.key]);
+  const canSubmit = allChecked && password !== "";
 
   const toggle = (key: ConsentKey) =>
     setChecked((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const handleWithdraw = async () => {
-    if (!allChecked || withdrawing) return;
+    if (!canSubmit || withdrawing) return;
     setWithdrawing(true);
     setError(null);
     try {
-      await withdrawUser();
+      await withdrawUser(password);
       setDone(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "회원탈퇴에 실패했습니다.");
@@ -95,6 +99,18 @@ export default function WithdrawSection() {
         ))}
       </div>
 
+      {/* 본인 확인 — 비밀번호 재입력 (검증은 탈퇴 API가 수행) */}
+      <div className="withdraw-page__password">
+        <FormField
+          id="withdraw-password"
+          label="비밀번호 확인"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={setPassword}
+        />
+      </div>
+
       {error ? (
         <p className="withdraw-page__error" role="alert">
           {error}
@@ -108,7 +124,7 @@ export default function WithdrawSection() {
         <button
           type="button"
           onClick={handleWithdraw}
-          disabled={!allChecked || withdrawing}
+          disabled={!canSubmit || withdrawing}
           className="btn btn--danger withdraw-page__submit"
         >
           {withdrawing ? "처리 중..." : "탈퇴하기"}
