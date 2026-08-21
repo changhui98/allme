@@ -620,17 +620,43 @@ a.mypage-stats__item:hover {
   color: var(--primary-text);
 }
 
-/* ---------- mypage-profile: 내 정보 (플랫 — 박스 없이 구분선만) ---------- */
+/* ---------- mypage-profile: 내 정보 (2열 카드 그리드 — A안 경계선 카드) ---------- */
 
 .mypage-profile {
-  max-width: 48rem; /* 폼·정보 글줄 가독 — 풀폭 본문에서도 좁게 유지 */
   margin-top: 2rem;
+}
+
+.mypage-profile__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 64rem) {
+  .mypage-profile__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 카드 — 배경은 본문과 같은 색(통일), 경계선(hairline)만으로 구분. 그림자 없음 */
+.mypage-profile__card {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.625rem;
+  background-color: var(--background);
+}
+
+.mypage-profile__card-title {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 600;
 }
 
 .mypage-profile__head {
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  margin-top: 1.25rem;
 }
 
 .mypage-profile__summary {
@@ -653,21 +679,26 @@ a.mypage-stats__item:hover {
   color: var(--muted);
 }
 
-/* 사진 변경 — 테두리 없는 텍스트 버튼 */
-.mypage-profile__upload {
+/* 사진 변경·닉네임 변경 — 테두리 없는 텍스트 버튼 행 */
+.mypage-profile__actions {
+  display: flex;
+  gap: 1rem;
   margin-top: 0.5rem;
+}
+
+.mypage-profile__text-btn {
   font-size: 0.8125rem;
   line-height: 1.125rem;
   font-weight: 500;
   color: var(--primary-text);
 }
 
-.mypage-profile__upload:hover:not(:disabled) {
+.mypage-profile__text-btn:hover:not(:disabled) {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.mypage-profile__upload:disabled {
+.mypage-profile__text-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -679,13 +710,30 @@ a.mypage-stats__item:hover {
   color: var(--danger);
 }
 
+/* 닉네임 인라인 편집 — 카드 안 구분선 아래 form-field(auth.css) 재사용 */
+.mypage-profile__edit {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.mypage-profile__edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.mypage-profile__edit-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .mypage-profile__facts {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-  margin-top: 2rem;
-  border-top: 1px solid var(--border);
-  padding-top: 1.5rem;
+  margin-top: 1.25rem;
 }
 
 .mypage-profile__fact {
@@ -705,6 +753,14 @@ a.mypage-stats__item:hover {
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
+}
+
+/* 카드 하단 보조 안내 (실명 비공개 안내 등) */
+.mypage-profile__note {
+  margin-top: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.375rem;
+  color: var(--muted);
 }
 
 

@@ -143,6 +143,61 @@ export async function uploadProfileImage(
   return res.json();
 }
 
+/** 백엔드 UserService.NICKNAME_PATTERN과 반드시 동일하게 유지할 것: 한글·영문·숫자·공백, 2~24자 */
+export const NICKNAME_RULES = {
+  pattern: /^[가-힣a-zA-Z0-9 ]{2,24}$/,
+  message: "닉네임은 한글·영문·숫자로 2~24자까지 입력할 수 있어요.",
+} as const;
+
+/** 닉네임 변경 — 형식 오류 U014(400)·중복 U015(409)는 ApiError.code로 구분한다. */
+export async function updateNickname(
+  nickname: string,
+): Promise<LoginUserResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/nickname`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ nickname }),
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(body?.message ?? "닉네임 변경에 실패했습니다.", body?.code);
+  }
+  return res.json();
+}
+
+/** 랜덤 닉네임 제안 — 저장하지 않은 유니크 후보만 받는다("랜덤 다시 뽑기"). */
+export async function fetchRandomNickname(): Promise<string> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/nickname/random`, {
+      credentials: "include",
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(
+      body?.message ?? "닉네임 추천에 실패했습니다.",
+      body?.code,
+    );
+  }
+  const body = (await res.json()) as { nickname: string };
+  return body.nickname;
+}
+
 /** 회원탈퇴 — 비밀번호 재확인(U013) 후 soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
 export async function withdrawUser(password: string): Promise<void> {
   let res: Response;
