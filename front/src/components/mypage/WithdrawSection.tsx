@@ -5,7 +5,7 @@ import { useState } from "react";
 import FormField from "@/components/auth/FormField";
 import Modal from "@/components/common/Modal";
 import { useMe } from "@/lib/use-me";
-import { withdrawUser } from "@/lib/user";
+import { displayName, withdrawUser } from "@/lib/user";
 
 type ConsentKey = "notice" | "deletion";
 
@@ -60,7 +60,7 @@ export default function WithdrawSection() {
     <>
       <h1 className="mypage-page__title">올미와 이별하시는 건가요?</h1>
       <p className="mypage-page__subtitle">
-        {me.name}님, 탈퇴하기 전에 아래 내용을 꼭 확인해주세요.
+        {displayName(me)}님, 탈퇴하기 전에 아래 내용을 꼭 확인해주세요.
       </p>
 
       <section aria-label="탈퇴 유의사항" className="mypage-section">

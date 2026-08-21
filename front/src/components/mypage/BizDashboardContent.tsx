@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMe } from "@/lib/use-me";
+import { displayName } from "@/lib/user";
 
 /**
  * 업체 대시보드 본문 — 인사말 + 업체 활동 스탯 카드 + 최근 활동 (A안: 경계선 카드, 그림자 없음).
@@ -16,7 +17,7 @@ export default function BizDashboardContent() {
 
   return (
     <>
-      <h1 className="mypage-page__title">{me.name}님의 업체 공간이에요.</h1>
+      <h1 className="mypage-page__title">{displayName(me)}님의 업체 공간이에요.</h1>
       <p className="mypage-page__subtitle">내 서비스와 받은 요청 현황이에요.</p>
 
       {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}

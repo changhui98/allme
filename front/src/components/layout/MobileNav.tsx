@@ -8,7 +8,7 @@ import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
-import { logoutAndGoHome } from "@/lib/user";
+import { displayName, logoutAndGoHome } from "@/lib/user";
 
 /**
  * 모바일(<md) 전용 네비. 햄버거 버튼으로 검색/메뉴 패널을 토글한다.
@@ -93,9 +93,9 @@ export default function MobileNav() {
               onClick={() => setOpen(false)}
               className="mobile-nav__profile"
             >
-              <Avatar name={me.name} imageUrl={me.profileImageUrl} size="md" />
+              <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="md" />
               <span className="mobile-nav__profile-who">
-                <span className="mobile-nav__profile-name">{me.name}</span>
+                <span className="mobile-nav__profile-name">{displayName(me)}</span>
                 <span className="mobile-nav__profile-login-id">
                   {me.loginId}
                 </span>

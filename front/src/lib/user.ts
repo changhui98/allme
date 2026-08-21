@@ -40,11 +40,20 @@ export type UserRole = "USER" | "PROVIDER" | "MANAGER" | "ADMIN";
 
 export type LoginUserResult = {
   loginId: string;
+  /** 실명(본인인증 확보 값) — 내 정보·계약·정산에만 표시 */
   name: string;
+  /** 대외 표시명(랜덤 3단어 닉네임, 변경 가능) */
+  nickname: string;
   /** 프로필 이미지 서빙 경로(/images/...) — API_BASE_URL을 붙여 사용. 미설정이면 null */
   profileImageUrl: string | null;
   roles: UserRole[];
+  marketingConsent: boolean;
 };
+
+/** 대외 표시명 — 닉네임 우선, 닉네임 없는 구버전 응답은 실명으로 방어 */
+export function displayName(me: LoginUserResult): string {
+  return me.nickname || me.name;
+}
 
 /**
  * 역할 보유 여부 — 메뉴 노출·페이지 가드 등 프론트 분기용(실질 보호는 백엔드 인가).

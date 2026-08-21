@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMe } from "@/lib/use-me";
-import { hasRole } from "@/lib/user";
+import { displayName, hasRole } from "@/lib/user";
 
 /**
  * 대시보드 본문 — 인사말 + 거래 현황 스탯 카드 + 최근 활동 (A안: 경계선 카드, 그림자 없음).
@@ -17,7 +17,7 @@ export default function DashboardContent() {
 
   return (
     <>
-      <h1 className="mypage-page__title">{me.name}님, 안녕하세요.</h1>
+      <h1 className="mypage-page__title">{displayName(me)}님, 안녕하세요.</h1>
       <p className="mypage-page__subtitle">오늘의 거래 현황이에요.</p>
 
       {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}

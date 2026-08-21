@@ -7,7 +7,7 @@ import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
-import { logoutAndGoHome } from "@/lib/user";
+import { displayName, logoutAndGoHome } from "@/lib/user";
 
 /** 관리자 메뉴 — /admin만 정확 일치, 나머지는 프리픽스 일치(상세 페이지에서도 활성 유지) */
 const MENU_ITEMS = [
@@ -85,7 +85,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             className="mypage-topbar__profile"
             aria-label="내 정보"
           >
-            <Avatar name={me.name} imageUrl={me.profileImageUrl} size="sm" />
+            <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="sm" />
             <span className="mypage-topbar__login-id">{me.loginId}</span>
           </Link>
           <ThemeMenu />

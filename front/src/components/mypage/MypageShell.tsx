@@ -7,7 +7,7 @@ import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
-import { hasRole, logoutAndGoHome } from "@/lib/user";
+import { displayName, hasRole, logoutAndGoHome } from "@/lib/user";
 
 /**
  * 모드별 메뉴 — 개인(/mypage/*)과 업체(/mypage/biz/*)를 URL로 분리하고
@@ -134,7 +134,7 @@ export default function MypageShell({ children }: { children: ReactNode }) {
             className="mypage-topbar__profile"
             aria-label="내 정보"
           >
-            <Avatar name={me.name} imageUrl={me.profileImageUrl} size="sm" />
+            <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="sm" />
             <span className="mypage-topbar__login-id">{me.loginId}</span>
           </Link>
           <ThemeMenu />
@@ -173,9 +173,9 @@ export default function MypageShell({ children }: { children: ReactNode }) {
               onClick={() => setMenuOpen(false)}
               className="mypage-menu-panel__profile"
             >
-              <Avatar name={me.name} imageUrl={me.profileImageUrl} size="md" />
+              <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="md" />
               <span className="mypage-menu-panel__who">
-                <span className="mypage-menu-panel__name">{me.name}</span>
+                <span className="mypage-menu-panel__name">{displayName(me)}</span>
                 {modeBadge}
               </span>
             </Link>
@@ -232,9 +232,9 @@ export default function MypageShell({ children }: { children: ReactNode }) {
           {isProvider && (
             <div className="mypage-mode">
               <div className="mypage-mode__profile">
-                <Avatar name={me.name} imageUrl={me.profileImageUrl} size="md" />
+                <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="md" />
                 <span className="mypage-mode__who">
-                  <span className="mypage-mode__name">{me.name}</span>
+                  <span className="mypage-mode__name">{displayName(me)}</span>
                   {modeBadge}
                 </span>
               </div>
