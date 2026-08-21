@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
@@ -67,8 +68,26 @@ export default function ApplicationDetail({ id }: { id: number }) {
     }
   };
 
-  if (error) return <p className="admin-error">{error}</p>;
-  if (!detail) return <p className="admin-loading">불러오는 중…</p>;
+  const backLink = (
+    <Link href="/admin/applications" className="admin-back">
+      ← 목록으로
+    </Link>
+  );
+
+  if (error)
+    return (
+      <>
+        {backLink}
+        <p className="admin-error">{error}</p>
+      </>
+    );
+  if (!detail)
+    return (
+      <>
+        {backLink}
+        <p className="admin-loading">불러오는 중…</p>
+      </>
+    );
 
   const rows: { term: string; desc: string | null }[] = [
     { term: "업체명", desc: detail.businessName },
@@ -95,6 +114,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
 
   return (
     <>
+      {backLink}
       <span
         className={`admin-status admin-status--${detail.status.toLowerCase()}`}
       >

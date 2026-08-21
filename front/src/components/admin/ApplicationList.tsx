@@ -21,8 +21,8 @@ const FILTERS: { value: ApplicationStatus | ""; label: string }[] = [
 const PAGE_SIZE = 20;
 
 /**
- * 업체 신청 심사 목록 — 상태 필터·페이지를 URL 쿼리로 동기화한다
- * (뒤로가기·새로고침·대시보드의 ?status=PENDING 링크 대응).
+ * 업체 신청 심사 목록 — 컬럼 헤더가 있는 데이터 테이블.
+ * 상태 필터·페이지를 URL 쿼리로 동기화한다(뒤로가기·새로고침·대시보드 링크 대응).
  */
 export default function ApplicationList() {
   const router = useRouter();
@@ -83,6 +83,9 @@ export default function ApplicationList() {
             {filter.label}
           </button>
         ))}
+        {data && (
+          <span className="admin-filter__total">총 {data.totalElements}건</span>
+        )}
       </nav>
 
       {error && <p className="admin-error">{error}</p>}
@@ -93,31 +96,54 @@ export default function ApplicationList() {
       )}
 
       {data && data.content.length > 0 && (
-        <ul className="admin-list">
-          {data.content.map((application) => (
-            <li key={application.id}>
-              <Link
-                href={`/admin/applications/${application.id}`}
-                className="admin-list__row"
-              >
-                <span className="admin-list__main">
-                  {application.businessName}
-                </span>
-                <span className="admin-list__meta">
-                  {application.applicantLoginId}
-                </span>
-                <span
-                  className={`admin-status admin-status--${application.status.toLowerCase()}`}
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">업체명</th>
+                <th scope="col">신청자</th>
+                <th scope="col">상태</th>
+                <th scope="col" className="admin-table__num">
+                  신청일
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.content.map((application) => (
+                <tr
+                  key={application.id}
+                  className="admin-table__row--link"
+                  onClick={() =>
+                    router.push(`/admin/applications/${application.id}`)
+                  }
                 >
-                  {APPLICATION_STATUS_LABEL[application.status]}
-                </span>
-                <span className="admin-list__date">
-                  {application.createdDate.slice(0, 10)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <td>
+                    <Link
+                      href={`/admin/applications/${application.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="admin-table__primary"
+                    >
+                      {application.businessName}
+                    </Link>
+                  </td>
+                  <td className="admin-table__muted">
+                    {application.applicantLoginId}
+                  </td>
+                  <td>
+                    <span
+                      className={`admin-status admin-status--${application.status.toLowerCase()}`}
+                    >
+                      {APPLICATION_STATUS_LABEL[application.status]}
+                    </span>
+                  </td>
+                  <td className="admin-table__num">
+                    {application.createdDate.slice(0, 10)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {data && data.totalPages > 1 && (

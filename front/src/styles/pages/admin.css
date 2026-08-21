@@ -1,11 +1,25 @@
 /*
  * 관리자 콘솔 (/admin/*): 셸 골격은 mypage.css의 mypage-shell/topbar/sidebar/menu-panel을
  * 재사용하고(AdminShell 주석 참고), 여기엔 관리자 고유 블록만 둔다.
- * admin-topbar(브랜드 뱃지) · admin-filter(상태 탭) · admin-list(플랫 목록) ·
- * admin-status(상태 뱃지) · admin-search(검색) · admin-detail(상세 dl) ·
- * admin-actions(승인/반려) · admin-reject(반려 사유 입력) · admin-pagination.
- * 원칙: 카드/박스 감싸기 금지 — hairline(var(--border))·여백·타이포로만 구분.
+ * admin-main(풀폭 본문) · admin-topbar(브랜드 뱃지) · admin-page(헤더 행) ·
+ * admin-filter(상태 탭 + 총 건수) · admin-table(데이터 테이블) · admin-status(도트 상태 칩) ·
+ * admin-role(역할 칩) · admin-stats(대시보드 스탯) · admin-mini(대시보드 하위 섹션) ·
+ * admin-search · admin-detail · admin-actions · admin-reject · admin-pagination.
+ * 원칙: 카드/박스 감싸기 금지 — hairline(var(--border))·여백·타이포로만 구분. 색은 토큰 변수만.
  */
+
+/* ---------- admin-main: 마이페이지의 56rem 글줄 제한을 풀어 화면을 채우는 콘솔 본문 ---------- */
+
+.admin-main {
+  width: 100%;
+  max-width: 96rem;
+}
+
+@media (min-width: 64rem) {
+  .admin-main {
+    padding: 2.25rem 3rem 3rem;
+  }
+}
 
 /* ---------- admin-topbar: 로고 옆 관리자 표시 ---------- */
 
@@ -27,21 +41,34 @@
   color: var(--muted);
 }
 
-/* ---------- admin-filter: 상태 필터 탭 (언더라인 방식) ---------- */
+/* ---------- admin-page: 페이지 헤더 행 — 제목 + 우측 슬롯(검색 등) ---------- */
+
+.admin-page__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ---------- admin-filter: 상태 필터 탭 + 우측 총 건수 ---------- */
 
 .admin-filter {
   display: flex;
-  gap: 1.125rem;
-  margin-top: 1.75rem;
+  align-items: flex-end;
+  gap: 1.25rem;
+  margin-top: 2rem;
   border-bottom: 1px solid var(--border);
 }
 
 .admin-filter__item {
-  padding: 0.25rem 0.125rem 0.625rem;
+  padding: 0.25rem 0.125rem 0.6875rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
   color: var(--muted);
+  transition-property: color;
+  transition-duration: 150ms;
 }
 
 .admin-filter__item:hover {
@@ -56,107 +83,278 @@
   color: var(--foreground);
 }
 
-/* ---------- admin-list: hairline 구분 플랫 목록 ---------- */
-
-.admin-list {
-  margin-top: 0.25rem;
-}
-
-.admin-list__row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.25rem 0.75rem;
-  border-bottom: 1px solid var(--border);
-  padding: 0.875rem 0.25rem;
-  transition-property: background-color;
-  transition-duration: 150ms;
-}
-
-.admin-list__row:hover {
-  background-color: var(--surface);
-}
-
-/* 데스크톱: 업체명 | 신청자 | 상태 | 날짜 한 줄 그리드 */
-@media (min-width: 40rem) {
-  .admin-list__row {
-    grid-template-columns: minmax(0, 1fr) 8rem 5.5rem 6.5rem;
-    align-items: center;
-  }
-}
-
-.admin-list__main {
-  font-size: 0.9375rem;
-  line-height: 1.375rem;
-  font-weight: 600;
-  color: var(--foreground);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-list__meta {
+.admin-filter__total {
+  margin-left: auto;
+  padding-bottom: 0.6875rem;
   font-size: 0.8125rem;
-  line-height: 1.125rem;
+  line-height: 1.25rem;
   color: var(--muted);
 }
 
-.admin-list__date {
-  font-size: 0.8125rem;
-  line-height: 1.125rem;
+/* ---------- admin-table: 데이터 테이블 (모바일은 래퍼 가로 스크롤) ---------- */
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table-wrap--gap {
+  margin-top: 1rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0.75rem 0.5625rem;
+  font-size: 0.71875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.9375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.admin-table tbody tr {
+  transition-property: background-color;
+  transition-duration: 100ms;
+}
+
+.admin-table tbody tr:hover {
+  background-color: var(--surface);
+}
+
+/* 클릭 가능한 행 — 커서·첫 컬럼 강조 */
+.admin-table__row--link {
+  cursor: pointer;
+}
+
+.admin-table__primary {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.admin-table__primary:hover {
+  color: var(--primary-text);
+}
+
+.admin-table td.admin-table__muted {
+  color: var(--muted);
+}
+
+.admin-table th.admin-table__num,
+.admin-table td.admin-table__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
 
 /* 탈퇴 회원 행 — 흐리게 */
-.admin-list__row--dim .admin-list__main,
-.admin-list__row--dim .admin-list__meta {
+.admin-table__row--dim td,
+.admin-table__row--dim .admin-table__primary {
   color: var(--muted);
   font-weight: 500;
 }
 
-/* ---------- admin-status: 신청/역할 상태 뱃지 ---------- */
+/* ---------- admin-status: 도트 + 텍스트 상태 칩 (사이드바 도트 모티프와 통일) ---------- */
 
 .admin-status {
-  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.admin-status::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--muted);
+  flex-shrink: 0;
+}
+
+.admin-status--pending {
+  color: var(--primary-text);
+}
+
+.admin-status--pending::before {
+  background-color: var(--primary);
+}
+
+.admin-status--approved {
+  color: var(--success);
+}
+
+.admin-status--approved::before {
+  background-color: var(--success);
+}
+
+.admin-status--rejected {
+  color: var(--danger);
+}
+
+.admin-status--rejected::before {
+  background-color: var(--danger);
+}
+
+/* ---------- admin-role: 회원 역할 소형 칩 ---------- */
+
+.admin-role {
+  display: inline-block;
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.0625rem 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.0625rem 0.4375rem;
   font-size: 0.6875rem;
   line-height: 1rem;
   font-weight: 500;
   background-color: var(--surface);
   color: var(--muted);
-  white-space: nowrap;
 }
 
-.admin-status--pending {
+.admin-role + .admin-role {
+  margin-left: 0.25rem;
+}
+
+/* 운영 권한(MANAGER/ADMIN)은 브랜드 색으로 구분 */
+.admin-role--staff {
   border-color: color-mix(in oklab, var(--primary) 35%, transparent);
-  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary-text);
 }
 
-.admin-status--approved {
-  border-color: color-mix(in oklab, var(--success) 35%, transparent);
-  background-color: color-mix(in oklab, var(--success) 10%, transparent);
-  color: var(--success);
+/* ---------- admin-stats: 대시보드 스탯 로우 (풀폭 grid, hairline 구분) ---------- */
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
-.admin-status--rejected {
-  border-color: color-mix(in oklab, var(--danger) 35%, transparent);
-  background-color: color-mix(in oklab, var(--danger) 10%, transparent);
-  color: var(--danger);
+@media (min-width: 48rem) {
+  .admin-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
-/* ---------- admin-search: 회원 loginId 검색 ---------- */
+.admin-stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.375rem 1.25rem;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+
+.admin-stats__item + .admin-stats__item {
+  border-left: 1px solid var(--border);
+}
+
+/* 2열 접힘(모바일)에서 3·4번째 타일 위쪽 hairline */
+.admin-stats__item:nth-child(n + 3) {
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 48rem) {
+  .admin-stats__item:nth-child(n + 3) {
+    border-top: none;
+  }
+}
+
+a.admin-stats__item:hover {
+  background-color: var(--surface);
+}
+
+.admin-stats__label {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.admin-stats__value {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+
+/* 주의가 필요한 수치(대기 중 신청 > 0) 강조 */
+.admin-stats__value--attention {
+  color: var(--primary-text);
+}
+
+/* ---------- admin-mini: 대시보드 하위 섹션 (제목 + 전체 보기 + 미니 테이블) ---------- */
+
+.admin-mini {
+  margin-top: 2.5rem;
+}
+
+.admin-mini__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.admin-mini__title {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+}
+
+.admin-mini__more {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--primary-text);
+}
+
+.admin-mini__more:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-mini__empty {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---------- admin-search: 회원 loginId 검색 (페이지 헤더 우측 슬롯) ---------- */
 
 .admin-search {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1.75rem;
+}
+
+.admin-search--below {
+  margin-top: 1.25rem;
 }
 
 .admin-search__input {
-  flex: 1;
-  max-width: 18rem;
+  width: 14rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
@@ -176,10 +374,27 @@
   border-color: var(--primary);
 }
 
-/* ---------- admin-detail: 상세 정의 리스트 (hairline 구분) ---------- */
+/* ---------- admin-detail: 상세 — 백링크·헤더·정의 리스트 ---------- */
+
+.admin-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.admin-back:hover {
+  color: var(--foreground);
+}
 
 .admin-detail {
-  margin-top: 1.75rem;
+  max-width: 48rem; /* 소개문 등 글줄 가독 — 콘솔 폭과 무관하게 제한 */
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 
 .admin-detail__row {
@@ -187,19 +402,19 @@
   flex-direction: column;
   gap: 0.25rem;
   border-bottom: 1px solid var(--border);
-  padding: 0.875rem 0.25rem;
+  padding: 0.9375rem 0.25rem;
 }
 
 @media (min-width: 40rem) {
   .admin-detail__row {
     flex-direction: row;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 }
 
 .admin-detail__term {
   flex-shrink: 0;
-  width: 8rem;
+  width: 8.5rem;
   font-size: 0.8125rem;
   line-height: 1.375rem;
   font-weight: 500;
@@ -256,6 +471,7 @@
 .admin-pagination__info {
   font-size: 0.8125rem;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- 공통 보조 ---------- */

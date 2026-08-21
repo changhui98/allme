@@ -9,7 +9,10 @@ import {
 
 const PAGE_SIZE = 20;
 
-/** 회원 목록 — loginId 검색 + 역할 뱃지. 탈퇴 회원은 흐리게 표시. */
+/** 운영 권한 역할 — 칩을 브랜드 색으로 구분 */
+const STAFF_ROLES = new Set(["MANAGER", "ADMIN"]);
+
+/** 회원 목록 — 컬럼 헤더가 있는 데이터 테이블 + loginId 검색·역할 칩. 탈퇴 회원은 흐리게. */
 export default function UserList() {
   const [keywordInput, setKeywordInput] = useState("");
   const [query, setQuery] = useState({ keyword: "", page: 0 });
@@ -49,7 +52,20 @@ export default function UserList() {
 
   return (
     <>
-      <form role="search" onSubmit={handleSearch} className="admin-search">
+      <div className="admin-filter">
+        <span className="admin-filter__item admin-filter__item--active">
+          전체 회원
+        </span>
+        {data && (
+          <span className="admin-filter__total">총 {data.totalElements}명</span>
+        )}
+      </div>
+
+      <form
+        role="search"
+        onSubmit={handleSearch}
+        className="admin-search admin-search--below"
+      >
         <input
           type="search"
           value={keywordInput}
@@ -70,32 +86,58 @@ export default function UserList() {
       )}
 
       {data && data.content.length > 0 && (
-        <ul className="admin-list">
-          {data.content.map((user) => (
-            <li key={user.id}>
-              <div
-                className={`admin-list__row${
-                  user.withdrawn ? " admin-list__row--dim" : ""
-                }`}
-              >
-                <span className="admin-list__main">{user.loginId}</span>
-                <span className="admin-list__meta">
-                  {user.roles.join(" · ") || "-"}
-                </span>
-                <span
-                  className={`admin-status${
-                    user.withdrawn ? " admin-status--rejected" : ""
-                  }`}
+        <div className="admin-table-wrap admin-table-wrap--gap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">아이디</th>
+                <th scope="col">역할</th>
+                <th scope="col">상태</th>
+                <th scope="col" className="admin-table__num">
+                  가입일
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.content.map((user) => (
+                <tr
+                  key={user.id}
+                  className={user.withdrawn ? "admin-table__row--dim" : ""}
                 >
-                  {user.withdrawn ? "탈퇴" : "활성"}
-                </span>
-                <span className="admin-list__date">
-                  {user.createdDate.slice(0, 10)}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <td>
+                    <span className="admin-table__primary">{user.loginId}</span>
+                  </td>
+                  <td>
+                    {user.roles.length > 0
+                      ? user.roles.map((role) => (
+                          <span
+                            key={role}
+                            className={`admin-role${
+                              STAFF_ROLES.has(role) ? " admin-role--staff" : ""
+                            }`}
+                          >
+                            {role}
+                          </span>
+                        ))
+                      : "-"}
+                  </td>
+                  <td>
+                    <span
+                      className={`admin-status${
+                        user.withdrawn ? " admin-status--rejected" : ""
+                      }`}
+                    >
+                      {user.withdrawn ? "탈퇴" : "활성"}
+                    </span>
+                  </td>
+                  <td className="admin-table__num">
+                    {user.createdDate.slice(0, 10)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {data && data.totalPages > 1 && (

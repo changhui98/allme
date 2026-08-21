@@ -161,7 +161,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           </div>
         </nav>
 
-        <main className="mypage-shell__main">{children}</main>
+        {/* admin-main이 마이페이지의 56rem 글줄 제한을 풀어 콘솔답게 화면을 채운다 */}
+        <main className="mypage-shell__main admin-main">{children}</main>
       </div>
     </div>
   );
