@@ -1,0 +1,48 @@
+/*
+ * 공용 토글 스위치 블록 — button[role="switch"] + aria-checked 기반.
+ * 켜짐 상태는 is-on 클래스(aria-checked와 동기)로 표현한다.
+ */
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 1.625rem;
+  border-radius: 9999px;
+  background-color: color-mix(in oklab, var(--muted) 35%, transparent);
+  transition-property: background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.switch.is-on {
+  background-color: var(--primary);
+}
+
+.switch:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.switch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+/* 썸 — 좌우 여백 0.1875rem(트랙 1.625 - 썸 1.25 의 절반) */
+.switch__thumb {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  transition-property: translate;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.switch.is-on .switch__thumb {
+  translate: 1.125rem 0; /* 트랙 2.75 - 썸 1.25 - 여백 0.1875×2 */
+}

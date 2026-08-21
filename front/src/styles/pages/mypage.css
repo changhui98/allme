@@ -763,6 +763,83 @@ a.mypage-stats__item:hover {
   color: var(--muted);
 }
 
+/* ---------- mypage-account: 정산 계좌 카드의 등록/변경 폼 ---------- */
+
+.mypage-account__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.mypage-account__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.mypage-account__label {
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* form-field__input과 같은 박스 문법 — select라 플로팅 라벨 대신 고정 라벨 사용 */
+.mypage-account__select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  background-color: var(--background);
+  padding: 0.75rem 1rem;
+  font-size: 15px;
+  line-height: 1.5rem;
+  outline: none;
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
+}
+
+.mypage-account__select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 15%, transparent);
+}
+
+.mypage-account__register {
+  margin-top: 1rem;
+}
+
+/* ---------- mypage-consent: 알림 설정 카드의 토글 행 ---------- */
+
+.mypage-consent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.mypage-consent__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.mypage-consent__label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.mypage-consent__sub {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+.mypage-consent .switch {
+  margin-left: auto;
+}
+
 
 /* ---------- mypage-empty: 빈 상태 (게시판 API 연동 전) ---------- */
 

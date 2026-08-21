@@ -35,6 +35,8 @@ type FormFieldProps = {
   success?: string;
   /** 외부 설명 요소(비밀번호 체크리스트 등)를 aria-describedby로 연결 */
   describedById?: string;
+  /** 모바일 키패드 힌트 (계좌번호 등 숫자 입력 필드용) */
+  inputMode?: "numeric";
 };
 
 export default function FormField({
@@ -51,6 +53,7 @@ export default function FormField({
   error,
   success,
   describedById,
+  inputMode,
 }: FormFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -85,6 +88,7 @@ export default function FormField({
           id={id}
           name={id}
           type={inputType}
+          inputMode={inputMode}
           autoComplete={autoComplete}
           placeholder={focused ? placeholder : undefined}
           defaultValue={defaultValue}

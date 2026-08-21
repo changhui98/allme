@@ -25,6 +25,7 @@
 @import "../styles/components/mobile-nav.css";
 @import "../styles/components/theme-menu.css";
 @import "../styles/components/modal.css";
+@import "../styles/components/switch.css";
 @import "../styles/pages/home.css";
 @import "../styles/pages/board.css";
 @import "../styles/pages/provider.css";

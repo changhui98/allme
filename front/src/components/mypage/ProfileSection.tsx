@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import Avatar from "@/components/mypage/Avatar";
 import FormField from "@/components/auth/FormField";
+import MarketingConsentCard from "@/components/mypage/MarketingConsentCard";
+import SettlementAccountCard from "@/components/mypage/SettlementAccountCard";
 import { useMe } from "@/lib/use-me";
 import {
   NICKNAME_RULES,
@@ -14,7 +16,8 @@ import {
 
 /**
  * 내 정보 본문 — 2열 카드 그리드(A안 경계선 카드).
- * 프로필 카드(아바타·닉네임·사진 변경·닉네임 인라인 편집) + 계정 정보 카드(실명·아이디).
+ * 프로필(아바타·닉네임·사진 변경·닉네임 인라인 편집) · 계정 정보(실명·아이디)
+ * · 정산 계좌(SettlementAccountCard) · 알림 설정(MarketingConsentCard).
  * 사진·닉네임 변경 성공 시 풀 리로드로 useMe 캐시를 초기화해 상단 바까지 반영한다.
  * 셸(MypageShell)이 이미 세션을 보장하므로 여기서는 me 유무만 가드한다.
  * 스타일: styles/pages/mypage.css
@@ -206,6 +209,9 @@ export default function ProfileSection() {
             실명은 다른 사용자에게 공개되지 않고 계약·정산에만 사용돼요.
           </p>
         </article>
+
+        <SettlementAccountCard />
+        <MarketingConsentCard />
       </div>
     </section>
   );

@@ -198,6 +198,110 @@ export async function fetchRandomNickname(): Promise<string> {
   return body.nickname;
 }
 
+/** 마케팅 수신 동의 변경 — 서버가 변경 일시도 함께 기록한다. */
+export async function updateMarketingConsent(
+  marketingConsent: boolean,
+): Promise<LoginUserResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/marketing-consent`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ marketingConsent }),
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(
+      body?.message ?? "수신 동의 변경에 실패했습니다.",
+      body?.code,
+    );
+  }
+  return res.json();
+}
+
+/** 정산 계좌(마스킹 응답) — 평문 계좌번호는 서버가 절대 내리지 않는다(수정은 전체 재입력). */
+export type SettlementAccount = {
+  /** 백엔드 Bank enum name (lib/banks.ts BANKS.code와 계약) */
+  bank: string;
+  bankName: string;
+  /** "****1234" 형태 마스킹 */
+  accountNumberMasked: string;
+  accountHolder: string;
+};
+
+type SettlementAccountResponse = {
+  registered: boolean;
+  account: SettlementAccount | null;
+};
+
+/** 정산 계좌 조회 — 미등록이면 null. */
+export async function fetchSettlementAccount(): Promise<SettlementAccount | null> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/settlement-account`, {
+      credentials: "include",
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(
+      body?.message ?? "정산 계좌 조회에 실패했습니다.",
+      body?.code,
+    );
+  }
+  const body = (await res.json()) as SettlementAccountResponse;
+  return body.registered ? body.account : null;
+}
+
+export type SettlementAccountInput = {
+  bank: string;
+  accountNumber: string;
+  accountHolder: string;
+};
+
+/** 정산 계좌 등록/수정(upsert) — 형식·은행 오류는 U016(400). 성공 시 마스킹된 계좌를 반환한다. */
+export async function saveSettlementAccount(
+  input: SettlementAccountInput,
+): Promise<SettlementAccount> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/api/users/me/settlement-account`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(input),
+    });
+  } catch {
+    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  if (!res.ok) {
+    const body = (await res
+      .json()
+      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
+    throw new ApiError(
+      body?.message ?? "정산 계좌 저장에 실패했습니다.",
+      body?.code,
+    );
+  }
+  const body = (await res.json()) as SettlementAccountResponse;
+  // upsert 직후 응답이라 항상 registered:true — 방어적으로만 체크
+  if (!body.account) throw new Error("정산 계좌 저장에 실패했습니다.");
+  return body.account;
+}
+
 /** 회원탈퇴 — 비밀번호 재확인(U013) 후 soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
 export async function withdrawUser(password: string): Promise<void> {
   let res: Response;
