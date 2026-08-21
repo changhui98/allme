@@ -43,3 +43,5 @@ app:
   # 업로드 이미지 루트 — 저장소 루트의 images/ (front·back과 나란히).
   # 호스트 bootRun은 back/이 작업 디렉터리라 ../images, 도커는 볼륨 마운트된 /images.
   images-root: ${IMAGES_ROOT:../images}
+  # true면 기동 시 역할별 테스트 계정 4종(testuser 등, 비밀번호 Test1234!)을 시드 — 개발 전용, 운영 금지.
+  seed-test-accounts: ${SEED_TEST_ACCOUNTS:false}
