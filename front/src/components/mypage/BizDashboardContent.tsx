@@ -20,6 +20,7 @@ export default function BizDashboardContent() {
       <h1 className="mypage-page__title">{me.name}님의 업체 공간이에요.</h1>
       <p className="mypage-page__subtitle">내 서비스와 받은 요청 현황이에요.</p>
 
+      {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}
       <div className="mypage-stats">
         <Link href="/mypage/biz/services" className="mypage-stats__item">
           <span className="mypage-stats__label">내 서비스</span>
@@ -29,6 +30,10 @@ export default function BizDashboardContent() {
           <span className="mypage-stats__label">받은 요청</span>
           <span className="mypage-stats__value">0</span>
         </Link>
+        <div className="mypage-stats__item">
+          <span className="mypage-stats__label">진행 중 거래</span>
+          <span className="mypage-stats__value">0</span>
+        </div>
       </div>
 
       <section aria-label="최근 활동" className="mypage-section">

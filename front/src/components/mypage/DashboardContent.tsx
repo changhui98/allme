@@ -21,11 +21,20 @@ export default function DashboardContent() {
       <h1 className="mypage-page__title">{me.name}님, 안녕하세요.</h1>
       <p className="mypage-page__subtitle">오늘의 거래 현황이에요.</p>
 
+      {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}
       <div className="mypage-stats">
         <Link href="/mypage/requests" className="mypage-stats__item">
           <span className="mypage-stats__label">요청한 서비스</span>
           <span className="mypage-stats__value">0</span>
         </Link>
+        <div className="mypage-stats__item">
+          <span className="mypage-stats__label">진행 중 거래</span>
+          <span className="mypage-stats__value">0</span>
+        </div>
+        <div className="mypage-stats__item">
+          <span className="mypage-stats__label">완료된 거래</span>
+          <span className="mypage-stats__value">0</span>
+        </div>
       </div>
 
       <section aria-label="최근 활동" className="mypage-section">
