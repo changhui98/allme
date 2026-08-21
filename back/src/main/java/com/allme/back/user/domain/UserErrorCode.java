@@ -22,7 +22,10 @@ public enum UserErrorCode implements ErrorCode {
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "U010", "아이디 또는 비밀번호가 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "U011", "로그인이 필요합니다."),
     PROFILE_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "U012", "지원하지 않는 이미지 형식이거나 파일이 너무 큽니다."),
-    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U013", "비밀번호가 올바르지 않습니다.")
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U013", "비밀번호가 올바르지 않습니다."),
+    NICKNAME_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "U014",
+        "닉네임은 한글·영문·숫자로 2~24자까지 입력할 수 있어요."),
+    NICKNAME_DUPLICATED(HttpStatus.CONFLICT, "U015", "이미 사용 중인 닉네임이에요.")
     ;
 
     private final HttpStatus status;

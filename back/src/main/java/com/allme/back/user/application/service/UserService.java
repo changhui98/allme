@@ -192,6 +192,52 @@ public class UserService {
         return newFileId;
     }
 
+    /** front lib/user.ts NICKNAME_RULES와 반드시 동일하게 유지할 것: 한글·영문·숫자·공백, 2~24자 */
+    private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[가-힣a-zA-Z0-9 ]{2,24}$");
+
+    /**
+     * 닉네임 변경 — trim·연속 공백 축약 후 형식(U014)·중복(U015) 검증.
+     * 본인 닉네임과 같으면 no-op. 검사~커밋 사이 race는 unique 제약 catch로 U015.
+     */
+    @Transactional
+    public User updateNickname(Long userId, String rawNickname) {
+        String nickname = rawNickname == null
+            ? ""
+            : rawNickname.trim().replaceAll("\\s+", " ");
+        if (!NICKNAME_PATTERN.matcher(nickname).matches()) {
+            throw new AppException(UserErrorCode.NICKNAME_INVALID_FORMAT);
+        }
+
+        User user = getById(userId);
+        if (nickname.equals(user.getNickname())) {
+            return user;
+        }
+        if (userRepository.existsByNickname(nickname)) {
+            throw new AppException(UserErrorCode.NICKNAME_DUPLICATED);
+        }
+
+        user.changeNickname(nickname);
+        try {
+            userRepository.save(user); // saveAndFlush — unique race를 여기서 잡는다
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(UserErrorCode.NICKNAME_DUPLICATED);
+        }
+        return user;
+    }
+
+    /** 랜덤 닉네임 제안 — 저장하지 않는다(저장은 updateNickname이 담당). */
+    public String suggestNickname() {
+        return nicknameService.generateUnique();
+    }
+
+    /** 마케팅 수신 동의 변경 — 변경 일시를 함께 기록한다. */
+    @Transactional
+    public User updateMarketingConsent(Long userId, boolean marketingConsent) {
+        User user = getById(userId);
+        user.changeMarketingConsent(marketingConsent);
+        return user;
+    }
+
     /** 프로필 이미지의 저장 상대경로 — 없으면 null. 응답 DTO의 URL 조합용. */
     public String getProfileImagePath(User user) {
         return user.getProfileImageFileId() != null

@@ -4,10 +4,13 @@ import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.service.UserService;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
+import com.allme.back.user.presentation.dto.request.MarketingConsentUpdateRequest;
 import com.allme.back.user.presentation.dto.request.UserJoinRequest;
 import com.allme.back.user.presentation.dto.request.UserLoginRequest;
+import com.allme.back.user.presentation.dto.request.UserNicknameUpdateRequest;
 import com.allme.back.user.presentation.dto.request.UserWithdrawRequest;
 import com.allme.back.user.presentation.dto.response.LoginIdAvailabilityResponse;
+import com.allme.back.user.presentation.dto.response.NicknameSuggestionResponse;
 import com.allme.back.user.presentation.dto.response.UserJoinResponse;
 import com.allme.back.user.presentation.dto.response.UserSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -109,6 +113,31 @@ public class UserController {
         userService.updateProfileImage(userId, content, extensionOf(originalFilename), originalFilename);
 
         return summaryOf(userService.getById(userId));
+    }
+
+    /** 닉네임 변경 — 형식 오류 U014(400), 중복 U015(409). 성공 시 갱신된 요약 반환. */
+    @PatchMapping("/me/nickname")
+    public UserSummaryResponse updateNickname(
+        @Valid @RequestBody UserNicknameUpdateRequest request, HttpServletRequest httpRequest
+    ) {
+        return summaryOf(
+            userService.updateNickname(sessionUserId(httpRequest), request.nickname()));
+    }
+
+    /** 랜덤 닉네임 제안 — 저장하지 않고 유니크한 후보만 내려준다("랜덤 다시 뽑기"). */
+    @GetMapping("/me/nickname/random")
+    public NicknameSuggestionResponse randomNickname(HttpServletRequest httpRequest) {
+        sessionUserId(httpRequest); // 로그인 가드
+        return new NicknameSuggestionResponse(userService.suggestNickname());
+    }
+
+    /** 마케팅 수신 동의 변경 — 변경 일시가 함께 기록된다. */
+    @PatchMapping("/me/marketing-consent")
+    public UserSummaryResponse updateMarketingConsent(
+        @Valid @RequestBody MarketingConsentUpdateRequest request, HttpServletRequest httpRequest
+    ) {
+        return summaryOf(userService.updateMarketingConsent(
+            sessionUserId(httpRequest), request.marketingConsent()));
     }
 
     /** 회원탈퇴 — 비밀번호 재확인 후 soft delete + 개인정보 익명화, 세션 무효화. */

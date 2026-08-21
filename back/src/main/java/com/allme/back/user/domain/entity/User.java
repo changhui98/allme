@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,6 +77,10 @@ public class User extends BaseEntity {
     @Column(name = "marketing_consent", nullable = false)
     private boolean marketingConsent;
 
+    /** 마케팅 동의 변경 일시 — 동의 이력 고지 대비. 가입 시엔 가입일이 곧 동의일이라 null */
+    @Column(name = "marketing_consent_updated_at")
+    private LocalDateTime marketingConsentUpdatedAt;
+
     /**
      * 프로필 이미지 파일 id — file 도메인 upload_files 테이블 참조.
      * 도메인 간 결합을 피하려고 JPA 연관 없이 id만 보관한다(DB FK 제약도 없음). 미설정이면 null.
@@ -114,6 +119,11 @@ public class User extends BaseEntity {
     /** 닉네임 변경 — 형식·중복 검증은 서비스가 수행하고 여기선 반영만 한다. */
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void changeMarketingConsent(boolean marketingConsent) {
+        this.marketingConsent = marketingConsent;
+        this.marketingConsentUpdatedAt = LocalDateTime.now(KST_CLOCK);
     }
 
     /** 역할 부여 — 이미 보유한 역할이면 no-op(unique 제약 위반 방지). */
