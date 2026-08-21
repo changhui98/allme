@@ -74,7 +74,7 @@ export default function UserList() {
           aria-label="아이디 검색"
           className="admin-search__input"
         />
-        <button type="submit" className="btn btn--outline">
+        <button type="submit" className="btn btn--outline admin-search__btn">
           검색
         </button>
       </form>
@@ -144,7 +144,7 @@ export default function UserList() {
         <div className="admin-pagination">
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--outline admin-pagination__btn"
             disabled={data.page === 0}
             onClick={() => setQuery((q) => ({ ...q, page: q.page - 1 }))}
           >
@@ -155,7 +155,7 @@ export default function UserList() {
           </span>
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--outline admin-pagination__btn"
             disabled={data.page >= data.totalPages - 1}
             onClick={() => setQuery((q) => ({ ...q, page: q.page + 1 }))}
           >

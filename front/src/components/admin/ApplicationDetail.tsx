@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
@@ -68,26 +67,8 @@ export default function ApplicationDetail({ id }: { id: number }) {
     }
   };
 
-  const backLink = (
-    <Link href="/admin/applications" className="admin-back">
-      ← 목록으로
-    </Link>
-  );
-
-  if (error)
-    return (
-      <>
-        {backLink}
-        <p className="admin-error">{error}</p>
-      </>
-    );
-  if (!detail)
-    return (
-      <>
-        {backLink}
-        <p className="admin-loading">불러오는 중…</p>
-      </>
-    );
+  if (error) return <p className="admin-error">{error}</p>;
+  if (!detail) return <p className="admin-loading">불러오는 중…</p>;
 
   const rows: { term: string; desc: string | null }[] = [
     { term: "업체명", desc: detail.businessName },
@@ -114,14 +95,18 @@ export default function ApplicationDetail({ id }: { id: number }) {
 
   return (
     <>
-      {backLink}
-      <span
-        className={`admin-status admin-status--${detail.status.toLowerCase()}`}
-      >
-        {APPLICATION_STATUS_LABEL[detail.status]}
-      </span>
-
       <dl className="admin-detail">
+        {/* 상태는 첫 행 — 떠 있는 칩 대신 다른 항목과 같은 위계로 */}
+        <div className="admin-detail__row">
+          <dt className="admin-detail__term">상태</dt>
+          <dd className="admin-detail__desc">
+            <span
+              className={`admin-status admin-status--${detail.status.toLowerCase()}`}
+            >
+              {APPLICATION_STATUS_LABEL[detail.status]}
+            </span>
+          </dd>
+        </div>
         {rows.map((row) => (
           <div key={row.term} className="admin-detail__row">
             <dt className="admin-detail__term">{row.term}</dt>
@@ -136,7 +121,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
         <div className="admin-actions">
           <button
             type="button"
-            className="btn btn--primary"
+            className="btn btn--primary admin-actions__btn"
             disabled={processing}
             onClick={handleApprove}
           >
@@ -144,7 +129,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
           </button>
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--outline admin-actions__btn"
             disabled={processing}
             onClick={() => setRejectOpen(true)}
           >
@@ -161,7 +146,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
           <>
             <button
               type="button"
-              className="btn btn--outline"
+              className="btn btn--outline admin-modal__btn"
               disabled={processing}
               onClick={() => setRejectOpen(false)}
             >
@@ -169,7 +154,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
             </button>
             <button
               type="button"
-              className="btn btn--danger"
+              className="btn btn--danger admin-modal__btn"
               disabled={processing}
               onClick={handleReject}
             >

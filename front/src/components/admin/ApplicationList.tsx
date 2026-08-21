@@ -150,7 +150,7 @@ export default function ApplicationList() {
         <div className="admin-pagination">
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--outline admin-pagination__btn"
             disabled={data.page === 0}
             onClick={() => navigate(statusParam, data.page - 1)}
           >
@@ -161,7 +161,7 @@ export default function ApplicationList() {
           </span>
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--outline admin-pagination__btn"
             disabled={data.page >= data.totalPages - 1}
             onClick={() => navigate(statusParam, data.page + 1)}
           >
