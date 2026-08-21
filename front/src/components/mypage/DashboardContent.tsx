@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMe } from "@/lib/use-me";
+import { hasRole } from "@/lib/user";
 
 /**
  * 대시보드 본문 — 인사말 + 거래 현황 스탯 로우 + 최근 활동.
@@ -25,10 +26,6 @@ export default function DashboardContent() {
           <span className="mypage-stats__label">요청한 서비스</span>
           <span className="mypage-stats__value">0</span>
         </Link>
-        <Link href="/mypage/received" className="mypage-stats__item">
-          <span className="mypage-stats__label">받은 요청</span>
-          <span className="mypage-stats__value">0</span>
-        </Link>
       </div>
 
       <section aria-label="최근 활동" className="mypage-section">
@@ -37,6 +34,16 @@ export default function DashboardContent() {
           아직 활동 내역이 없어요. 거래를 시작하면 여기에 표시돼요.
         </p>
       </section>
+
+      {/* 업체 스탯(받은 요청 등)은 개인 대시보드에 섞지 않고 업체 모드로 안내만 한다 */}
+      {hasRole(me, "PROVIDER") && (
+        <p className="mypage-crosslink">
+          업체 활동은 업체 모드에서 관리해요.
+          <Link href="/mypage/biz" className="mypage-crosslink__link">
+            업체 모드로 가기
+          </Link>
+        </p>
+      )}
     </>
   );
 }
