@@ -103,9 +103,37 @@ class UserServiceTest {
                 "VERIFIED", "홍길동", "1998-01-02", "01012345678", "MALE", "ci-value", "di-value"),
             stubRepository, hasher);
         return new UserService(
-            stubRepository, new NicknameService(new NicknameGenerator(), stubRepository),
+            stubRepository, new InMemorySettlementAccountRepository(),
+            new NicknameService(new NicknameGenerator(), stubRepository),
             stubVerification, new BCryptPasswordEncoder(), hasher,
             fileService, stubArchive, Clock.system(ZoneId.of("Asia/Seoul")));
+    }
+
+    /** 인메모리 정산 계좌 저장소 — userId 1건 upsert 흉내 */
+    private static class InMemorySettlementAccountRepository
+        implements com.allme.back.user.domain.repository.UserSettlementAccountRepository {
+
+        private final java.util.Map<Long, com.allme.back.user.domain.entity.UserSettlementAccount>
+            store = new java.util.HashMap<>();
+
+        @Override
+        public java.util.Optional<com.allme.back.user.domain.entity.UserSettlementAccount>
+            findByUserId(Long userId) {
+            return java.util.Optional.ofNullable(store.get(userId));
+        }
+
+        @Override
+        public com.allme.back.user.domain.entity.UserSettlementAccount save(
+            com.allme.back.user.domain.entity.UserSettlementAccount account) {
+            store.put(account.getUserId(), account);
+            return account;
+        }
+
+        @Override
+        public void deleteByUserId(Long userId) {
+            store.remove(userId);
+        }
+
     }
 
     /** 이관 호출을 기록하는 스텁 아카이브 — failNext로 아카이브 장애를 흉내낸다 */
@@ -121,6 +149,13 @@ class UserServiceTest {
             }
             archived.add(data);
         }
+
+        @Override
+        public void archiveSettlementAccount(WithdrawnSettlementAccount data) {
+            archivedAccounts.add(data);
+        }
+
+        final List<WithdrawnSettlementAccount> archivedAccounts = new ArrayList<>();
 
     }
 

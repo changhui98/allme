@@ -16,6 +16,22 @@ public interface WithdrawnUserArchivePort {
     void archive(WithdrawnUser data);
 
     /**
+     * 탈퇴 회원의 정산 계좌를 보관소에 저장한다 — 대금 지급 기록의 일부로 분쟁·세무 대응용.
+     * 계좌번호·예금주 평문 전달, 암호화는 어댑터 책임(archive와 동일 계약).
+     */
+    void archiveSettlementAccount(WithdrawnSettlementAccount data);
+
+    record WithdrawnSettlementAccount(
+        Long userId,
+        String bank,
+        String accountNumber,
+        String accountHolder,
+        LocalDateTime withdrawnAt
+    ) {
+
+    }
+
+    /**
      * 이관 대상 스냅샷. 개인정보(name·ci·di·phoneNumber)는 평문으로 전달하고
      * 저장 시 암호화는 어댑터가 책임진다. password 해시는 보관 가치가 없어 이관하지 않는다.
      */

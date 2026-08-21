@@ -25,7 +25,8 @@ public enum UserErrorCode implements ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U013", "비밀번호가 올바르지 않습니다."),
     NICKNAME_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "U014",
         "닉네임은 한글·영문·숫자로 2~24자까지 입력할 수 있어요."),
-    NICKNAME_DUPLICATED(HttpStatus.CONFLICT, "U015", "이미 사용 중인 닉네임이에요.")
+    NICKNAME_DUPLICATED(HttpStatus.CONFLICT, "U015", "이미 사용 중인 닉네임이에요."),
+    SETTLEMENT_ACCOUNT_INVALID(HttpStatus.BAD_REQUEST, "U016", "계좌 정보를 다시 확인해주세요.")
     ;
 
     private final HttpStatus status;

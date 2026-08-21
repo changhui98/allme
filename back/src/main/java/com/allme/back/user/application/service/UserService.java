@@ -7,14 +7,19 @@ import com.allme.back.global.crypto.HmacSha256Hasher;
 import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.port.IdentityVerificationPort.IdentityVerificationResult;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort;
+import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnSettlementAccount;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnUser;
+import com.allme.back.user.domain.Bank;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Set;
 import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
+import com.allme.back.user.domain.entity.UserSettlementAccount;
 import com.allme.back.user.domain.repository.UserRepository;
+import com.allme.back.user.domain.repository.UserSettlementAccountRepository;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,6 +51,7 @@ public class UserService {
         Set.of("jpg", "jpeg", "png", "webp");
 
     private final UserRepository userRepository;
+    private final UserSettlementAccountRepository settlementAccountRepository;
     private final NicknameService nicknameService;
     private final IdentityVerificationService identityVerificationService;
     private final PasswordEncoder passwordEncoder;
@@ -238,6 +244,51 @@ public class UserService {
         return user;
     }
 
+    /** front lib/user.ts와 동기화: 하이픈 제거 후 숫자 8~16자리 */
+    private static final Pattern ACCOUNT_NUMBER_PATTERN = Pattern.compile("^\\d{8,16}$");
+
+    /** 정산 계좌 조회 — 미등록이면 empty. */
+    public Optional<UserSettlementAccount> getSettlementAccount(Long userId) {
+        return settlementAccountRepository.findByUserId(userId);
+    }
+
+    /**
+     * 정산 계좌 등록/수정(upsert). 계좌번호는 하이픈·공백 제거 후 숫자 8~16자리로 정규화.
+     * 형식·은행 오류는 U016 하나로 응답(형식별 안내는 프론트 검증이 1차 담당).
+     */
+    @Transactional
+    public UserSettlementAccount saveSettlementAccount(
+        Long userId, String bankName, String rawAccountNumber, String rawAccountHolder
+    ) {
+        Bank bank = parseBank(bankName);
+        String accountNumber = rawAccountNumber == null
+            ? ""
+            : rawAccountNumber.replaceAll("[\\s-]", "");
+        String accountHolder = rawAccountHolder == null ? "" : rawAccountHolder.trim();
+        if (!ACCOUNT_NUMBER_PATTERN.matcher(accountNumber).matches()
+            || accountHolder.isEmpty() || accountHolder.length() > 30) {
+            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_INVALID);
+        }
+
+        getById(userId); // 활성 회원 확인
+
+        return settlementAccountRepository.findByUserId(userId)
+            .map(account -> {
+                account.change(bank, accountNumber, accountHolder);
+                return account;
+            })
+            .orElseGet(() -> settlementAccountRepository.save(
+                UserSettlementAccount.create(userId, bank, accountNumber, accountHolder)));
+    }
+
+    private Bank parseBank(String bankName) {
+        try {
+            return Bank.valueOf(bankName);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_INVALID);
+        }
+    }
+
     /** 프로필 이미지의 저장 상대경로 — 없으면 null. 응답 DTO의 URL 조합용. */
     public String getProfileImagePath(User user) {
         return user.getProfileImageFileId() != null
@@ -277,6 +328,18 @@ public class UserService {
             user.getCreatedDate(),
             LocalDateTime.now(clock)
         ));
+
+        // 정산 계좌 — 대금 지급 기록 보존을 위해 아카이브 이관 후 본 DB에서 파기
+        settlementAccountRepository.findByUserId(userId).ifPresent(account -> {
+            withdrawnUserArchivePort.archiveSettlementAccount(new WithdrawnSettlementAccount(
+                userId,
+                account.getBank().name(),
+                account.getAccountNumber(),
+                account.getAccountHolder(),
+                LocalDateTime.now(clock)
+            ));
+            settlementAccountRepository.deleteByUserId(userId);
+        });
 
         Long profileImageFileId = user.getProfileImageFileId();
         user.withdraw();

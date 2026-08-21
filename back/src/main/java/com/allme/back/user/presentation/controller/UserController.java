@@ -5,12 +5,14 @@ import com.allme.back.user.application.service.UserService;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.presentation.dto.request.MarketingConsentUpdateRequest;
+import com.allme.back.user.presentation.dto.request.SettlementAccountUpdateRequest;
 import com.allme.back.user.presentation.dto.request.UserJoinRequest;
 import com.allme.back.user.presentation.dto.request.UserLoginRequest;
 import com.allme.back.user.presentation.dto.request.UserNicknameUpdateRequest;
 import com.allme.back.user.presentation.dto.request.UserWithdrawRequest;
 import com.allme.back.user.presentation.dto.response.LoginIdAvailabilityResponse;
 import com.allme.back.user.presentation.dto.response.NicknameSuggestionResponse;
+import com.allme.back.user.presentation.dto.response.SettlementAccountResponse;
 import com.allme.back.user.presentation.dto.response.UserJoinResponse;
 import com.allme.back.user.presentation.dto.response.UserSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -138,6 +141,24 @@ public class UserController {
     ) {
         return summaryOf(userService.updateMarketingConsent(
             sessionUserId(httpRequest), request.marketingConsent()));
+    }
+
+    /** 정산 계좌 조회 — 미등록이면 registered:false. 계좌번호는 마스킹만 내린다. */
+    @GetMapping("/me/settlement-account")
+    public SettlementAccountResponse settlementAccount(HttpServletRequest httpRequest) {
+        return SettlementAccountResponse.from(
+            userService.getSettlementAccount(sessionUserId(httpRequest)));
+    }
+
+    /** 정산 계좌 등록/수정(upsert) — 형식·은행 오류 U016(400). */
+    @PutMapping("/me/settlement-account")
+    public SettlementAccountResponse saveSettlementAccount(
+        @Valid @RequestBody SettlementAccountUpdateRequest request, HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionUserId(httpRequest);
+        userService.saveSettlementAccount(
+            userId, request.bank(), request.accountNumber(), request.accountHolder());
+        return SettlementAccountResponse.from(userService.getSettlementAccount(userId));
     }
 
     /** 회원탈퇴 — 비밀번호 재확인 후 soft delete + 개인정보 익명화, 세션 무효화. */
