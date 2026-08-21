@@ -1,0 +1,274 @@
+/*
+ * 관리자 콘솔 (/admin/*): 셸 골격은 mypage.css의 mypage-shell/topbar/sidebar/menu-panel을
+ * 재사용하고(AdminShell 주석 참고), 여기엔 관리자 고유 블록만 둔다.
+ * admin-topbar(브랜드 뱃지) · admin-filter(상태 탭) · admin-list(플랫 목록) ·
+ * admin-status(상태 뱃지) · admin-search(검색) · admin-detail(상세 dl) ·
+ * admin-actions(승인/반려) · admin-reject(반려 사유 입력) · admin-pagination.
+ * 원칙: 카드/박스 감싸기 금지 — hairline(var(--border))·여백·타이포로만 구분.
+ */
+
+/* ---------- admin-topbar: 로고 옆 관리자 표시 ---------- */
+
+.admin-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-topbar__badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background-color: var(--surface);
+  color: var(--muted);
+}
+
+/* ---------- admin-filter: 상태 필터 탭 (언더라인 방식) ---------- */
+
+.admin-filter {
+  display: flex;
+  gap: 1.125rem;
+  margin-top: 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-filter__item {
+  padding: 0.25rem 0.125rem 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.admin-filter__item:hover {
+  color: var(--foreground);
+}
+
+.admin-filter__item--active,
+.admin-filter__item--active:hover {
+  margin-bottom: -1px;
+  border-bottom: 2px solid var(--primary);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* ---------- admin-list: hairline 구분 플랫 목록 ---------- */
+
+.admin-list {
+  margin-top: 0.25rem;
+}
+
+.admin-list__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.875rem 0.25rem;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+
+.admin-list__row:hover {
+  background-color: var(--surface);
+}
+
+/* 데스크톱: 업체명 | 신청자 | 상태 | 날짜 한 줄 그리드 */
+@media (min-width: 40rem) {
+  .admin-list__row {
+    grid-template-columns: minmax(0, 1fr) 8rem 5.5rem 6.5rem;
+    align-items: center;
+  }
+}
+
+.admin-list__main {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-list__meta {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.admin-list__date {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+/* 탈퇴 회원 행 — 흐리게 */
+.admin-list__row--dim .admin-list__main,
+.admin-list__row--dim .admin-list__meta {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ---------- admin-status: 신청/역할 상태 뱃지 ---------- */
+
+.admin-status {
+  justify-self: start;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  background-color: var(--surface);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.admin-status--pending {
+  border-color: color-mix(in oklab, var(--primary) 35%, transparent);
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--primary-text);
+}
+
+.admin-status--approved {
+  border-color: color-mix(in oklab, var(--success) 35%, transparent);
+  background-color: color-mix(in oklab, var(--success) 10%, transparent);
+  color: var(--success);
+}
+
+.admin-status--rejected {
+  border-color: color-mix(in oklab, var(--danger) 35%, transparent);
+  background-color: color-mix(in oklab, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+
+/* ---------- admin-search: 회원 loginId 검색 ---------- */
+
+.admin-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.admin-search__input {
+  flex: 1;
+  max-width: 18rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.admin-search__input::placeholder {
+  color: var(--muted);
+}
+
+.admin-search__input:focus {
+  outline: 2px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+/* ---------- admin-detail: 상세 정의 리스트 (hairline 구분) ---------- */
+
+.admin-detail {
+  margin-top: 1.75rem;
+}
+
+.admin-detail__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.875rem 0.25rem;
+}
+
+@media (min-width: 40rem) {
+  .admin-detail__row {
+    flex-direction: row;
+    gap: 1rem;
+  }
+}
+
+.admin-detail__term {
+  flex-shrink: 0;
+  width: 8rem;
+  font-size: 0.8125rem;
+  line-height: 1.375rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.admin-detail__desc {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  color: var(--foreground);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- admin-actions: 승인/반려 버튼 행 ---------- */
+
+.admin-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+/* ---------- admin-reject: 반려 사유 입력 (모달 내부) ---------- */
+
+.admin-reject__textarea {
+  width: 100%;
+  min-height: 6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background-color: var(--background);
+  color: var(--foreground);
+  resize: vertical;
+}
+
+.admin-reject__textarea:focus {
+  outline: 2px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+/* ---------- admin-pagination: 이전/다음 ---------- */
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.admin-pagination__info {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* ---------- 공통 보조 ---------- */
+
+.admin-error {
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--danger);
+}
+
+.admin-loading {
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}

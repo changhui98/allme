@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { AUTH_LINKS, MEMBER_LINKS } from "./nav-items";
 import { useMe } from "@/lib/use-me";
-import { logoutAndGoHome } from "@/lib/user";
+import { hasRole, logoutAndGoHome } from "@/lib/user";
 
 /**
  * 헤더 우측 인증 영역 (데스크톱). 세션 확인(/me) 결과에 따라
@@ -32,6 +32,12 @@ export default function HeaderAuth() {
 
   return (
     <>
+      {/* 운영 스태프(MANAGER/ADMIN)에게만 노출 — 실질 보호는 /admin 가드·백엔드 인가 */}
+      {(hasRole(me, "MANAGER") || hasRole(me, "ADMIN")) && (
+        <Link href="/admin" className="header__login">
+          관리자
+        </Link>
+      )}
       <Link
         href={MEMBER_LINKS.mypage.href}
         aria-label={MEMBER_LINKS.mypage.label}
