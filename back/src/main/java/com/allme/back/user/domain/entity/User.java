@@ -49,6 +49,14 @@ public class User extends BaseEntity {
     @Column(length = 512)
     private String name;
 
+    /**
+     * 대외 표시명(랜덤 3단어 한글 닉네임, 예: "멀미하는 귀여운 고양이").
+     * 표시·중복확인이 필요해 평문 unique — 암호화(비결정적)하면 둘 다 불가.
+     * nullable인 이유: 탈퇴 시 null로 비워 unique를 반납한다(활성 회원은 가입 로직이 보장).
+     */
+    @Column(unique = true, length = 30)
+    private String nickname;
+
     @Convert(converter = EncryptedStringConverter.class)
     @Column(length = 512)
     private String ci;
@@ -85,12 +93,13 @@ public class User extends BaseEntity {
     private Set<UserRole> roles = new HashSet<>();
 
     private User(
-        String loginId, String encodedPassword, String name,
+        String loginId, String encodedPassword, String name, String nickname,
         String ci, String ciHash, String di, String phoneNumber, boolean marketingConsent
     ) {
         this.loginId = loginId;
         this.password = encodedPassword;
         this.name = name;
+        this.nickname = nickname;
         this.ci = ci;
         this.ciHash = ciHash;
         this.di = di;
@@ -100,6 +109,11 @@ public class User extends BaseEntity {
 
     public void changeProfileImageFile(Long profileImageFileId) {
         this.profileImageFileId = profileImageFileId;
+    }
+
+    /** 닉네임 변경 — 형식·중복 검증은 서비스가 수행하고 여기선 반영만 한다. */
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     /** 역할 부여 — 이미 보유한 역할이면 no-op(unique 제약 위반 방지). */
@@ -138,6 +152,8 @@ public class User extends BaseEntity {
         this.roles.clear();
         this.password = null;
         this.name = null;
+        this.nickname = null; // 개인정보 아님(이관 불요) — unique 반납 목적
+
         this.ci = null;
         this.ciHash = null;
         this.di = null;
@@ -145,12 +161,13 @@ public class User extends BaseEntity {
         this.profileImageFileId = null;
     }
 
-    /** encodedPassword는 반드시 BCrypt 해시를 넘긴다 (원문 전달 금지). */
+    /** encodedPassword는 반드시 BCrypt 해시를 넘긴다 (원문 전달 금지). nickname은 유니크 발급본. */
     public static User create(
-        String loginId, String encodedPassword, String name,
+        String loginId, String encodedPassword, String name, String nickname,
         String ci, String ciHash, String di, String phoneNumber, boolean marketingConsent
     ) {
-        return new User(loginId, encodedPassword, name, ci, ciHash, di, phoneNumber, marketingConsent);
+        return new User(
+            loginId, encodedPassword, name, nickname, ci, ciHash, di, phoneNumber, marketingConsent);
     }
 
 }

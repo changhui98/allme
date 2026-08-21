@@ -19,6 +19,10 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByLoginId(String loginId);
 
+    boolean existsByNickname(String nickname);
+
+    List<User> findAllByNicknameIsNullAndDeletedDateIsNull();
+
     /** 관리자 표시용 — 평문 컬럼(id·loginId)만 조회해 암호화 컬럼 복호화를 피한다 */
     @Query("select u.id, u.loginId from User u where u.id in :userIds")
     List<Object[]> findIdAndLoginIdByIdIn(@Param("userIds") Collection<Long> userIds);

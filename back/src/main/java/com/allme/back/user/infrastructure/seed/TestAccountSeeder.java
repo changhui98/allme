@@ -1,5 +1,6 @@
 package com.allme.back.user.infrastructure.seed;
 
+import com.allme.back.user.application.service.NicknameService;
 import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.domain.repository.UserRepository;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 비밀번호는 전부 Test1234! — 운영 환경에서는 절대 켜지 말 것.
  */
 @Component
+@Order(1) // NicknameBackfillRunner(@Order(2))보다 먼저 — 시더 계정도 자체적으로 닉네임을 받는다
 @ConditionalOnProperty(name = "app.seed-test-accounts", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
@@ -39,6 +42,7 @@ public class TestAccountSeeder implements ApplicationRunner {
     );
 
     private final UserRepository userRepository;
+    private final NicknameService nicknameService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -53,6 +57,7 @@ public class TestAccountSeeder implements ApplicationRunner {
             }
             User user = User.create(
                 account.loginId(), encodedPassword, account.name(),
+                nicknameService.generateUnique(),
                 null, null, null, null, false
             );
             account.roles().forEach(user::grantRole);

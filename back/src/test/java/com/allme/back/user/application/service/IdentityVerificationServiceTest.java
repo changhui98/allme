@@ -39,6 +39,16 @@ class IdentityVerificationServiceTest {
             }
 
             @Override
+            public boolean existsByNickname(String nickname) {
+                return false;
+            }
+
+            @Override
+            public java.util.List<User> findAllWithoutNickname() {
+                return java.util.List.of();
+            }
+
+            @Override
             public java.util.Optional<User> findById(Long id) {
                 return java.util.Optional.empty();
             }

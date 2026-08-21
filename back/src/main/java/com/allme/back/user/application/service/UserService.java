@@ -46,6 +46,7 @@ public class UserService {
         Set.of("jpg", "jpeg", "png", "webp");
 
     private final UserRepository userRepository;
+    private final NicknameService nicknameService;
     private final IdentityVerificationService identityVerificationService;
     private final PasswordEncoder passwordEncoder;
     private final HmacSha256Hasher hmacSha256Hasher;
@@ -99,6 +100,7 @@ public class UserService {
             loginId,
             passwordEncoder.encode(rawPassword),
             verification.name(),
+            nicknameService.generateUnique(),
             verification.ci(),
             ciHash,
             verification.di(),
@@ -113,6 +115,7 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             // 사전 검사 통과 후 INSERT 사이의 race — unique 제약이 최종 방어선.
             // 어느 제약에 걸렸는지는 원인 메시지의 컬럼명으로 구분한다.
+            // (nickname 충돌은 발급 직후 저장이라 실질 불가능 — 발생해도 재가입 시도로 해소)
             String cause = e.getMostSpecificCause().getMessage();
             throw new AppException(cause != null && cause.contains("login_id")
                 ? UserErrorCode.LOGIN_ID_DUPLICATED

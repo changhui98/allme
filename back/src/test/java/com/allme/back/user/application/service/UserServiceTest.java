@@ -13,6 +13,7 @@ import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.port.IdentityVerificationPort.IdentityVerificationResult;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnUser;
+import com.allme.back.user.domain.NicknameGenerator;
 import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
@@ -81,6 +82,16 @@ class UserServiceTest {
             }
 
             @Override
+            public boolean existsByNickname(String nickname) {
+                return false;
+            }
+
+            @Override
+            public java.util.List<User> findAllWithoutNickname() {
+                return java.util.List.of();
+            }
+
+            @Override
             public User save(User user) {
                 savedUsers.add(user);
                 return user;
@@ -92,7 +103,8 @@ class UserServiceTest {
                 "VERIFIED", "홍길동", "1998-01-02", "01012345678", "MALE", "ci-value", "di-value"),
             stubRepository, hasher);
         return new UserService(
-            stubRepository, stubVerification, new BCryptPasswordEncoder(), hasher,
+            stubRepository, new NicknameService(new NicknameGenerator(), stubRepository),
+            stubVerification, new BCryptPasswordEncoder(), hasher,
             fileService, stubArchive, Clock.system(ZoneId.of("Asia/Seoul")));
     }
 
@@ -144,12 +156,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("가입 성공 시 loginId를 반환하고 기본 역할 USER가 부여된다")
+    @DisplayName("가입 성공 시 loginId를 반환하고 기본 역할 USER와 3단어 랜덤 닉네임이 부여된다")
     void join_success() {
         assertThat(serviceWith(false).join("iv-1", "allme123", VALID_PASSWORD, true))
             .isEqualTo("allme123");
         assertThat(savedUsers).hasSize(1);
         assertThat(savedUsers.get(0).getRoles()).containsExactly(Role.USER);
+        assertThat(savedUsers.get(0).getNickname()).isNotBlank();
+        assertThat(savedUsers.get(0).getNickname().split(" ")).hasSize(3);
     }
 
     @Test
@@ -191,7 +205,7 @@ class UserServiceTest {
     private User userWithPassword(String rawPassword) {
         return User.create(
             "allme123", new BCryptPasswordEncoder().encode(rawPassword),
-            "홍길동", "ci-value", "ci-hash", null, "01012345678", true);
+            "홍길동", "멀미하는 귀여운 고양이", "ci-value", "ci-hash", null, "01012345678", true);
     }
 
     @Test
