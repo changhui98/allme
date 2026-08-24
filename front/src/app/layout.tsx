@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/theme/ThemeProvider";
+import SessionExpiredModal from "@/components/common/SessionExpiredModal";
 
 // 배포 시 NEXT_PUBLIC_SITE_URL을 실제 도메인으로 교체 — OG 이미지 절대 URL의 기준이 된다
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
@@ -40,7 +41,11 @@ export default function RootLayout({
           }}
         />
         {/* 헤더/푸터는 (main) 그룹 레이아웃 소관 — 인증 페이지((auth))는 독립 레이아웃을 쓴다 */}
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          {/* 세션 만료(401 U011) 전역 안내 — 어느 라우트 그룹에서든 뜰 수 있게 루트에 상주 */}
+          <SessionExpiredModal />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,3 +1,11 @@
+# 세션은 톰캣 인메모리(재시작 시 전부 소멸 — 근본 해결은 추후 Redis 세션 스토어 도입).
+# 타임아웃 기본 30m을 명시해 정책을 드러낸다. 개발 시 만료 UX 테스트는
+# SESSION_TIMEOUT=1m 등으로 단축(톰캣 최소 단위 1분).
+server:
+  servlet:
+    session:
+      timeout: ${SESSION_TIMEOUT:30m}
+
 spring:
   application:
     name: back

@@ -7,6 +7,7 @@ import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
+import { useSessionRevalidation } from "@/lib/use-session-revalidation";
 import { displayName, hasRole, logoutAndGoHome } from "@/lib/user";
 
 /**
@@ -42,6 +43,8 @@ export default function MypageShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { status, me } = useMe();
+  // API 호출 없는 페이지로 이동해도 세션 만료를 감지(전역 모달) — 셸은 리마운트되지 않으므로
+  useSessionRevalidation(Boolean(me));
   const [menuOpen, setMenuOpen] = useState(false);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);

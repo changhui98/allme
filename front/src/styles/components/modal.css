@@ -43,8 +43,16 @@
 
 .modal__actions {
   display: flex;
+  justify-content: flex-end; /* 다이얼로그 관례: 주 버튼이 우측 끝 (전체폭 버튼은 무영향) */
   gap: 0.5rem;
   margin-top: 1.5rem;
+}
+
+/* 액션 버튼 크기 — .btn은 크기 미정의라 모달 공용 보정을 여기서 제공 */
+.modal__btn {
+  padding: 0.5625rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 /* 열림 모션 — motion.css와 같은 조건부(스크립트 on + 모션 선호)로만 적용 */
