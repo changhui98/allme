@@ -135,13 +135,12 @@ export function updateMarketingConsent(
   });
 }
 
-/** 정산 계좌(마스킹 응답) — 평문 계좌번호는 서버가 절대 내리지 않는다(수정은 전체 재입력). */
+/** 정산 계좌 — 본인 세션 API라 계좌번호는 평문으로 내려온다(암호화 저장은 서버 유지). */
 export type SettlementAccount = {
   /** 백엔드 Bank enum name (lib/banks.ts BANKS.code와 계약) */
   bank: string;
   bankName: string;
-  /** "****1234" 형태 마스킹 */
-  accountNumberMasked: string;
+  accountNumber: string;
   accountHolder: string;
 };
 
@@ -159,13 +158,35 @@ export async function fetchSettlementAccount(): Promise<SettlementAccount | null
   return body.registered ? body.account : null;
 }
 
+/** 예금주는 보내지 않는다 — 계좌 인증(verify) 결과의 서버 세션 기록으로만 저장된다. */
 export type SettlementAccountInput = {
   bank: string;
   accountNumber: string;
-  accountHolder: string;
 };
 
-/** 정산 계좌 등록/수정(upsert) — 형식·은행 오류는 U016(400). 성공 시 마스킹된 계좌를 반환한다. */
+/**
+ * 계좌 인증 — 서버가 포트원 예금주 조회로 실명을 확인하고 세션에 기록한다.
+ * 성공 시 예금주 실명 반환. 실패: U016(형식)·U017(계좌 확인 불가)·U018(제공자 오류)·U019(미준비).
+ */
+export async function verifySettlementAccount(
+  input: SettlementAccountInput,
+): Promise<string> {
+  const body = await request<{ accountHolder: string }>(
+    "/api/users/me/settlement-account/verify",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+      fallbackMessage: "계좌 인증에 실패했습니다.",
+    },
+  );
+  return body.accountHolder;
+}
+
+/**
+ * 정산 계좌 등록/수정(upsert) — 형식·은행 오류는 U016(400),
+ * 계좌 인증 기록과 불일치·만료면 U020(400, 재인증 필요). 성공 시 저장된 계좌를 반환한다.
+ */
 export async function saveSettlementAccount(
   input: SettlementAccountInput,
 ): Promise<SettlementAccount> {

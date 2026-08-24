@@ -5,6 +5,7 @@ import com.allme.back.file.domain.FilePurpose;
 import com.allme.back.file.domain.entity.UploadTempFile;
 import com.allme.back.global.crypto.HmacSha256Hasher;
 import com.allme.back.global.exception.AppException;
+import com.allme.back.user.application.port.BankAccountHolderPort;
 import com.allme.back.user.application.port.IdentityVerificationPort.IdentityVerificationResult;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnSettlementAccount;
@@ -52,6 +53,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserSettlementAccountRepository settlementAccountRepository;
+    private final BankAccountHolderPort bankAccountHolderPort;
     private final NicknameService nicknameService;
     private final IdentityVerificationService identityVerificationService;
     private final PasswordEncoder passwordEncoder;
@@ -253,22 +255,40 @@ public class UserService {
     }
 
     /**
+     * 계좌 인증 — 포트원 예금주 조회로 실명을 확보한다.
+     * 결과는 컨트롤러가 HTTP 세션에 기록해 저장 요청과 대조한다(예금주 조회는 건당 과금이라
+     * 저장 시 재조회하지 않는다). 형식·은행 오류는 U016, 조회 실패 계열은 U017~U019.
+     */
+    public SettlementAccountVerification verifySettlementAccount(
+        Long userId, String bankName, String rawAccountNumber
+    ) {
+        Bank bank = parseBank(bankName);
+        String accountNumber = normalizeAccountNumber(rawAccountNumber);
+        getById(userId); // 활성 회원 확인
+        String accountHolder = bankAccountHolderPort.getHolderName(bank, accountNumber);
+        return new SettlementAccountVerification(bank, accountNumber, accountHolder);
+    }
+
+    /**
      * 정산 계좌 등록/수정(upsert). 계좌번호는 하이픈·공백 제거 후 숫자 8~16자리로 정규화.
      * 형식·은행 오류는 U016 하나로 응답(형식별 안내는 프론트 검증이 1차 담당).
+     * 예금주는 인증 기록(세션의 verification) 값으로만 저장한다 — 클라이언트가 보낸
+     * 예금주를 신뢰하지 않으며, 인증 기록이 없거나 은행·계좌번호가 다르면 U020(재인증 유도).
      */
     @Transactional
     public UserSettlementAccount saveSettlementAccount(
-        Long userId, String bankName, String rawAccountNumber, String rawAccountHolder
+        Long userId, String bankName, String rawAccountNumber,
+        SettlementAccountVerification verification
     ) {
         Bank bank = parseBank(bankName);
-        String accountNumber = rawAccountNumber == null
-            ? ""
-            : rawAccountNumber.replaceAll("[\\s-]", "");
-        String accountHolder = rawAccountHolder == null ? "" : rawAccountHolder.trim();
-        if (!ACCOUNT_NUMBER_PATTERN.matcher(accountNumber).matches()
-            || accountHolder.isEmpty() || accountHolder.length() > 30) {
-            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_INVALID);
+        String accountNumber = normalizeAccountNumber(rawAccountNumber);
+
+        if (verification == null
+            || verification.bank() != bank
+            || !verification.accountNumber().equals(accountNumber)) {
+            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_NOT_VERIFIED);
         }
+        String accountHolder = verification.accountHolder();
 
         getById(userId); // 활성 회원 확인
 
@@ -279,6 +299,16 @@ public class UserService {
             })
             .orElseGet(() -> settlementAccountRepository.save(
                 UserSettlementAccount.create(userId, bank, accountNumber, accountHolder)));
+    }
+
+    private String normalizeAccountNumber(String rawAccountNumber) {
+        String accountNumber = rawAccountNumber == null
+            ? ""
+            : rawAccountNumber.replaceAll("[\\s-]", "");
+        if (!ACCOUNT_NUMBER_PATTERN.matcher(accountNumber).matches()) {
+            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_INVALID);
+        }
+        return accountNumber;
     }
 
     private Bank parseBank(String bankName) {

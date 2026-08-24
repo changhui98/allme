@@ -785,23 +785,138 @@ a.mypage-stats__item:hover {
   color: var(--muted);
 }
 
-/* form-field__input과 같은 박스 문법 — select라 플로팅 라벨 대신 고정 라벨 사용 */
-.mypage-account__select {
+/* form-field__input과 같은 박스 문법 — 은행 선택 모달(BankPickerModal)을 여는 트리거 버튼 */
+.mypage-account__bank-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 0.625rem;
   background-color: var(--background);
+  color: var(--foreground);
   padding: 0.75rem 1rem;
   font-size: 15px;
   line-height: 1.5rem;
+  text-align: left;
+  cursor: pointer;
   outline: none;
   transition-property: border-color, box-shadow;
   transition-duration: 150ms;
 }
 
-.mypage-account__select:focus {
+.mypage-account__bank-btn:focus-visible {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 15%, transparent);
+}
+
+.mypage-account__bank-btn--placeholder {
+  color: var(--muted);
+}
+
+.mypage-account__bank-btn-icon {
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.mypage-account__bank-btn-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+/* 모달 안 은행 그리드 — 원형 CI 아이콘 + 짧은 이름 */
+.mypage-account__bank-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 24rem) {
+  .mypage-account__bank-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mypage-account__bank-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  border: 0;
+  border-radius: 0.75rem;
+  background: none;
+  padding: 0.75rem 0.25rem;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-duration: 150ms;
+}
+
+.mypage-account__bank-item:hover,
+.mypage-account__bank-item:focus-visible {
+  background-color: var(--surface);
+}
+
+.mypage-account__bank-icon {
+  border-radius: 50%;
+  /* 흰 심볼 계열 아이콘이 배경에 묻지 않게 은은한 윤곽만 */
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+
+.mypage-account__bank-item.is-selected .mypage-account__bank-icon {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.mypage-account__bank-name {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--foreground);
+}
+
+.mypage-account__bank-item.is-selected .mypage-account__bank-name {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* 조회 화면의 은행명 옆 소형 아이콘 정렬 */
+.mypage-account__fact-bank {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* 계좌 인증 버튼 — 인증 전에만 노출, 인증되면 예금주 행으로 대체된다 */
+.mypage-account__verify-btn {
+  align-self: flex-start;
+}
+
+/* 인증된 예금주 표시 행 — 실명 조회 결과라 입력 불가(읽기 전용) */
+.mypage-account__holder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.625rem;
+  background-color: var(--surface);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.mypage-account__holder-check {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.mypage-account__holder-label {
+  color: var(--muted);
+}
+
+.mypage-account__holder-name {
+  font-weight: 600;
 }
 
 .mypage-account__register {

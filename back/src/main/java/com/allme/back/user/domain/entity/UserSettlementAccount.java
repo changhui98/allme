@@ -19,7 +19,8 @@ import lombok.NoArgsConstructor;
 /**
  * 정산 계좌 — 1인 1계좌(user_id unique). users 컬럼이 아닌 별도 테이블인 이유:
  * users에 두면 로그인·me 등 모든 세션 확인에서 계좌번호까지 복호화된다(비용·노출면 확대).
- * 계좌번호·예금주는 암호화 저장하고, 응답에는 마스킹만 내린다(평문 미노출).
+ * 계좌번호·예금주는 암호화 저장하고, 본인 세션 API에서만 평문으로 응답한다.
+ * 예금주는 계좌 인증(포트원 예금주 조회) 결과만 저장한다 — 사용자 자유 입력 금지.
  * User와는 관례대로 JPA 연관 없이 userId(Long)로만 연결한다.
  * 탈퇴 시 아카이브 이관 후 본 DB에서 삭제한다(UserService.withdraw).
  */
@@ -68,14 +69,6 @@ public class UserSettlementAccount extends BaseEntity {
         this.bank = bank;
         this.accountNumber = accountNumber;
         this.accountHolder = accountHolder;
-    }
-
-    /** 뒤 4자리만 노출 — 앞자리는 자릿수 정보까지 숨기려 고정 길이 마스킹 */
-    public String maskedAccountNumber() {
-        String tail = accountNumber.length() > 4
-            ? accountNumber.substring(accountNumber.length() - 4)
-            : accountNumber;
-        return "****" + tail;
     }
 
 }

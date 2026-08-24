@@ -2,17 +2,24 @@
 
 import { useEffect, useState } from "react";
 import FormField from "@/components/auth/FormField";
-import { BANKS } from "@/lib/banks";
+import BankPickerModal from "@/components/mypage/BankPickerModal";
+import { ApiError } from "@/lib/api";
+import { BANKS, bankIconSrc } from "@/lib/banks";
 import {
   type SettlementAccount,
   fetchSettlementAccount,
   saveSettlementAccount,
+  verifySettlementAccount,
 } from "@/lib/user";
 
+/** 백엔드 U020 — 세션의 계좌 인증 기록이 없거나 만료·불일치 */
+const NOT_VERIFIED_CODE = "U020";
+
 /**
- * 정산 계좌 카드 — 조회(마스킹)·등록·변경(전체 재입력).
- * 평문 계좌번호는 서버가 내리지 않으므로 변경 폼은 항상 빈 값에서 시작한다.
- * 저장 성공 시 응답(마스킹)으로 로컬만 갱신한다(리로드 불필요).
+ * 정산 계좌 카드 — 조회·등록·변경.
+ * 예금주는 직접 입력하지 않는다: 은행+계좌번호로 "계좌 인증"(포트원 예금주 조회)을 거치면
+ * 실명이 표시되고, 그 상태에서만 저장할 수 있다. 은행·계좌번호를 바꾸면 인증이 무효화된다.
+ * 계좌번호는 본인 세션 API라 평문으로 오간다(서버 저장은 암호화 유지).
  * 스타일: styles/pages/mypage.css (mypage-profile·mypage-account)
  */
 export default function SettlementAccountCard() {
@@ -22,8 +29,11 @@ export default function SettlementAccountCard() {
 
   const [editing, setEditing] = useState(false);
   const [bank, setBank] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
-  const [accountHolder, setAccountHolder] = useState("");
+  /** 계좌 인증으로 조회된 예금주 — null이면 미인증(저장 불가) */
+  const [verifiedHolder, setVerifiedHolder] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -49,40 +59,64 @@ export default function SettlementAccountCard() {
 
   const openEdit = () => {
     setBank(account?.bank ?? "");
-    setAccountNumber("");
-    setAccountHolder(account?.accountHolder ?? "");
+    // 기존 계좌는 평문 프리필 — 은행만 바꾸는 경우 재입력을 줄인다(인증은 항상 새로 필요)
+    setAccountNumber(account?.accountNumber ?? "");
+    setVerifiedHolder(null);
     setSaveError(null);
     setEditing(true);
   };
 
-  const handleSave = async () => {
-    if (saving) return;
+  /** 백엔드 U016과 동일 기준의 선제 검증 — 통과 못 하면 요청 없이 인라인 안내 */
+  const validatedInput = () => {
     const number = accountNumber.replace(/-/g, "").trim();
-    const holder = accountHolder.trim();
-    // 백엔드 U016과 동일 기준의 선제 검증 — 통과 못 하면 요청 없이 인라인 안내
     if (!bank) {
       setSaveError("은행을 선택해주세요.");
-      return;
+      return null;
     }
     if (!/^\d{8,16}$/.test(number)) {
       setSaveError("계좌번호는 숫자 8~16자리로 입력해주세요.");
-      return;
+      return null;
     }
-    if (!holder) {
-      setSaveError("예금주를 입력해주세요.");
+    return { bank, accountNumber: number };
+  };
+
+  const handleVerify = async () => {
+    if (verifying || saving) return;
+    const input = validatedInput();
+    if (!input) return;
+    setVerifying(true);
+    setSaveError(null);
+    try {
+      setVerifiedHolder(await verifySettlementAccount(input));
+    } catch (e) {
+      setVerifiedHolder(null);
+      setSaveError(
+        e instanceof Error ? e.message : "계좌 인증에 실패했습니다.",
+      );
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (saving || verifying) return;
+    const input = validatedInput();
+    if (!input) return;
+    if (verifiedHolder === null) {
+      setSaveError("계좌 인증을 먼저 진행해주세요.");
       return;
     }
     setSaving(true);
     setSaveError(null);
     try {
-      const saved = await saveSettlementAccount({
-        bank,
-        accountNumber: number,
-        accountHolder: holder,
-      });
+      const saved = await saveSettlementAccount(input);
       setAccount(saved);
       setEditing(false);
     } catch (e) {
+      // 세션 인증 기록 만료·불일치(다른 탭에서 재인증 등) — 재인증 유도
+      if (e instanceof ApiError && e.code === NOT_VERIFIED_CODE) {
+        setVerifiedHolder(null);
+      }
       setSaveError(
         e instanceof Error ? e.message : "정산 계좌 저장에 실패했습니다.",
       );
@@ -90,6 +124,8 @@ export default function SettlementAccountCard() {
       setSaving(false);
     }
   };
+
+  const selectedBank = BANKS.find((b) => b.code === bank);
 
   return (
     <article className="mypage-profile__card">
@@ -110,26 +146,46 @@ export default function SettlementAccountCard() {
           }}
         >
           <div className="mypage-account__field">
-            <label htmlFor="settlement-bank" className="mypage-account__label">
+            <span id="settlement-bank-label" className="mypage-account__label">
               은행
-            </label>
-            <select
-              id="settlement-bank"
-              value={bank}
-              onChange={(e) => {
-                setBank(e.target.value);
-                setSaveError(null);
-              }}
-              className="mypage-account__select"
+            </span>
+            <button
+              type="button"
+              aria-labelledby="settlement-bank-label"
+              aria-haspopup="dialog"
+              onClick={() => setPickerOpen(true)}
+              className={`mypage-account__bank-btn${
+                selectedBank ? "" : " mypage-account__bank-btn--placeholder"
+              }`}
             >
-              <option value="">은행 선택</option>
-              {BANKS.map((b) => (
-                <option key={b.code} value={b.code}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
+              {selectedBank ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- 정적 브랜드 SVG, 최적화 불필요 */}
+                  <img
+                    src={bankIconSrc(selectedBank.code)}
+                    alt=""
+                    className="mypage-account__bank-btn-icon"
+                    width={24}
+                    height={24}
+                  />
+                  {selectedBank.name}
+                </>
+              ) : (
+                "은행 선택"
+              )}
+              <ChevronDownIcon />
+            </button>
           </div>
+          <BankPickerModal
+            open={pickerOpen}
+            value={bank}
+            onSelect={(code) => {
+              setBank(code);
+              setVerifiedHolder(null); // 입력 변경 → 인증 무효화
+              setSaveError(null);
+            }}
+            onClose={() => setPickerOpen(false)}
+          />
           <FormField
             id="settlement-account-number"
             label="계좌번호 (숫자만)"
@@ -139,25 +195,37 @@ export default function SettlementAccountCard() {
             value={accountNumber}
             onChange={(value) => {
               setAccountNumber(value);
+              setVerifiedHolder(null); // 입력 변경 → 인증 무효화
               setSaveError(null);
             }}
           />
-          <FormField
-            id="settlement-account-holder"
-            label="예금주"
-            type="text"
-            autoComplete="off"
-            value={accountHolder}
-            onChange={(value) => {
-              setAccountHolder(value);
-              setSaveError(null);
-            }}
-            error={saveError ?? undefined}
-          />
+          {verifiedHolder !== null ? (
+            <div className="mypage-account__holder" aria-live="polite">
+              <CheckIcon />
+              <span className="mypage-account__holder-label">예금주</span>
+              <span className="mypage-account__holder-name">
+                {verifiedHolder}
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void handleVerify()}
+              disabled={verifying || saving}
+              className="btn btn--outline mypage-profile__edit-btn mypage-account__verify-btn"
+            >
+              {verifying ? "인증 중..." : "계좌 인증"}
+            </button>
+          )}
+          {saveError ? (
+            <p className="mypage-profile__error" role="alert">
+              {saveError}
+            </p>
+          ) : null}
           <div className="mypage-profile__edit-actions">
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || verifying || verifiedHolder === null}
               className="btn btn--primary mypage-profile__edit-btn"
             >
               {saving ? "저장 중..." : "저장"}
@@ -177,12 +245,22 @@ export default function SettlementAccountCard() {
           <dl className="mypage-profile__facts">
             <div className="mypage-profile__fact">
               <dt className="mypage-profile__fact-label">은행</dt>
-              <dd className="mypage-profile__fact-value">{account.bankName}</dd>
+              <dd className="mypage-profile__fact-value mypage-account__fact-bank">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 브랜드 SVG, 최적화 불필요 */}
+                <img
+                  src={bankIconSrc(account.bank)}
+                  alt=""
+                  className="mypage-account__bank-btn-icon"
+                  width={20}
+                  height={20}
+                />
+                {account.bankName}
+              </dd>
             </div>
             <div className="mypage-profile__fact">
               <dt className="mypage-profile__fact-label">계좌번호</dt>
               <dd className="mypage-profile__fact-value">
-                {account.accountNumberMasked}
+                {account.accountNumber}
               </dd>
             </div>
             <div className="mypage-profile__fact">
@@ -218,5 +296,45 @@ export default function SettlementAccountCard() {
         </>
       )}
     </article>
+  );
+}
+
+/* 계좌 인증 완료 표시 */
+function CheckIcon() {
+  return (
+    <svg
+      className="mypage-account__holder-check"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m3 8.5 3.5 3.5L13 5" />
+    </svg>
+  );
+}
+
+/* 은행 선택 트리거의 펼침 표시 — select의 네이티브 화살표 대체 */
+function ChevronDownIcon() {
+  return (
+    <svg
+      className="mypage-account__bank-btn-chevron"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m4 6 4 4 4-4" />
+    </svg>
   );
 }

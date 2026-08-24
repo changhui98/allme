@@ -26,7 +26,15 @@ public enum UserErrorCode implements ErrorCode {
     NICKNAME_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "U014",
         "닉네임은 한글·영문·숫자로 2~24자까지 입력할 수 있어요."),
     NICKNAME_DUPLICATED(HttpStatus.CONFLICT, "U015", "이미 사용 중인 닉네임이에요."),
-    SETTLEMENT_ACCOUNT_INVALID(HttpStatus.BAD_REQUEST, "U016", "계좌 정보를 다시 확인해주세요.")
+    SETTLEMENT_ACCOUNT_INVALID(HttpStatus.BAD_REQUEST, "U016", "계좌 정보를 다시 확인해주세요."),
+    SETTLEMENT_ACCOUNT_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "U017",
+        "예금주를 확인할 수 없어요. 은행과 계좌번호를 다시 확인해주세요."),
+    SETTLEMENT_ACCOUNT_VERIFICATION_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "U018",
+        "계좌 인증 기관 연동 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+    SETTLEMENT_ACCOUNT_VERIFICATION_NOT_CONFIGURED(HttpStatus.SERVICE_UNAVAILABLE, "U019",
+        "계좌 인증 서비스가 아직 준비되지 않았습니다."),
+    SETTLEMENT_ACCOUNT_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "U020",
+        "계좌 인증이 만료되었거나 완료되지 않았습니다. 다시 인증해주세요.")
     ;
 
     private final HttpStatus status;

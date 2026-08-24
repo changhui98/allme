@@ -13,6 +13,7 @@ import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.port.IdentityVerificationPort.IdentityVerificationResult;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort;
 import com.allme.back.user.application.port.WithdrawnUserArchivePort.WithdrawnUser;
+import com.allme.back.user.domain.Bank;
 import com.allme.back.user.domain.NicknameGenerator;
 import com.allme.back.user.domain.Role;
 import com.allme.back.user.domain.UserErrorCode;
@@ -103,10 +104,31 @@ class UserServiceTest {
                 "VERIFIED", "홍길동", "1998-01-02", "01012345678", "MALE", "ci-value", "di-value"),
             stubRepository, hasher);
         return new UserService(
-            stubRepository, new InMemorySettlementAccountRepository(),
+            stubRepository, settlementAccountRepository, stubHolderPort,
             new NicknameService(new NicknameGenerator(), stubRepository),
             stubVerification, new BCryptPasswordEncoder(), hasher,
             fileService, stubArchive, Clock.system(ZoneId.of("Asia/Seoul")));
+    }
+
+    private final InMemorySettlementAccountRepository settlementAccountRepository =
+        new InMemorySettlementAccountRepository();
+    private final StubBankAccountHolder stubHolderPort = new StubBankAccountHolder();
+
+    /** 예금주 조회 스텁 — 고정 실명을 돌려주고 호출된 계좌를 기록한다 */
+    private static class StubBankAccountHolder
+        implements com.allme.back.user.application.port.BankAccountHolderPort {
+
+        String holderName = "홍길동";
+        Bank lastBank;
+        String lastAccountNumber;
+
+        @Override
+        public String getHolderName(Bank bank, String accountNumber) {
+            this.lastBank = bank;
+            this.lastAccountNumber = accountNumber;
+            return holderName;
+        }
+
     }
 
     /** 인메모리 정산 계좌 저장소 — userId 1건 upsert 흉내 */
@@ -452,6 +474,92 @@ class UserServiceTest {
         assertThat(stubArchive.archived).isEmpty();
         assertThat(user.isDeleted()).isFalse();
         assertThat(user.getName()).isEqualTo("홍길동");
+    }
+
+    @Test
+    @DisplayName("계좌 인증은 계좌번호를 정규화해 예금주 조회 결과와 함께 반환한다")
+    void verifySettlementAccount_success() {
+        User user = userWithPassword(VALID_PASSWORD);
+        stubHolderPort.holderName = "테스트사용자";
+
+        SettlementAccountVerification verification = serviceWith(true, false, user)
+            .verifySettlementAccount(1L, "KB", "110-1234-5678");
+
+        assertThat(verification.bank()).isEqualTo(Bank.KB);
+        assertThat(verification.accountNumber()).isEqualTo("11012345678");
+        assertThat(verification.accountHolder()).isEqualTo("테스트사용자");
+        assertThat(stubHolderPort.lastAccountNumber).isEqualTo("11012345678");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"1234567", "12345678901234567", "12ab5678"})
+    @DisplayName("계좌 인증 시 형식(숫자 8~16자리) 위반이면 SETTLEMENT_ACCOUNT_INVALID 예외를 던진다")
+    void verifySettlementAccount_invalidFormat(String accountNumber) {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThatThrownBy(() -> serviceWith(true, false, user)
+            .verifySettlementAccount(1L, "KB", accountNumber))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.SETTLEMENT_ACCOUNT_INVALID);
+    }
+
+    @Test
+    @DisplayName("인증 기록 없이 저장하면 SETTLEMENT_ACCOUNT_NOT_VERIFIED 예외를 던진다")
+    void saveSettlementAccount_notVerified() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        assertThatThrownBy(() -> serviceWith(true, false, user)
+            .saveSettlementAccount(1L, "KB", "11012345678", null))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.SETTLEMENT_ACCOUNT_NOT_VERIFIED);
+    }
+
+    @Test
+    @DisplayName("인증 기록과 은행 또는 계좌번호가 다르면 SETTLEMENT_ACCOUNT_NOT_VERIFIED 예외를 던진다")
+    void saveSettlementAccount_verificationMismatch() {
+        User user = userWithPassword(VALID_PASSWORD);
+        UserService service = serviceWith(true, false, user);
+        SettlementAccountVerification verified =
+            new SettlementAccountVerification(Bank.KB, "11012345678", "테스트사용자");
+
+        assertThatThrownBy(
+            () -> service.saveSettlementAccount(1L, "SHINHAN", "11012345678", verified))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.SETTLEMENT_ACCOUNT_NOT_VERIFIED);
+        assertThatThrownBy(
+            () -> service.saveSettlementAccount(1L, "KB", "99912345678", verified))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.SETTLEMENT_ACCOUNT_NOT_VERIFIED);
+    }
+
+    @Test
+    @DisplayName("인증 기록과 일치하면 저장되고 예금주는 인증 기록 값이 쓰인다(변경도 동일)")
+    void saveSettlementAccount_success() {
+        User user = userWithPassword(VALID_PASSWORD);
+        UserService service = serviceWith(true, false, user);
+
+        service.saveSettlementAccount(1L, "KB", "110-1234-5678",
+            new SettlementAccountVerification(Bank.KB, "11012345678", "테스트사용자"));
+
+        assertThat(settlementAccountRepository.findByUserId(1L)).hasValueSatisfying(saved -> {
+            assertThat(saved.getBank()).isEqualTo(Bank.KB);
+            assertThat(saved.getAccountNumber()).isEqualTo("11012345678");
+            assertThat(saved.getAccountHolder()).isEqualTo("테스트사용자");
+        });
+
+        // 같은 회원의 재등록은 upsert(변경) 경로를 탄다
+        service.saveSettlementAccount(1L, "TOSS", "20098765432",
+            new SettlementAccountVerification(Bank.TOSS, "20098765432", "테스트사용자"));
+
+        assertThat(settlementAccountRepository.findByUserId(1L)).hasValueSatisfying(saved -> {
+            assertThat(saved.getBank()).isEqualTo(Bank.TOSS);
+            assertThat(saved.getAccountNumber()).isEqualTo("20098765432");
+        });
     }
 
     @Test

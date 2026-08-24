@@ -1,11 +1,13 @@
 package com.allme.back.user.presentation.controller;
 
 import com.allme.back.global.exception.AppException;
+import com.allme.back.user.application.service.SettlementAccountVerification;
 import com.allme.back.user.application.service.UserService;
 import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.entity.User;
 import com.allme.back.user.presentation.dto.request.MarketingConsentUpdateRequest;
 import com.allme.back.user.presentation.dto.request.SettlementAccountUpdateRequest;
+import com.allme.back.user.presentation.dto.request.SettlementAccountVerifyRequest;
 import com.allme.back.user.presentation.dto.request.UserJoinRequest;
 import com.allme.back.user.presentation.dto.request.UserLoginRequest;
 import com.allme.back.user.presentation.dto.request.UserNicknameUpdateRequest;
@@ -13,6 +15,7 @@ import com.allme.back.user.presentation.dto.request.UserWithdrawRequest;
 import com.allme.back.user.presentation.dto.response.LoginIdAvailabilityResponse;
 import com.allme.back.user.presentation.dto.response.NicknameSuggestionResponse;
 import com.allme.back.user.presentation.dto.response.SettlementAccountResponse;
+import com.allme.back.user.presentation.dto.response.SettlementAccountVerifyResponse;
 import com.allme.back.user.presentation.dto.response.UserJoinResponse;
 import com.allme.back.user.presentation.dto.response.UserSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -143,21 +146,49 @@ public class UserController {
             sessionUserId(httpRequest), request.marketingConsent()));
     }
 
-    /** 정산 계좌 조회 — 미등록이면 registered:false. 계좌번호는 마스킹만 내린다. */
+    /** 세션에 계좌 인증 결과를 담는 attribute 키 — 저장(PUT) 시 대조 후 소거한다. */
+    private static final String SETTLEMENT_VERIFICATION_ATTR = "settlementAccountVerification";
+
+    /** 정산 계좌 조회 — 미등록이면 registered:false. 본인 세션 전용이라 계좌번호는 평문으로 내린다. */
     @GetMapping("/me/settlement-account")
     public SettlementAccountResponse settlementAccount(HttpServletRequest httpRequest) {
         return SettlementAccountResponse.from(
             userService.getSettlementAccount(sessionUserId(httpRequest)));
     }
 
-    /** 정산 계좌 등록/수정(upsert) — 형식·은행 오류 U016(400). */
+    /**
+     * 계좌 인증 — 포트원 예금주 조회로 실명을 확인하고 세션에 기록한다.
+     * POST인 이유: 계좌번호를 URL·액세스 로그에 남기지 않기 위함(본인인증 verify와 동일).
+     * 실패: U016(형식) / U017(계좌 확인 불가) / U018(제공자 오류) / U019(서비스 미준비).
+     */
+    @PostMapping("/me/settlement-account/verify")
+    public SettlementAccountVerifyResponse verifySettlementAccount(
+        @Valid @RequestBody SettlementAccountVerifyRequest request, HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionUserId(httpRequest);
+        SettlementAccountVerification verification =
+            userService.verifySettlementAccount(userId, request.bank(), request.accountNumber());
+        httpRequest.getSession().setAttribute(SETTLEMENT_VERIFICATION_ATTR, verification);
+        return new SettlementAccountVerifyResponse(verification.accountHolder());
+    }
+
+    /** 정산 계좌 등록/수정(upsert) — 세션의 인증 기록과 불일치하면 U020(재인증 유도). */
     @PutMapping("/me/settlement-account")
     public SettlementAccountResponse saveSettlementAccount(
         @Valid @RequestBody SettlementAccountUpdateRequest request, HttpServletRequest httpRequest
     ) {
         Long userId = sessionUserId(httpRequest);
+        HttpSession session = httpRequest.getSession(false);
+        Object attr = session != null ? session.getAttribute(SETTLEMENT_VERIFICATION_ATTR) : null;
+        SettlementAccountVerification verification =
+            attr instanceof SettlementAccountVerification v ? v : null;
+
         userService.saveSettlementAccount(
-            userId, request.bank(), request.accountNumber(), request.accountHolder());
+            userId, request.bank(), request.accountNumber(), verification);
+
+        if (session != null) {
+            session.removeAttribute(SETTLEMENT_VERIFICATION_ATTR);
+        }
         return SettlementAccountResponse.from(userService.getSettlementAccount(userId));
     }
 
