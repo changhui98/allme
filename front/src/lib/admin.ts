@@ -1,9 +1,9 @@
 /**
- * 관리자 콘솔 API 클라이언트 (/api/admin/**) — user.ts와 같은 fetch 패턴.
- * 전부 세션 쿠키 필수(credentials: "include"), 실패 시 ApiError(message, code).
+ * 관리자 콘솔 API 클라이언트 (/api/admin/**) — 공통 요청은 lib/api의 request()를 사용한다.
+ * 전부 세션 쿠키 필수(credentials 기본 포함), 실패 시 ApiError(message, code).
  */
 
-import { API_BASE_URL, ApiError } from "@/lib/api";
+import { request } from "@/lib/api";
 
 export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -51,28 +51,6 @@ export type AdminDashboardSummary = {
   pendingApplicationCount: number;
   totalApplicationCount: number;
 };
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}${path}`, {
-      credentials: "include",
-      ...init,
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "요청에 실패했습니다.", body?.code);
-  }
-  // 승인/반려 등 본문 없는 200 응답 대응
-  const text = await res.text();
-  return (text ? JSON.parse(text) : undefined) as T;
-}
 
 export function fetchDashboardSummary(): Promise<AdminDashboardSummary> {
   return request("/api/admin/dashboard/summary");

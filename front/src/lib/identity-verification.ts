@@ -5,7 +5,7 @@
  * - API Secret을 쓰는 실제 검증은 백엔드(/api/identity-verifications/verify)에서만 수행
  */
 
-import { API_BASE_URL, ApiError } from "@/lib/api";
+import { request } from "@/lib/api";
 
 export type VerifiedCustomer = {
   name: string;
@@ -111,27 +111,17 @@ export async function requestIdentityVerification(): Promise<string> {
   return response.identityVerificationId;
 }
 
-/** 백엔드에 인증 완료 여부를 검증하고 인증된 고객 정보를 받아온다. */
-export async function verifyIdentityOnServer(
+/**
+ * 백엔드에 인증 완료 여부를 검증하고 인증된 고객 정보를 받아온다.
+ * ApiError.code가 보존돼 호출부가 U009(이미 가입된 계정) 등으로 분기할 수 있다.
+ */
+export function verifyIdentityOnServer(
   identityVerificationId: string,
 ): Promise<VerifiedCustomer> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/identity-verifications/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identityVerificationId }),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    // code를 보존해 호출부가 U009(이미 가입된 계정) 등으로 분기할 수 있게 한다
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "본인인증 확인에 실패했습니다.", body?.code);
-  }
-  return res.json();
+  return request("/api/identity-verifications/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identityVerificationId }),
+    fallbackMessage: "본인인증 확인에 실패했습니다.",
+  });
 }

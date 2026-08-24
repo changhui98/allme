@@ -1,30 +1,17 @@
 /**
- * user 도메인 API 클라이언트. (identity-verification.ts와 같은 fetch 패턴)
+ * user 도메인 API 클라이언트 — 공통 요청은 lib/api의 request()를 사용한다.
  */
 
-import { API_BASE_URL, ApiError } from "@/lib/api";
+import { request } from "@/lib/api";
 
 /** 아이디 사용 가능 여부를 확인한다. 형식 오류(U006) 등은 서버 메시지로 throw. */
 export async function checkLoginIdAvailability(
   loginId: string,
 ): Promise<boolean> {
-  let res: Response;
-  try {
-    res = await fetch(
-      `${API_BASE_URL}/api/users/login-id/availability?loginId=${encodeURIComponent(loginId)}`,
-    );
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const message = await res
-      .json()
-      .then((body: { message?: string }) => body.message)
-      .catch(() => undefined);
-    throw new Error(message ?? "아이디 확인에 실패했습니다.");
-  }
-  const body = (await res.json()) as { available: boolean };
+  const body = await request<{ available: boolean }>(
+    `/api/users/login-id/availability?loginId=${encodeURIComponent(loginId)}`,
+    { fallbackMessage: "아이디 확인에 실패했습니다." },
+  );
   return body.available;
 }
 
@@ -68,79 +55,47 @@ export function hasRole(
 
 /**
  * 로그인. 성공 시 백엔드가 세션 쿠키(JSESSIONID)를 내려주므로
- * credentials: "include"가 필수다 (다른 오리진 간 쿠키 수신·전송 허용).
+ * credentials: "include"가 필수다 (request()가 기본으로 포함).
  */
-export async function loginUser(
+export function loginUser(
   loginId: string,
   password: string,
 ): Promise<LoginUserResult> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ loginId, password }),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "로그인에 실패했습니다.", body?.code);
-  }
-  return res.json();
+  return request("/api/users/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ loginId, password }),
+    fallbackMessage: "로그인에 실패했습니다.",
+  });
 }
 
 /**
  * 세션 확인 — 로그인 상태면 회원 요약, 아니면 null.
- * 401(U011)은 "비로그인"이라는 정상 상태이므로 에러로 던지지 않는다.
+ * 401(U011)은 "비로그인"이라는 정상 상태이므로 에러로 던지지 않고,
+ * 전역 세션 만료 신호도 발신하지 않는다(notifySessionExpired: false).
  */
 export async function fetchMe(): Promise<LoginUserResult | null> {
-  let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      credentials: "include",
+    return await request<LoginUserResult>("/api/users/me", {
+      notifySessionExpired: false,
     });
   } catch {
     // 서버 접속 불가도 헤더 입장에선 비로그인과 동일하게 취급
     return null;
   }
-  if (!res.ok) return null;
-  return res.json();
 }
 
 /** 프로필 이미지 업로드(교체). 성공 시 갱신된 회원 요약을 반환한다. */
-export async function uploadProfileImage(
-  file: File,
-): Promise<LoginUserResult> {
+export function uploadProfileImage(file: File): Promise<LoginUserResult> {
   const formData = new FormData();
   formData.append("image", file);
 
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/profile-image`, {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(
-      body?.message ?? "프로필 이미지 업로드에 실패했습니다.",
-      body?.code,
-    );
-  }
-  return res.json();
+  // Content-Type 미지정 — 브라우저가 multipart boundary를 붙이게 둔다
+  return request("/api/users/me/profile-image", {
+    method: "POST",
+    body: formData,
+    fallbackMessage: "프로필 이미지 업로드에 실패했습니다.",
+  });
 }
 
 /** 백엔드 UserService.NICKNAME_PATTERN과 반드시 동일하게 유지할 것: 한글·영문·숫자·공백, 2~24자 */
@@ -150,80 +105,34 @@ export const NICKNAME_RULES = {
 } as const;
 
 /** 닉네임 변경 — 형식 오류 U014(400)·중복 U015(409)는 ApiError.code로 구분한다. */
-export async function updateNickname(
-  nickname: string,
-): Promise<LoginUserResult> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/nickname`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ nickname }),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "닉네임 변경에 실패했습니다.", body?.code);
-  }
-  return res.json();
+export function updateNickname(nickname: string): Promise<LoginUserResult> {
+  return request("/api/users/me/nickname", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nickname }),
+    fallbackMessage: "닉네임 변경에 실패했습니다.",
+  });
 }
 
 /** 랜덤 닉네임 제안 — 저장하지 않은 유니크 후보만 받는다("랜덤 다시 뽑기"). */
 export async function fetchRandomNickname(): Promise<string> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/nickname/random`, {
-      credentials: "include",
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(
-      body?.message ?? "닉네임 추천에 실패했습니다.",
-      body?.code,
-    );
-  }
-  const body = (await res.json()) as { nickname: string };
+  const body = await request<{ nickname: string }>(
+    "/api/users/me/nickname/random",
+    { fallbackMessage: "닉네임 추천에 실패했습니다." },
+  );
   return body.nickname;
 }
 
 /** 마케팅 수신 동의 변경 — 서버가 변경 일시도 함께 기록한다. */
-export async function updateMarketingConsent(
+export function updateMarketingConsent(
   marketingConsent: boolean,
 ): Promise<LoginUserResult> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/marketing-consent`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ marketingConsent }),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(
-      body?.message ?? "수신 동의 변경에 실패했습니다.",
-      body?.code,
-    );
-  }
-  return res.json();
+  return request("/api/users/me/marketing-consent", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ marketingConsent }),
+    fallbackMessage: "수신 동의 변경에 실패했습니다.",
+  });
 }
 
 /** 정산 계좌(마스킹 응답) — 평문 계좌번호는 서버가 절대 내리지 않는다(수정은 전체 재입력). */
@@ -243,25 +152,10 @@ type SettlementAccountResponse = {
 
 /** 정산 계좌 조회 — 미등록이면 null. */
 export async function fetchSettlementAccount(): Promise<SettlementAccount | null> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/settlement-account`, {
-      credentials: "include",
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(
-      body?.message ?? "정산 계좌 조회에 실패했습니다.",
-      body?.code,
-    );
-  }
-  const body = (await res.json()) as SettlementAccountResponse;
+  const body = await request<SettlementAccountResponse>(
+    "/api/users/me/settlement-account",
+    { fallbackMessage: "정산 계좌 조회에 실패했습니다." },
+  );
   return body.registered ? body.account : null;
 }
 
@@ -275,61 +169,37 @@ export type SettlementAccountInput = {
 export async function saveSettlementAccount(
   input: SettlementAccountInput,
 ): Promise<SettlementAccount> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me/settlement-account`, {
+  const body = await request<SettlementAccountResponse>(
+    "/api/users/me/settlement-account",
+    {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(input),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(
-      body?.message ?? "정산 계좌 저장에 실패했습니다.",
-      body?.code,
-    );
-  }
-  const body = (await res.json()) as SettlementAccountResponse;
+      fallbackMessage: "정산 계좌 저장에 실패했습니다.",
+    },
+  );
   // upsert 직후 응답이라 항상 registered:true — 방어적으로만 체크
   if (!body.account) throw new Error("정산 계좌 저장에 실패했습니다.");
   return body.account;
 }
 
 /** 회원탈퇴 — 비밀번호 재확인(U013) 후 soft delete + 개인정보 익명화. 성공 시 세션도 무효화된다. */
-export async function withdrawUser(password: string): Promise<void> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ password }),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "회원탈퇴에 실패했습니다.", body?.code);
-  }
+export function withdrawUser(password: string): Promise<void> {
+  return request("/api/users/me", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+    fallbackMessage: "회원탈퇴에 실패했습니다.",
+  });
 }
 
 /** 로그아웃 — 세션 무효화. 호출 후에는 풀 리로드로 useMe 캐시를 초기화할 것. */
 export async function logoutUser(): Promise<void> {
   try {
-    await fetch(`${API_BASE_URL}/api/users/logout`, {
+    // 세션이 이미 죽어도 204인 멱등 엔드포인트 — 만료 신호도 불필요
+    await request<void>("/api/users/logout", {
       method: "POST",
-      credentials: "include",
+      notifySessionExpired: false,
     });
   } catch {
     // 서버 접속 불가여도 리로드 후 비로그인 취급되므로 조용히 넘어간다
@@ -346,22 +216,11 @@ export async function logoutAndGoHome(): Promise<void> {
  * 회원가입. 이름 등 개인정보는 보내지 않는다 —
  * 백엔드가 identityVerificationId로 포트원을 재조회해 확보·암호화 저장한다.
  */
-export async function joinUser(input: JoinUserInput): Promise<void> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-    });
-  } catch {
-    throw new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  if (!res.ok) {
-    const body = (await res
-      .json()
-      .catch(() => undefined)) as { code?: string; message?: string } | undefined;
-    throw new ApiError(body?.message ?? "회원가입에 실패했습니다.", body?.code);
-  }
+export function joinUser(input: JoinUserInput): Promise<void> {
+  return request("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    fallbackMessage: "회원가입에 실패했습니다.",
+  });
 }
