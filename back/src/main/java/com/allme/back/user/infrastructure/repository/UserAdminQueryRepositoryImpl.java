@@ -32,7 +32,10 @@ public class UserAdminQueryRepositoryImpl implements UserAdminQueryRepository {
 
     @Override
     public Page<AdminUserRow> search(String loginIdKeywordOrNull, Pageable pageable) {
-        return userJpaRepository.searchAdminRows(loginIdKeywordOrNull, pageable);
+        if (loginIdKeywordOrNull == null) {
+            return userJpaRepository.findAllAdminRows(pageable); // null을 like에 바인딩하지 않는다
+        }
+        return userJpaRepository.searchAdminRowsByLoginId(loginIdKeywordOrNull, pageable);
     }
 
     @Override

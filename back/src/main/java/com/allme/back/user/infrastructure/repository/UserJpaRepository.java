@@ -27,21 +27,36 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     @Query("select u.id, u.loginId from User u where u.id in :userIds")
     List<Object[]> findIdAndLoginIdByIdIn(@Param("userIds") Collection<Long> userIds);
 
-    /** 관리자 회원 목록 — 생성자 프로젝션으로 암호화 컬럼 미로딩. keyword null이면 전체. */
+    /** 관리자 회원 목록 전체 — 생성자 프로젝션으로 암호화 컬럼 미로딩. */
     @Query(
         value = """
             select new com.allme.back.user.domain.AdminUserRow(
                 u.id, u.loginId, u.createdDate, u.deletedDate)
             from User u
-            where :keyword is null or u.loginId like concat('%', :keyword, '%')
+            """,
+        countQuery = "select count(u) from User u"
+    )
+    Page<AdminUserRow> findAllAdminRows(Pageable pageable);
+
+    /**
+     * 관리자 회원 목록 loginId 부분 일치 검색 — keyword는 non-null이어야 한다.
+     * ":keyword is null or ... like" 한 쿼리로 합치면 null 바인딩이 PostgreSQL에서 bytea로 추론되어
+     * "operator does not exist: character varying ~~ bytea" 오류가 나므로 전체 조회와 분리한다.
+     */
+    @Query(
+        value = """
+            select new com.allme.back.user.domain.AdminUserRow(
+                u.id, u.loginId, u.createdDate, u.deletedDate)
+            from User u
+            where u.loginId like concat('%', :keyword, '%')
             """,
         countQuery = """
             select count(u)
             from User u
-            where :keyword is null or u.loginId like concat('%', :keyword, '%')
+            where u.loginId like concat('%', :keyword, '%')
             """
     )
-    Page<AdminUserRow> searchAdminRows(@Param("keyword") String keyword, Pageable pageable);
+    Page<AdminUserRow> searchAdminRowsByLoginId(@Param("keyword") String keyword, Pageable pageable);
 
     long countByDeletedDateIsNull();
 
