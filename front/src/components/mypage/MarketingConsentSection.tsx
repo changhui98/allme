@@ -5,11 +5,11 @@ import { useMe } from "@/lib/use-me";
 import { updateMarketingConsent } from "@/lib/user";
 
 /**
- * 마케팅 수신 동의 카드 — 스위치 토글, 낙관적 갱신 + 실패 시 원복.
+ * 알림 설정 섹션 — 마케팅 수신 동의 스위치 토글, 낙관적 갱신 + 실패 시 원복.
  * useMe 캐시는 건드리지 않고 로컬 state로만 관리한다(다른 화면에 노출되지 않는 값).
- * 스타일: styles/pages/mypage.css(mypage-consent) + components/switch.css
+ * 스타일: styles/pages/mypage.css(mypage-group·mypage-consent) + components/switch.css
  */
-export default function MarketingConsentCard() {
+export default function MarketingConsentSection() {
   const { me } = useMe();
   const [consent, setConsent] = useState<boolean | null>(null);
   const [pending, setPending] = useState(false);
@@ -38,34 +38,40 @@ export default function MarketingConsentCard() {
   };
 
   return (
-    <article className="mypage-profile__card">
-      <h2 className="mypage-profile__card-title">알림 설정</h2>
-      <div className="mypage-consent">
-        <div className="mypage-consent__body">
-          <p className="mypage-consent__label" id="marketing-consent-label">
-            마케팅 정보 수신 동의
-          </p>
-          <p className="mypage-consent__sub">
-            이벤트·혜택 소식을 이메일과 알림으로 받아요.
-          </p>
+    <section className="mypage-group" aria-labelledby="notification-title">
+      <div className="mypage-group__header">
+        <h2 id="notification-title" className="mypage-group__title">
+          알림 설정
+        </h2>
+      </div>
+      <div className="mypage-rows">
+        <div className="mypage-row mypage-consent">
+          <div className="mypage-consent__body">
+            <p className="mypage-consent__label" id="marketing-consent-label">
+              마케팅 정보 수신 동의
+            </p>
+            <p className="mypage-consent__sub">
+              이벤트·혜택 소식을 이메일과 알림으로 받아요.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={checked}
+            aria-labelledby="marketing-consent-label"
+            onClick={() => void handleToggle()}
+            disabled={pending}
+            className={`switch${checked ? " is-on" : ""}`}
+          >
+            <span className="switch__thumb" />
+          </button>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={checked}
-          aria-labelledby="marketing-consent-label"
-          onClick={() => void handleToggle()}
-          disabled={pending}
-          className={`switch${checked ? " is-on" : ""}`}
-        >
-          <span className="switch__thumb" />
-        </button>
       </div>
       {error ? (
-        <p className="mypage-profile__error" role="alert">
+        <p className="mypage-group__error" role="alert">
           {error}
         </p>
       ) : null}
-    </article>
+    </section>
   );
 }

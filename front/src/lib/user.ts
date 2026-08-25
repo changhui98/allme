@@ -135,12 +135,13 @@ export function updateMarketingConsent(
   });
 }
 
-/** 정산 계좌 — 본인 세션 API라 계좌번호는 평문으로 내려온다(암호화 저장은 서버 유지). */
+/** 정산 계좌 조회 결과 — 계좌번호는 마스킹(앞 3·뒤 4자리)만 내려오고 평문은 절대 오지 않는다. */
 export type SettlementAccount = {
   /** 백엔드 Bank enum name (lib/banks.ts BANKS.code와 계약) */
   bank: string;
   bankName: string;
-  accountNumber: string;
+  /** 예: 695*******8005 — 변경 폼 프리필에 쓸 수 없다(재입력) */
+  accountNumberMasked: string;
   accountHolder: string;
 };
 

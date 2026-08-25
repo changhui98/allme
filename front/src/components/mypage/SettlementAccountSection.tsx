@@ -16,13 +16,13 @@ import {
 const NOT_VERIFIED_CODE = "U020";
 
 /**
- * 정산 계좌 카드 — 조회·등록·변경.
+ * 정산 계좌 섹션 — 조회·등록·변경.
  * 예금주는 직접 입력하지 않는다: 은행+계좌번호로 "계좌 인증"(포트원 예금주 조회)을 거치면
  * 실명이 표시되고, 그 상태에서만 저장할 수 있다. 은행·계좌번호를 바꾸면 인증이 무효화된다.
- * 계좌번호는 본인 세션 API라 평문으로 오간다(서버 저장은 암호화 유지).
- * 스타일: styles/pages/mypage.css (mypage-profile·mypage-account)
+ * 조회 응답의 계좌번호는 마스킹(앞 3·뒤 4자리)이라 변경 시 은행만 프리필하고 번호는 재입력한다.
+ * 스타일: styles/pages/mypage.css (mypage-group·mypage-rows·mypage-account)
  */
-export default function SettlementAccountCard() {
+export default function SettlementAccountSection() {
   const [account, setAccount] = useState<SettlementAccount | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -59,8 +59,8 @@ export default function SettlementAccountCard() {
 
   const openEdit = () => {
     setBank(account?.bank ?? "");
-    // 기존 계좌는 평문 프리필 — 은행만 바꾸는 경우 재입력을 줄인다(인증은 항상 새로 필요)
-    setAccountNumber(account?.accountNumber ?? "");
+    // 계좌번호는 마스킹 응답이라 프리필 불가 — 재입력(인증도 항상 새로 필요)
+    setAccountNumber("");
     setVerifiedHolder(null);
     setSaveError(null);
     setEditing(true);
@@ -128,13 +128,28 @@ export default function SettlementAccountCard() {
   const selectedBank = BANKS.find((b) => b.code === bank);
 
   return (
-    <article className="mypage-profile__card">
-      <h2 className="mypage-profile__card-title">정산 계좌</h2>
+    <section className="mypage-group" aria-labelledby="settlement-title">
+      <div className="mypage-group__header">
+        <h2 id="settlement-title" className="mypage-group__title">
+          정산 계좌
+        </h2>
+        {loaded && !loadError && account && !editing ? (
+          <div className="mypage-group__action">
+            <button
+              type="button"
+              onClick={openEdit}
+              className="mypage-profile__text-btn"
+            >
+              계좌 변경
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       {!loaded ? (
-        <p className="mypage-profile__note">불러오는 중...</p>
+        <p className="mypage-group__note">불러오는 중...</p>
       ) : loadError ? (
-        <p className="mypage-profile__error" role="alert">
+        <p className="mypage-group__error" role="alert">
           {loadError}
         </p>
       ) : editing ? (
@@ -218,7 +233,7 @@ export default function SettlementAccountCard() {
             </button>
           )}
           {saveError ? (
-            <p className="mypage-profile__error" role="alert">
+            <p className="mypage-group__error" role="alert">
               {saveError}
             </p>
           ) : null}
@@ -241,48 +256,33 @@ export default function SettlementAccountCard() {
           </div>
         </form>
       ) : account ? (
-        <>
-          <dl className="mypage-profile__facts">
-            <div className="mypage-profile__fact">
-              <dt className="mypage-profile__fact-label">은행</dt>
-              <dd className="mypage-profile__fact-value mypage-account__fact-bank">
-                {/* eslint-disable-next-line @next/next/no-img-element -- 정적 브랜드 SVG, 최적화 불필요 */}
-                <img
-                  src={bankIconSrc(account.bank)}
-                  alt=""
-                  className="mypage-account__bank-btn-icon"
-                  width={20}
-                  height={20}
-                />
-                {account.bankName}
-              </dd>
-            </div>
-            <div className="mypage-profile__fact">
-              <dt className="mypage-profile__fact-label">계좌번호</dt>
-              <dd className="mypage-profile__fact-value">
-                {account.accountNumber}
-              </dd>
-            </div>
-            <div className="mypage-profile__fact">
-              <dt className="mypage-profile__fact-label">예금주</dt>
-              <dd className="mypage-profile__fact-value">
-                {account.accountHolder}
-              </dd>
-            </div>
-          </dl>
-          <div className="mypage-profile__actions">
-            <button
-              type="button"
-              onClick={openEdit}
-              className="mypage-profile__text-btn"
-            >
-              계좌 변경
-            </button>
+        <dl className="mypage-rows">
+          <div className="mypage-row">
+            <dt className="mypage-row__label">은행</dt>
+            <dd className="mypage-row__value mypage-account__fact-bank">
+              {/* eslint-disable-next-line @next/next/no-img-element -- 정적 브랜드 SVG, 최적화 불필요 */}
+              <img
+                src={bankIconSrc(account.bank)}
+                alt=""
+                className="mypage-account__bank-btn-icon"
+                width={20}
+                height={20}
+              />
+              {account.bankName}
+            </dd>
           </div>
-        </>
+          <div className="mypage-row">
+            <dt className="mypage-row__label">계좌번호</dt>
+            <dd className="mypage-row__value">{account.accountNumberMasked}</dd>
+          </div>
+          <div className="mypage-row">
+            <dt className="mypage-row__label">예금주</dt>
+            <dd className="mypage-row__value">{account.accountHolder}</dd>
+          </div>
+        </dl>
       ) : (
         <>
-          <p className="mypage-profile__note">
+          <p className="mypage-group__note">
             판매 대금을 받으려면 정산 계좌가 필요해요. 계좌 정보는 암호화되어
             안전하게 보관돼요.
           </p>
@@ -295,7 +295,7 @@ export default function SettlementAccountCard() {
           </button>
         </>
       )}
-    </article>
+    </section>
   );
 }
 

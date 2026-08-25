@@ -3,7 +3,7 @@ import { API_BASE_URL } from "@/lib/api";
 /**
  * 프로필 아바타. 이미지가 있으면 원형으로 보여주고,
  * 없으면 이름 첫 글자를 넣은 이니셜 아바타로 폴백한다.
- * size 모디파이어: sm(상단 바) / md(모바일 메뉴 패널) / lg(내 정보 페이지).
+ * size 모디파이어: sm(상단 바) / md(모바일 메뉴 패널) / lg(내 정보 히어로).
  * 스타일: styles/pages/mypage.css
  */
 export default function Avatar({
