@@ -107,6 +107,90 @@
   --primary-text: #a78bfa;
 }
 
+/*
+ * 파스텔 컬러 테마 — 위 6색과 같은 색상(hue)의 연한 변형. 원칙:
+ * 라이트: primary는 연한 톤(버튼 면), 그 위 글자는 같은 색상의 짙은 톤(--primary-foreground),
+ *         본문 위 텍스트(--primary-text)는 파스텔이 대비 미달이라 700 계열 짙은 톤을 쓴다.
+ * 다크:   primary를 한 단계 더 밝은 톤으로 올려 어두운 배경에서 파스텔 느낌을 유지한다.
+ */
+:root[data-accent="peach"] {
+  --primary: #efb39a; /* 테라코타 파스텔 */
+  --primary-hover: #e69b7d;
+  --primary-foreground: #3d1d12;
+  --primary-text: #b5542f;
+}
+.dark[data-accent="peach"] {
+  --primary: #f1c2ae;
+  --primary-hover: #f6d3c4;
+  --primary-foreground: #3d1d12;
+  --primary-text: #f1c2ae;
+}
+
+:root[data-accent="mint"] {
+  --primary: #5eead4; /* teal-300 */
+  --primary-hover: #2dd4bf;
+  --primary-foreground: #042f2e;
+  --primary-text: #0f766e;
+}
+.dark[data-accent="mint"] {
+  --primary: #99f6e4; /* teal-200 */
+  --primary-hover: #ccfbf1;
+  --primary-foreground: #042f2e;
+  --primary-text: #99f6e4;
+}
+
+:root[data-accent="sage"] {
+  --primary: #86efac; /* green-300 */
+  --primary-hover: #4ade80;
+  --primary-foreground: #052e16;
+  --primary-text: #15803d;
+}
+.dark[data-accent="sage"] {
+  --primary: #bbf7d0; /* green-200 */
+  --primary-hover: #dcfce7;
+  --primary-foreground: #052e16;
+  --primary-text: #bbf7d0;
+}
+
+:root[data-accent="sky"] {
+  --primary: #93c5fd; /* blue-300 */
+  --primary-hover: #60a5fa;
+  --primary-foreground: #172554;
+  --primary-text: #1d4ed8;
+}
+.dark[data-accent="sky"] {
+  --primary: #bfdbfe; /* blue-200 */
+  --primary-hover: #dbeafe;
+  --primary-foreground: #172554;
+  --primary-text: #bfdbfe;
+}
+
+:root[data-accent="lavender"] {
+  --primary: #a5b4fc; /* indigo-300 */
+  --primary-hover: #818cf8;
+  --primary-foreground: #1e1b4b;
+  --primary-text: #4338ca;
+}
+.dark[data-accent="lavender"] {
+  --primary: #c7d2fe; /* indigo-200 */
+  --primary-hover: #e0e7ff;
+  --primary-foreground: #1e1b4b;
+  --primary-text: #c7d2fe;
+}
+
+:root[data-accent="lilac"] {
+  --primary: #c4b5fd; /* violet-300 */
+  --primary-hover: #a78bfa;
+  --primary-foreground: #2e1065;
+  --primary-text: #6d28d9;
+}
+.dark[data-accent="lilac"] {
+  --primary: #ddd6fe; /* violet-200 */
+  --primary-hover: #ede9fe;
+  --primary-foreground: #2e1065;
+  --primary-text: #ddd6fe;
+}
+
 /* 팔레트 (구 Tailwind oklch 원문) — 테마와 무관한 고정색 */
 :root {
   --stone-50: oklch(98.5% 0.001 106.423);

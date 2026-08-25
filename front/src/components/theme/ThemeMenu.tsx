@@ -29,6 +29,16 @@ const ACCENTS = [
   { key: "violet", label: "바이올렛", light: "#7c3aed", dark: "#a78bfa" },
 ] as const;
 
+/** 파스텔 — 위 6색과 같은 색상의 연한 변형(tokens.css 파스텔 블록과 키 1:1). 같은 accent 상태를 공유한다. */
+const PASTEL_ACCENTS = [
+  { key: "peach", label: "피치", light: "#efb39a", dark: "#f1c2ae" },
+  { key: "mint", label: "민트", light: "#5eead4", dark: "#99f6e4" },
+  { key: "sage", label: "세이지", light: "#86efac", dark: "#bbf7d0" },
+  { key: "sky", label: "스카이", light: "#93c5fd", dark: "#bfdbfe" },
+  { key: "lavender", label: "라벤더", light: "#a5b4fc", dark: "#c7d2fe" },
+  { key: "lilac", label: "라일락", light: "#c4b5fd", dark: "#ddd6fe" },
+] as const;
+
 const MODES = [
   { key: "system", label: "시스템" },
   { key: "light", label: "라이트" },
@@ -39,6 +49,7 @@ const MODES = [
  * 테마 설정 드롭다운: 모드(시스템/라이트/다크) + 컬러 테마 스와치.
  * 모드는 next-themes(setTheme), 컬러는 <html data-accent> + localStorage로 관리한다.
  * 컬러는 하나를 고르면 라이트/다크 양쪽에 공통 적용된다(스와치만 현재 모드 색으로 표시).
+ * 컬러 테마(진한 6색)와 파스텔(연한 6색)은 그룹만 다를 뿐 하나의 선택값(accent)을 공유한다.
  * 서버/클라 하이드레이션 불일치를 피하려고 마운트 전엔 빈 자리(placeholder)만 렌더한다.
  */
 export default function ThemeMenu() {
@@ -50,7 +61,8 @@ export default function ThemeMenu() {
   const [accent, setAccent] = useState(() =>
     typeof document === "undefined"
       ? DEFAULT_ACCENT
-      : (document.documentElement.getAttribute("data-accent") ?? DEFAULT_ACCENT),
+      : (document.documentElement.getAttribute("data-accent") ??
+        DEFAULT_ACCENT),
   );
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -140,26 +152,72 @@ export default function ThemeMenu() {
             className="theme-menu__swatches"
           >
             {ACCENTS.map((a) => (
-              <button
+              <Swatch
                 key={a.key}
-                type="button"
-                role="radio"
-                aria-checked={accent === a.key}
-                onClick={() => selectAccent(a.key)}
-                className={`theme-menu__swatch${accent === a.key ? " is-active" : ""}`}
-              >
-                <span
-                  className="theme-menu__swatch-dot"
-                  style={{ backgroundColor: isDark ? a.dark : a.light }}
-                  aria-hidden="true"
-                />
-                {a.label}
-              </button>
+                accent={a}
+                active={accent === a.key}
+                isDark={isDark}
+                onSelect={selectAccent}
+              />
+            ))}
+          </div>
+
+          <p
+            className="theme-menu__title theme-menu__title--sub"
+            id="theme-menu-pastel-label"
+          >
+            파스텔
+          </p>
+          <div
+            role="radiogroup"
+            aria-labelledby="theme-menu-pastel-label"
+            className="theme-menu__swatches"
+          >
+            {PASTEL_ACCENTS.map((a) => (
+              <Swatch
+                key={a.key}
+                accent={a}
+                active={accent === a.key}
+                isDark={isDark}
+                onSelect={selectAccent}
+              />
             ))}
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+type AccentOption = (typeof ACCENTS)[number] | (typeof PASTEL_ACCENTS)[number];
+
+/** 컬러 스와치 라디오 — 점 색은 현재 모드(라이트/다크)의 미리보기 값 */
+function Swatch({
+  accent,
+  active,
+  isDark,
+  onSelect,
+}: {
+  accent: AccentOption;
+  active: boolean;
+  isDark: boolean;
+  onSelect: (key: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      onClick={() => onSelect(accent.key)}
+      className={`theme-menu__swatch${active ? " is-active" : ""}`}
+    >
+      <span
+        className="theme-menu__swatch-dot"
+        style={{ backgroundColor: isDark ? accent.dark : accent.light }}
+        aria-hidden="true"
+      />
+      {accent.label}
+    </button>
   );
 }
 

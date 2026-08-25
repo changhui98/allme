@@ -46,6 +46,11 @@
   color: var(--muted);
 }
 
+/* 같은 패널 안의 두 번째 스와치 그룹 제목(파스텔) — 위 그룹과 여백으로 구분 */
+.theme-menu__title--sub {
+  margin-top: 0.875rem;
+}
+
 .theme-menu__modes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
