@@ -516,16 +516,29 @@ class UserServiceTest {
     @Test
     @DisplayName("계좌 인증은 계좌번호를 정규화해 예금주 조회 결과와 함께 반환한다")
     void verifySettlementAccount_success() {
-        User user = userWithPassword(VALID_PASSWORD);
-        stubHolderPort.holderName = "테스트사용자";
+        User user = userWithPassword(VALID_PASSWORD); // 실명 "홍길동"
+        stubHolderPort.holderName = "홍 길동"; // 은행 표기의 공백 차이는 무시
 
         SettlementAccountVerification verification = serviceWith(true, false, user)
             .verifySettlementAccount(1L, "KB", "110-1234-5678");
 
         assertThat(verification.bank()).isEqualTo(Bank.KB);
         assertThat(verification.accountNumber()).isEqualTo("11012345678");
-        assertThat(verification.accountHolder()).isEqualTo("테스트사용자");
+        assertThat(verification.accountHolder()).isEqualTo("홍 길동");
         assertThat(stubHolderPort.lastAccountNumber).isEqualTo("11012345678");
+    }
+
+    @Test
+    @DisplayName("예금주가 회원 실명과 다르면 SETTLEMENT_ACCOUNT_HOLDER_MISMATCH 예외를 던진다")
+    void verifySettlementAccount_holderMismatch() {
+        User user = userWithPassword(VALID_PASSWORD); // 실명 "홍길동"
+        stubHolderPort.holderName = "김철수";
+
+        assertThatThrownBy(() -> serviceWith(true, false, user)
+            .verifySettlementAccount(1L, "KB", "110-1234-5678"))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.SETTLEMENT_ACCOUNT_HOLDER_MISMATCH);
     }
 
     @ParameterizedTest

@@ -35,7 +35,9 @@ public enum UserErrorCode implements ErrorCode {
         "계좌 인증 서비스가 아직 준비되지 않았습니다."),
     SETTLEMENT_ACCOUNT_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "U020",
         "계좌 인증이 만료되었거나 완료되지 않았습니다. 다시 인증해주세요."),
-    NICKNAME_CHANGE_TOO_SOON(HttpStatus.BAD_REQUEST, "U021", "닉네임은 2일에 한 번만 바꿀 수 있어요.")
+    NICKNAME_CHANGE_TOO_SOON(HttpStatus.BAD_REQUEST, "U021", "닉네임은 2일에 한 번만 바꿀 수 있어요."),
+    SETTLEMENT_ACCOUNT_HOLDER_MISMATCH(HttpStatus.BAD_REQUEST, "U022",
+        "본인 명의 계좌만 등록할 수 있어요. 예금주가 회원 실명과 일치해야 해요.")
     ;
 
     private final HttpStatus status;

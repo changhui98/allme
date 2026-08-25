@@ -5,6 +5,7 @@ import FormField from "@/components/auth/FormField";
 import BankPickerModal from "@/components/mypage/BankPickerModal";
 import { ApiError } from "@/lib/api";
 import { BANKS, bankIconSrc } from "@/lib/banks";
+import { useMe } from "@/lib/use-me";
 import {
   type SettlementAccount,
   fetchSettlementAccount,
@@ -20,9 +21,11 @@ const NOT_VERIFIED_CODE = "U020";
  * 예금주는 직접 입력하지 않는다: 은행+계좌번호로 "계좌 인증"(포트원 예금주 조회)을 거치면
  * 실명이 표시되고, 그 상태에서만 저장할 수 있다. 은행·계좌번호를 바꾸면 인증이 무효화된다.
  * 조회 응답의 계좌번호는 마스킹(앞 3·뒤 4자리)이라 변경 시 은행만 프리필하고 번호는 재입력한다.
+ * 본인 명의만 허용 — 서버가 예금주를 회원 실명과 대조한다(U022). 폼에 실명 일치 안내를 띄운다.
  * 스타일: styles/pages/mypage.css (mypage-group·mypage-rows·mypage-account)
  */
 export default function SettlementAccountSection() {
+  const { me } = useMe();
   const [account, setAccount] = useState<SettlementAccount | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -214,6 +217,12 @@ export default function SettlementAccountSection() {
               setSaveError(null);
             }}
           />
+          {verifiedHolder === null ? (
+            <p className="mypage-account__hint">
+              본인 명의 계좌만 등록할 수 있어요. 예금주가 회원 실명
+              {me?.name ? `(${me.name})` : ""}과 일치해야 해요.
+            </p>
+          ) : null}
           {verifiedHolder !== null ? (
             <div className="mypage-account__holder" aria-live="polite">
               <CheckIcon />

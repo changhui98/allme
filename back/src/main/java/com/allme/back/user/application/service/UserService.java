@@ -262,15 +262,26 @@ public class UserService {
      * 계좌 인증 — 포트원 예금주 조회로 실명을 확보한다.
      * 결과는 컨트롤러가 HTTP 세션에 기록해 저장 요청과 대조한다(예금주 조회는 건당 과금이라
      * 저장 시 재조회하지 않는다). 형식·은행 오류는 U016, 조회 실패 계열은 U017~U019.
+     * 예금주가 회원 실명과 다르면 U022(본인 명의 계좌만 허용).
      */
     public SettlementAccountVerification verifySettlementAccount(
         Long userId, String bankName, String rawAccountNumber
     ) {
         Bank bank = parseBank(bankName);
         String accountNumber = normalizeAccountNumber(rawAccountNumber);
-        getById(userId); // 활성 회원 확인
+        User user = getById(userId); // 활성 회원 확인
         String accountHolder = bankAccountHolderPort.getHolderName(bank, accountNumber);
+        // 본인 명의 계좌만 허용 — 본인인증으로 확보한 실명과 예금주를 대조한다(공백 차이만 무시).
+        // 업체의 사업자·법인 명의 계좌는 업체 정보(상호·대표자)와 대조하는 별도 규칙이 필요하다(미구현).
+        if (!sameName(accountHolder, user.getName())) {
+            throw new AppException(UserErrorCode.SETTLEMENT_ACCOUNT_HOLDER_MISMATCH);
+        }
         return new SettlementAccountVerification(bank, accountNumber, accountHolder);
+    }
+
+    private static boolean sameName(String a, String b) {
+        return a != null && b != null
+            && a.replaceAll("\\s+", "").equals(b.replaceAll("\\s+", ""));
     }
 
     /**
