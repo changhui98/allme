@@ -161,7 +161,7 @@
 
 .brand-panel__subcopy {
   max-width: 28rem;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.625;
   color: color-mix(in oklab, var(--bp-white) 80%, transparent);
 }
@@ -279,7 +279,7 @@
   left: 0.75rem; /* 인풋 padding 1rem - 라벨 좌우 padding 0.25rem */
   translate: 0 -50%;
   padding: 0 0.25rem;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.25rem;
   color: color-mix(in oklab, var(--muted) 70%, transparent); /* placeholder와 동일 색 */
   pointer-events: none;
@@ -331,7 +331,7 @@
   border-color: var(--border);
   background-color: var(--ff-bg);
   padding: 0.75rem 1rem;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.5rem;
   outline: none;
   transition-property: border-color, box-shadow;

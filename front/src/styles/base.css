@@ -12,6 +12,17 @@ html {
     "Pretendard", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
 }
 
+/* 글자 크기 단계 — ThemeMenu가 <html data-font-size>로 지정하고 localStorage("fontSize")에 보관.
+   기본(속성 없음)=최대 16px. 스타일이 거의 전부 rem이라 이 한 줄로 전 페이지가 비율대로 따라온다.
+   → 새 스타일에 px 단위 font-size를 쓰면 단계에 안 따라오니 rem으로 쓸 것. */
+html[data-font-size="medium"] {
+  font-size: 93.75%; /* 15px */
+}
+
+html[data-font-size="small"] {
+  font-size: 87.5%; /* 14px */
+}
+
 /* 앱 프레임: 헤더-본문-푸터 세로 배치, 본문(flex:1)이 남은 높이를 채운다 */
 body {
   display: flex;
