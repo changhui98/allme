@@ -57,14 +57,21 @@ export default function WithdrawSection() {
   const goHome = () => window.location.assign("/");
 
   return (
-    <>
+    <div className="mypage-column">
       <h1 className="mypage-page__title">올미와 이별하시는 건가요?</h1>
       <p className="mypage-page__subtitle">
         {displayName(me)}님, 탈퇴하기 전에 아래 내용을 꼭 확인해주세요.
       </p>
 
-      <section aria-label="탈퇴 유의사항" className="mypage-section">
-        <h2 className="mypage-section__title">탈퇴하면 이렇게 돼요</h2>
+      <section
+        aria-labelledby="withdraw-notice-title"
+        className="mypage-group withdraw-page__notice-group"
+      >
+        <div className="mypage-group__header">
+          <h2 id="withdraw-notice-title" className="mypage-group__title">
+            탈퇴하면 이렇게 돼요
+          </h2>
+        </div>
         <ul className="withdraw-page__notices">
           <li className="withdraw-page__notice">
             계정 정보(이름·본인인증 정보·휴대폰번호)가 즉시 삭제되며 복구할 수
@@ -147,7 +154,7 @@ export default function WithdrawSection() {
       >
         탈퇴가 완료되었습니다. 그동안 올미를 이용해주셔서 감사합니다.
       </Modal>
-    </>
+    </div>
   );
 }
 
