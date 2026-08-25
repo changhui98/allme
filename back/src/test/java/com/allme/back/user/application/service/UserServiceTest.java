@@ -266,6 +266,43 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("닉네임 첫 변경은 즉시 가능하고 다음 변경 가능 일시가 2일 뒤로 기록된다")
+    void updateNickname_firstChange() {
+        User user = userWithPassword(VALID_PASSWORD);
+
+        serviceWith(true, false, user).updateNickname(1L, "용감한 시골 감자");
+
+        assertThat(user.getNickname()).isEqualTo("용감한 시골 감자");
+        assertThat(user.nicknameChangeableAt())
+            .isCloseTo(java.time.LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusDays(2),
+                org.assertj.core.api.Assertions.within(1, java.time.temporal.ChronoUnit.MINUTES));
+    }
+
+    @Test
+    @DisplayName("마지막 변경 후 2일이 지나지 않았으면 NICKNAME_CHANGE_TOO_SOON 예외를 던진다")
+    void updateNickname_tooSoon() {
+        User user = userWithPassword(VALID_PASSWORD);
+        UserService service = serviceWith(true, false, user);
+        service.updateNickname(1L, "용감한 시골 감자");
+
+        assertThatThrownBy(() -> service.updateNickname(1L, "느긋한 바다 거북"))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(UserErrorCode.NICKNAME_CHANGE_TOO_SOON);
+        assertThat(user.getNickname()).isEqualTo("용감한 시골 감자");
+    }
+
+    @Test
+    @DisplayName("같은 닉네임이면 주기 제한과 무관하게 no-op이다")
+    void updateNickname_sameNicknameIsNoop() {
+        User user = userWithPassword(VALID_PASSWORD);
+        UserService service = serviceWith(true, false, user);
+        service.updateNickname(1L, "용감한 시골 감자");
+
+        assertThat(service.updateNickname(1L, "용감한 시골 감자")).isSameAs(user);
+    }
+
+    @Test
     @DisplayName("아이디·비밀번호가 맞으면 회원을 반환한다")
     void login_success() {
         User user = userWithPassword(VALID_PASSWORD);

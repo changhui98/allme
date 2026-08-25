@@ -32,8 +32,17 @@ export default function ProfileSection() {
   const [nicknameInput, setNicknameInput] = useState("");
   const [nicknameError, setNicknameError] = useState<string | null>(null);
   const [savingNickname, setSavingNickname] = useState(false);
+  // 잠금 판정 기준 시각 — 렌더 순수성을 위해 마운트 시 1회 스냅샷(변경 성공 시 풀 리로드라 충분)
+  const [renderedAt] = useState(() => Date.now());
 
   if (!me) return null;
+
+  // 닉네임 변경 주기(백엔드 U021과 동일 정책) — 잠금 중이면 버튼을 막고 가능 시각을 안내한다
+  const nicknameChangeableAt = me.nicknameChangeableAt
+    ? new Date(me.nicknameChangeableAt)
+    : null;
+  const nicknameLocked =
+    nicknameChangeableAt !== null && nicknameChangeableAt.getTime() > renderedAt;
 
   const handleFileChange = async (file: File | undefined) => {
     if (!file || uploading) return;
@@ -107,6 +116,12 @@ export default function ProfileSection() {
         <div className="mypage-hero__body">
           <p className="mypage-hero__name">{displayName(me)}</p>
           <p className="mypage-hero__login-id">{me.loginId}</p>
+          {nicknameLocked && nicknameChangeableAt ? (
+            <p className="mypage-hero__hint">
+              닉네임은 2일에 한 번 바꿀 수 있어요 ·{" "}
+              {formatChangeableAt(nicknameChangeableAt)}부터 가능
+            </p>
+          ) : null}
           {uploadError ? (
             <p className="mypage-profile__error" role="alert">
               {uploadError}
@@ -133,6 +148,7 @@ export default function ProfileSection() {
             <button
               type="button"
               onClick={openNicknameEdit}
+              disabled={nicknameLocked}
               className="mypage-profile__text-btn"
             >
               닉네임 변경
@@ -218,3 +234,12 @@ export default function ProfileSection() {
   );
 }
 
+/** 변경 가능 시각 표기 — 예: "8월 27일 오전 11:20" */
+function formatChangeableAt(date: Date): string {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}

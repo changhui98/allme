@@ -35,6 +35,8 @@ export type LoginUserResult = {
   profileImageUrl: string | null;
   roles: UserRole[];
   marketingConsent: boolean;
+  /** 다음 닉네임 변경 가능 일시(KST, 오프셋 없는 ISO) — 즉시 가능하면 null. 2일 주기 제한(U021) */
+  nicknameChangeableAt: string | null;
 };
 
 /** 대외 표시명 — 닉네임 우선, 닉네임 없는 구버전 응답은 실명으로 방어 */

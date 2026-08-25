@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -57,6 +58,13 @@ public class User extends BaseEntity {
      */
     @Column(unique = true, length = 30)
     private String nickname;
+
+    /** 닉네임 변경 주기 정책 — 마지막 변경 후 이 기간이 지나야 다시 바꿀 수 있다 */
+    public static final Duration NICKNAME_CHANGE_INTERVAL = Duration.ofDays(2);
+
+    /** 마지막 닉네임 변경 일시 — 가입 시 발급본은 변경이 아니라 null(첫 변경은 즉시 가능) */
+    @Column(name = "nickname_changed_at")
+    private LocalDateTime nicknameChangedAt;
 
     @Convert(converter = EncryptedStringConverter.class)
     @Column(length = 512)
@@ -116,9 +124,20 @@ public class User extends BaseEntity {
         this.profileImageFileId = profileImageFileId;
     }
 
-    /** 닉네임 변경 — 형식·중복 검증은 서비스가 수행하고 여기선 반영만 한다. */
+    /** 닉네임 변경 — 형식·중복·주기 검증은 서비스가 수행하고 여기선 반영 + 변경 일시 기록만 한다. */
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+        this.nicknameChangedAt = LocalDateTime.now(KST_CLOCK);
+    }
+
+    /** 다음 닉네임 변경 가능 일시 — 한 번도 안 바꿨으면 null(즉시 가능) */
+    public LocalDateTime nicknameChangeableAt() {
+        return nicknameChangedAt == null ? null : nicknameChangedAt.plus(NICKNAME_CHANGE_INTERVAL);
+    }
+
+    public boolean canChangeNickname(LocalDateTime now) {
+        LocalDateTime changeableAt = nicknameChangeableAt();
+        return changeableAt == null || !now.isBefore(changeableAt);
     }
 
     public void changeMarketingConsent(boolean marketingConsent) {

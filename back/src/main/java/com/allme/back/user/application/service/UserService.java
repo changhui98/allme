@@ -205,7 +205,7 @@ public class UserService {
 
     /**
      * 닉네임 변경 — trim·연속 공백 축약 후 형식(U014)·중복(U015) 검증.
-     * 본인 닉네임과 같으면 no-op. 검사~커밋 사이 race는 unique 제약 catch로 U015.
+     * 본인 닉네임과 같으면 no-op. 마지막 변경 후 2일 미경과면 U021. 검사~커밋 사이 race는 unique 제약 catch로 U015.
      */
     @Transactional
     public User updateNickname(Long userId, String rawNickname) {
@@ -219,6 +219,10 @@ public class UserService {
         User user = getById(userId);
         if (nickname.equals(user.getNickname())) {
             return user;
+        }
+        // 변경 주기(User.NICKNAME_CHANGE_INTERVAL) — 잦은 변경으로 인한 사칭·혼선 방지
+        if (!user.canChangeNickname(LocalDateTime.now(clock))) {
+            throw new AppException(UserErrorCode.NICKNAME_CHANGE_TOO_SOON);
         }
         if (userRepository.existsByNickname(nickname)) {
             throw new AppException(UserErrorCode.NICKNAME_DUPLICATED);

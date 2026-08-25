@@ -664,6 +664,14 @@ a.mypage-stats__item:hover {
   color: var(--muted);
 }
 
+/* 닉네임 변경 잠금 안내 — 아이디 아래, 제한 상태임이 드러나게 danger 색(라이트·다크 토큰 각각 정의) */
+.mypage-hero__hint {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+
 .mypage-hero__actions {
   display: flex;
   flex-shrink: 0;
