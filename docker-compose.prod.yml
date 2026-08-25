@@ -30,6 +30,22 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # 세션 스토어 (Spring Session). 외부 노출 불필요(컴포즈 네트워크 내부 접속), AOF 영속화 + 비밀번호 필수.
+  # REDIS_PASSWORD는 컴포즈 보간(저장소 루트 .env)과 back/.env.prod 양쪽에 같은 값으로 둔다.
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?}"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?}
+    restart: unless-stopped
+
   back:
     build:
       context: ./back
@@ -40,6 +56,8 @@ services:
       IMAGES_ROOT: /images
       ARCHIVE_DB_HOST: db-archive
       ARCHIVE_DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       # 업로드 이미지 — 서버에서도 front·back·images 구조 그대로 유지
       - ./images:/images
@@ -47,6 +65,8 @@ services:
       db:
         condition: service_healthy
       db-archive:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -61,3 +81,4 @@ services:
 volumes:
   db-data:
   db-archive-data:
+  redis-data:

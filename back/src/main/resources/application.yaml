@@ -1,14 +1,24 @@
-# 세션은 톰캣 인메모리(재시작 시 전부 소멸 — 근본 해결은 추후 Redis 세션 스토어 도입).
-# 타임아웃 기본 30m을 명시해 정책을 드러낸다. 개발 시 만료 UX 테스트는
-# SESSION_TIMEOUT=1m 등으로 단축(톰캣 최소 단위 1분).
-server:
-  servlet:
-    session:
-      timeout: ${SESSION_TIMEOUT:30m}
-
 spring:
   application:
     name: back
+  # 세션 스토어 — Spring Session + Redis. 백엔드를 재기동·재배포하거나 여러 대로 늘려도 로그인이 유지된다.
+  # 직렬화는 기본(JDK) — 세션에 넣는 값은 userId(Long)와 SettlementAccountVerification(record, Serializable)뿐.
+  # 세션 객체 클래스를 바꾸면 기존 세션은 역직렬화에 실패해 로그아웃된 것처럼 보일 수 있다(30분 내 자연 소멸).
+  # 타임아웃은 마지막 요청 기준 슬라이딩 30m. 개발 시 만료 UX 테스트는 SESSION_TIMEOUT=1m 등으로 단축.
+  session:
+    timeout: ${SESSION_TIMEOUT:30m}
+    data:
+      redis:
+        namespace: allme:session # Boot 4 키 이름(spring.session.redis.*는 구버전 — 무시됨)
+  data:
+    redis:
+      # 호스트 bootRun은 컴포즈의 redis(호스트 6380 → 컨테이너 6379), 도커 back은 REDIS_HOST=redis로 주입
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      password: ${REDIS_PASSWORD:}
+      # Redis는 세션 스토어 전용 — Spring Data Redis 리포지토리 스캔(JPA 리포지토리를 후보로 훑는 기동 노이즈) 비활성화
+      repositories:
+        enabled: false
   servlet:
     multipart:
       max-file-size: 5MB

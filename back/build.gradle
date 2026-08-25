@@ -23,6 +23,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-restclient' // RestClient.Builder 자동 구성 (포트원 본인인증 조회)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // HttpSession을 Redis에 저장(Spring Session) — 재기동·다중 인스턴스에도 로그인 유지.
+    // Boot 4는 자동 구성이 모듈별 스타터로 분리돼 있어 spring-session-data-redis 단독 추가로는 활성화되지 않는다.
+    implementation 'org.springframework.boot:spring-boot-starter-session-data-redis'
     implementation 'org.springframework.security:spring-security-crypto' // BCrypt 비밀번호 해시 (전체 starter-security는 엔드포인트를 잠그므로 미사용)
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'
