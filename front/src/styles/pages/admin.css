@@ -8,11 +8,12 @@
  * 원칙: 카드/박스 감싸기 금지 — hairline(var(--border))·여백·타이포로만 구분. 색은 토큰 변수만.
  */
 
-/* ---------- admin-main: 마이페이지의 56rem 글줄 제한을 풀어 화면을 채우는 콘솔 본문 ---------- */
+/* ---------- admin-main: 관리자 콘솔 본문 (표·목록 풀폭, 96rem 캡·가운데 — mypage-shell__main과 동일) ---------- */
 
 .admin-main {
   width: 100%;
   max-width: 96rem;
+  margin-inline: auto;
 }
 
 @media (min-width: 64rem) {

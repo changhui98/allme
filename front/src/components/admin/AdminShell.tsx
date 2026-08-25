@@ -2,26 +2,49 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from "react";
+import {
+  ClipboardCheckIcon,
+  HamburgerIcon,
+  HomeIcon,
+  LogoutIcon,
+  UsersGroupIcon,
+  WidgetGridIcon,
+} from "@/components/icons/SolarIcons";
 import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { currentPath, loginHref } from "@/lib/login-redirect";
 import { useMe } from "@/lib/use-me";
+import { DESKTOP_MEDIA_QUERY, useMediaQuery } from "@/lib/use-media";
 import { useOutsideClose } from "@/lib/use-outside-close";
 import { useSessionRevalidation } from "@/lib/use-session-revalidation";
+import { useSidebarCollapsed } from "@/lib/use-sidebar-collapsed";
 import { displayName, logoutAndGoHome } from "@/lib/user";
 
+type MenuItem = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ size?: number }>;
+  exact?: boolean;
+};
+
 /** 관리자 메뉴 — /admin만 정확 일치, 나머지는 프리픽스 일치(상세 페이지에서도 활성 유지) */
-const MENU_ITEMS = [
-  { href: "/admin", label: "대시보드", exact: true },
-  { href: "/admin/applications", label: "업체 신청" },
-  { href: "/admin/users", label: "회원" },
+const MENU_ITEMS: MenuItem[] = [
+  { href: "/admin", label: "대시보드", icon: WidgetGridIcon, exact: true },
+  { href: "/admin/applications", label: "업체 신청", icon: ClipboardCheckIcon },
+  { href: "/admin/users", label: "회원", icon: UsersGroupIcon },
 ];
 
 /**
- * 관리자 전용 셸 — MypageShell과 같은 골격(상단 바 + 사이드바 + 모바일 패널)이라
+ * 관리자 전용 셸 — MypageShell과 같은 골격(상단 바 [햄버거][로고] + 사이드바(레일 토글) + 모바일 패널)이라
  * mypage-* 셸 클래스(styles/pages/mypage.css)를 재사용하고, 관리자 고유 스타일만
- * admin.css(admin-topbar__badge 등)에 둔다.
+ * admin.css(admin-topbar__badge 등)에 둔다. 레일 상태는 마이페이지와 localStorage 키를 공유한다.
  * 비로그인 가드는 이 셸이, 역할 가드(MANAGER/ADMIN)는 (admin) layout의 RoleGuard가,
  * 실질 보호는 백엔드 /api/admin/** 인가가 담당한다.
  */
@@ -32,6 +55,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   // API 호출 없는 페이지로 이동해도 세션 만료를 감지(전역 모달) — 셸은 리마운트되지 않으므로
   useSessionRevalidation(Boolean(me));
   const [menuOpen, setMenuOpen] = useState(false);
+  const [collapsed, toggleCollapsed] = useSidebarCollapsed();
+  const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
 
@@ -52,47 +77,77 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     return <div className="mypage-shell mypage-shell--pending" />;
   }
 
+  const isRail = isDesktop && collapsed;
+
   const renderMenuLinks = (onNavigate?: () => void) =>
     MENU_ITEMS.map((item) => {
       const isActive = item.exact
         ? pathname === item.href
         : pathname === item.href || pathname.startsWith(`${item.href}/`);
+      const Icon = item.icon;
       return (
         <li key={item.href} className="mypage-sidebar__item">
           <Link
             href={item.href}
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
+            title={isRail ? item.label : undefined}
             className={`mypage-sidebar__link${
               isActive ? " mypage-sidebar__link--active" : ""
             }`}
           >
-            {item.label}
+            <span className="mypage-sidebar__icon">
+              <Icon />
+            </span>
+            <span className="mypage-sidebar__label">{item.label}</span>
           </Link>
         </li>
       );
     });
 
-  return (
-    <div className="mypage-shell">
-      <header className="mypage-topbar">
-        <span className="admin-topbar__brand">
-          <Link href="/" className="mypage-topbar__logo" aria-label="올미 홈">
-            올미
-          </Link>
-          <span className="admin-topbar__badge">관리자</span>
-        </span>
+  const handleMenuButton = () => {
+    if (window.matchMedia(DESKTOP_MEDIA_QUERY).matches) toggleCollapsed();
+    else setMenuOpen((v) => !v);
+  };
 
-        {/* 데스크톱: 아바타+아이디·테마·홈 아이콘 */}
-        <div className="mypage-topbar__actions">
-          <Link
-            href="/mypage/profile"
-            className="mypage-topbar__profile"
-            aria-label="내 정보"
+  return (
+    <div className={`mypage-shell${collapsed ? " mypage-shell--rail" : ""}`}>
+      <header className="mypage-topbar">
+        <div className="mypage-topbar__lead">
+          {/* 햄버거 — 데스크톱: 사이드바 레일 토글 / 모바일: 드롭다운 패널 토글 */}
+          <button
+            ref={menuBtnRef}
+            type="button"
+            aria-label={
+              isDesktop
+                ? collapsed
+                  ? "메뉴 펼치기"
+                  : "메뉴 접기"
+                : menuOpen
+                  ? "메뉴 닫기"
+                  : "메뉴 열기"
+            }
+            aria-expanded={isDesktop ? !collapsed : menuOpen}
+            aria-controls={isDesktop ? "admin-sidebar" : "admin-menu-panel"}
+            onClick={handleMenuButton}
+            className="icon-btn mypage-topbar__menu-btn"
           >
-            <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="sm" />
-            <span className="mypage-topbar__login-id">{me.loginId}</span>
-          </Link>
+            {!isDesktop && menuOpen ? (
+              <CloseIcon />
+            ) : (
+              <HamburgerIcon size={22} />
+            )}
+          </button>
+          <span className="admin-topbar__brand">
+            <Link href="/" className="mypage-topbar__logo" aria-label="올미 홈">
+              올미
+            </Link>
+            <span className="admin-topbar__badge">관리자</span>
+          </span>
+        </div>
+
+        {/* 데스크톱: 화면 설정·홈 아이콘 */}
+        <div className="mypage-topbar__actions">
           <ThemeMenu />
           <Link
             href="/"
@@ -103,19 +158,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <HomeIcon />
           </Link>
         </div>
-
-        {/* 모바일: 햄버거 토글 */}
-        <button
-          ref={menuBtnRef}
-          type="button"
-          aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
-          aria-expanded={menuOpen}
-          aria-controls="admin-menu-panel"
-          onClick={() => setMenuOpen((v) => !v)}
-          className="icon-btn mypage-topbar__menu-btn"
-        >
-          {menuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
 
         {/* 모바일 드롭다운 패널 */}
         {menuOpen && (
@@ -152,60 +194,40 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       </header>
 
       <div className="mypage-shell__body">
-        {/* 데스크톱 사이드바 — 하단에 로그아웃 */}
-        <nav aria-label="관리자 메뉴" className="mypage-sidebar">
-          <ul className="mypage-sidebar__list">{renderMenuLinks()}</ul>
-          <div className="mypage-sidebar__footer">
-            <button
-              type="button"
-              onClick={logoutAndGoHome}
-              className="mypage-sidebar__footer-link"
+        {/* 데스크톱 사이드바 — 상단 세로형 프로필(내 정보 링크), 메뉴, 하단 로그아웃 */}
+        <nav id="admin-sidebar" aria-label="관리자 메뉴" className="mypage-sidebar">
+          <div className="mypage-mode">
+            <Link
+              href="/mypage/profile"
+              title={isRail ? `${displayName(me)} — 내 정보` : undefined}
+              className="mypage-mode__profile"
             >
-              로그아웃
-            </button>
+              <Avatar name={displayName(me)} imageUrl={me.profileImageUrl} size="md" />
+              <span className="mypage-mode__name">{displayName(me)}</span>
+            </Link>
           </div>
+          <ul className="mypage-sidebar__list">{renderMenuLinks()}</ul>
+          <ul className="mypage-sidebar__list mypage-sidebar__footer">
+            <li className="mypage-sidebar__item">
+              <button
+                type="button"
+                onClick={logoutAndGoHome}
+                title={isRail ? "로그아웃" : undefined}
+                className="mypage-sidebar__link"
+              >
+                <span className="mypage-sidebar__icon">
+                  <LogoutIcon />
+                </span>
+                <span className="mypage-sidebar__label">로그아웃</span>
+              </button>
+            </li>
+          </ul>
         </nav>
 
-        {/* admin-main이 마이페이지의 56rem 글줄 제한을 풀어 콘솔답게 화면을 채운다 */}
+        {/* admin-main: 관리자 콘솔 본문(표·목록이 넓어 풀폭 사용) */}
         <main className="mypage-shell__main admin-main">{children}</main>
       </div>
     </div>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M3 10.5 12 3l9 7.5" />
-      <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
-    </svg>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <path d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
   );
 }
 
