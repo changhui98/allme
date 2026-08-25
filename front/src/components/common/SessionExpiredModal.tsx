@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
 import { subscribeSessionExpired } from "@/lib/api";
+import { currentPath, loginHref } from "@/lib/login-redirect";
 
 /**
  * 전역 세션 만료 안내 — lib/api의 request()가 401 U011을 감지하면 신호를 받아 뜬다.
  * 모든 탈출 경로가 풀 내비게이션(useMe 모듈 캐시 초기화 목적):
- * 다시 로그인 → /login, 홈으로·ESC → /.
+ * 다시 로그인 → /login?redirect=<현재 경로> (로그인 후 보던 페이지로 복귀), 홈으로·ESC → /.
  * 백드롭 클릭으로는 닫히지 않는다 — 반로그인 상태로 화면에 남는 것을 막기 위함.
  */
 export default function SessionExpiredModal() {
@@ -33,7 +34,7 @@ export default function SessionExpiredModal() {
           <button
             type="button"
             className="btn btn--primary modal__btn"
-            onClick={() => window.location.assign("/login")}
+            onClick={() => window.location.assign(loginHref(currentPath()))}
           >
             다시 로그인
           </button>

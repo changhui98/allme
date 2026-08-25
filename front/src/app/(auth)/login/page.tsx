@@ -3,6 +3,7 @@ import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
 import LoginForm from "@/components/auth/LoginForm";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import { LOGIN_REDIRECT_PARAM, safeRedirectPath } from "@/lib/login-redirect";
 
 export const metadata: Metadata = {
   title: "로그인",
@@ -12,10 +13,17 @@ export const metadata: Metadata = {
 
 /**
  * 로그인 페이지. (서버 컴포넌트 — metadata 유지, 폼은 LoginForm으로 분리)
+ * `?redirect=` 쿼리(세션 만료 모달·셸 가드가 붙임)를 검증해 LoginForm에 넘긴다 —
+ * searchParams 접근으로 동적 렌더링이 되지만 로그인 페이지라 무방.
  * 소셜 OAuth 연동은 백엔드 구현 후 붙인다. /forgot-password는 계획된 경로 플레이스홀더.
  * 스타일: styles/pages/auth.css
  */
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const redirectTo = safeRedirectPath((await searchParams)[LOGIN_REDIRECT_PARAM]);
   return (
     <AuthShell
       title="로그인"
@@ -36,7 +44,7 @@ export default function LoginPage() {
         </nav>
       }
     >
-      <LoginForm />
+      <LoginForm redirectTo={redirectTo} />
 
       <SocialLoginButtons variant="login" />
     </AuthShell>

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
+import { currentPath, loginHref } from "@/lib/login-redirect";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
 import { useSessionRevalidation } from "@/lib/use-session-revalidation";
@@ -36,7 +37,7 @@ const BIZ_MENU_ITEMS = [
  * 데스크톱: 좌측 고정 사이드바(하단에 회원탈퇴·로그아웃) /
  * 모바일: 우측 햄버거 → 위에서 아래로 펼쳐지는 패널(메인 MobileNav와 같은 방식,
  * 프로필 → 메뉴 → 하단 로그아웃 구성).
- * 세션 가드: 비로그인이면 /login으로 보낸다(공용 미들웨어 도입 전 페이지 단위 가드).
+ * 세션 가드: 비로그인이면 /login?redirect=<현재 경로>로 보낸다(공용 미들웨어 도입 전 페이지 단위 가드).
  * 스타일: styles/pages/mypage.css
  */
 export default function MypageShell({ children }: { children: ReactNode }) {
@@ -51,7 +52,8 @@ export default function MypageShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status === "ready" && !me) {
-      router.replace("/login");
+      // 현재 경로를 붙여 보내 로그인 후 여기로 복귀시킨다
+      router.replace(loginHref(currentPath()));
     }
   }, [status, me, router]);
 

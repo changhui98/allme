@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Avatar from "@/components/mypage/Avatar";
 import ThemeMenu from "@/components/theme/ThemeMenu";
+import { currentPath, loginHref } from "@/lib/login-redirect";
 import { useMe } from "@/lib/use-me";
 import { useOutsideClose } from "@/lib/use-outside-close";
 import { useSessionRevalidation } from "@/lib/use-session-revalidation";
@@ -36,7 +37,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status === "ready" && !me) {
-      router.replace("/login");
+      // 현재 경로를 붙여 보내 로그인 후 여기로 복귀시킨다
+      router.replace(loginHref(currentPath()));
     }
   }, [status, me, router]);
 
