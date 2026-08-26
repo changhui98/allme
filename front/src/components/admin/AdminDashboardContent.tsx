@@ -76,6 +76,21 @@ export default function AdminDashboardContent() {
             {summary.totalApplicationCount}
           </span>
         </Link>
+        <Link
+          href="/admin/service/inquiries?status=PENDING"
+          className="admin-stats__item"
+        >
+          <span className="admin-stats__label">답변 대기 문의</span>
+          <span
+            className={`admin-stats__value${
+              summary.pendingInquiryCount > 0
+                ? " admin-stats__value--attention"
+                : ""
+            }`}
+          >
+            {summary.pendingInquiryCount}
+          </span>
+        </Link>
       </div>
 
       <section aria-label="대기 중 신청" className="admin-mini">
