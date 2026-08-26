@@ -18,6 +18,7 @@ import {
   WidgetGridIcon,
 } from "@/components/icons/SolarIcons";
 import Avatar from "@/components/mypage/Avatar";
+import ShellConnectionError from "@/components/mypage/ShellConnectionError";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { currentPath, loginHref } from "@/lib/login-redirect";
 import { useMe } from "@/lib/use-me";
@@ -46,12 +47,13 @@ const MENU_ITEMS: MenuItem[] = [
  * mypage-* 셸 클래스(styles/pages/mypage.css)를 재사용하고, 관리자 고유 스타일만
  * admin.css(admin-topbar__badge 등)에 둔다. 레일 상태는 마이페이지와 localStorage 키를 공유한다.
  * 비로그인 가드는 이 셸이, 역할 가드(MANAGER/ADMIN)는 (admin) layout의 RoleGuard가,
+ * 연결 실패·5xx는 비로그인과 구분해 리다이렉트하지 않고 재시도 화면(ShellConnectionError)을 띄운다.
  * 실질 보호는 백엔드 /api/admin/** 인가가 담당한다.
  */
 export default function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { status, me } = useMe();
+  const { status, me, retry } = useMe();
   // API 호출 없는 페이지로 이동해도 세션 만료를 감지(전역 모달) — 셸은 리마운트되지 않으므로
   useSessionRevalidation(Boolean(me));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -71,6 +73,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     menuBtnRef,
     menuPanelRef,
   ]);
+
+  // /me 호출 자체가 실패(연결 불가·5xx) — 비로그인이 아니므로 리다이렉트 대신 재시도 화면
+  if (status === "error") {
+    return <ShellConnectionError onRetry={retry} />;
+  }
 
   // 세션 확인 중이거나 리다이렉트 대기 — 빈 화면 유지
   if (!me) {

@@ -24,6 +24,30 @@
   /* 세션 확인·리다이렉트 동안 빈 화면 유지 */
 }
 
+/* /me 연결 실패 화면 — 화면 가운데 안내 문구 + 재시도 버튼(비로그인 리다이렉트와 구분) */
+.mypage-shell__error {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.mypage-shell__error-message {
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  color: var(--muted);
+}
+
+.mypage-shell__retry {
+  padding: 0.5625rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 /* 관리자 콘솔형 — 사이드바가 화면 왼쪽에 붙고, 본문은 그 오른쪽 영역을 쓴다 */
 .mypage-shell__body {
   display: flex;

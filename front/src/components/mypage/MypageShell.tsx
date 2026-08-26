@@ -23,6 +23,7 @@ import {
   WidgetIcon,
 } from "@/components/icons/SolarIcons";
 import Avatar from "@/components/mypage/Avatar";
+import ShellConnectionError from "@/components/mypage/ShellConnectionError";
 import ThemeMenu from "@/components/theme/ThemeMenu";
 import { currentPath, loginHref } from "@/lib/login-redirect";
 import { useMe } from "@/lib/use-me";
@@ -65,12 +66,13 @@ const BIZ_MENU_ITEMS: MenuItem[] = [
  * 햄버거 하나가 두 역할: 데스크톱(≥48rem)은 사이드바를 아이콘 레일로 접고 펼치며(localStorage 기억),
  * 모바일은 위에서 아래로 펼쳐지는 패널을 연다(메인 MobileNav와 같은 방식).
  * 세션 가드: 비로그인이면 /login?redirect=<현재 경로>로 보낸다(공용 미들웨어 도입 전 페이지 단위 가드).
+ * 연결 실패·5xx는 비로그인과 구분해 리다이렉트하지 않고 재시도 화면(ShellConnectionError)을 띄운다.
  * 스타일: styles/pages/mypage.css
  */
 export default function MypageShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { status, me } = useMe();
+  const { status, me, retry } = useMe();
   // API 호출 없는 페이지로 이동해도 세션 만료를 감지(전역 모달) — 셸은 리마운트되지 않으므로
   useSessionRevalidation(Boolean(me));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -91,6 +93,11 @@ export default function MypageShell({ children }: { children: ReactNode }) {
     menuBtnRef,
     menuPanelRef,
   ]);
+
+  // /me 호출 자체가 실패(연결 불가·5xx) — 비로그인이 아니므로 리다이렉트 대신 재시도 화면
+  if (status === "error") {
+    return <ShellConnectionError onRetry={retry} />;
+  }
 
   // 세션 확인 중이거나 리다이렉트 대기 — 빈 화면 유지
   if (!me) {

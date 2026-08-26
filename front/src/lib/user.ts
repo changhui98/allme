@@ -2,7 +2,7 @@
  * user 도메인 API 클라이언트 — 공통 요청은 lib/api의 request()를 사용한다.
  */
 
-import { request } from "@/lib/api";
+import { ApiError, request, SESSION_EXPIRED_CODE } from "@/lib/api";
 
 /** 아이디 사용 가능 여부를 확인한다. 형식 오류(U006) 등은 서버 메시지로 throw. */
 export async function checkLoginIdAvailability(
@@ -72,18 +72,20 @@ export function loginUser(
 }
 
 /**
- * 세션 확인 — 로그인 상태면 회원 요약, 아니면 null.
- * 401(U011)은 "비로그인"이라는 정상 상태이므로 에러로 던지지 않고,
+ * 세션 확인 — 로그인 상태면 회원 요약, 비로그인(401 U011)이면 null.
+ * 401은 "비로그인"이라는 정상 상태이므로 에러로 던지지 않고,
  * 전역 세션 만료 신호도 발신하지 않는다(notifySessionExpired: false).
+ * 연결 실패·5xx 등 그 외 실패는 그대로 던진다 — 백엔드 재기동 중 접속을
+ * 비로그인으로 오판해 로그인 페이지로 보내는 일을 막기 위함(셸이 재시도 화면으로 처리).
  */
 export async function fetchMe(): Promise<LoginUserResult | null> {
   try {
     return await request<LoginUserResult>("/api/users/me", {
       notifySessionExpired: false,
     });
-  } catch {
-    // 서버 접속 불가도 헤더 입장에선 비로그인과 동일하게 취급
-    return null;
+  } catch (e) {
+    if (e instanceof ApiError && e.code === SESSION_EXPIRED_CODE) return null;
+    throw e;
   }
 }
 
