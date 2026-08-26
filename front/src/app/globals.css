@@ -31,6 +31,7 @@
 @import "../styles/pages/provider.css";
 @import "../styles/pages/auth.css";
 @import "../styles/pages/legal.css";
+@import "../styles/pages/support.css"; /* 공지·FAQ·문의 — board-page·category-tabs·mypage-group 위에 얹는다 */
 @import "../styles/pages/mypage.css";
 @import "../styles/pages/admin.css"; /* mypage.css의 셸 클래스를 재사용하므로 반드시 그 뒤에 */
 @import "../styles/pages/not-found.css";

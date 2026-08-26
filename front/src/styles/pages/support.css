@@ -1,0 +1,516 @@
+/*
+ * 고객지원 페이지 블록 — 공지사항(/notice, /notice/[id]) · FAQ(/support/faq) · 1:1 문의(/support/inquiry) ·
+ * 마이페이지 내 문의(/mypage/inquiries). 페이지 골격(제목·부제)은 board-page를, 컨테이너는 page-container를 재사용한다.
+ * support-page(공통 가운데 헤딩 — SupportPageHead) · notice-toolbar(검색 왼쪽 + 정렬 오른쪽) · notice-search · notice-sort · notice-list · notice-detail · faq · inquiry-form · inquiry-status ·
+ * inquiry-list · inquiry-detail · support-back
+ * 원칙: hairline(var(--border))·여백·타이포로 구분, 색은 토큰 변수만(다크는 변수 재정의로 자동 대응).
+ */
+
+/* ---------- support-back: 상세 → 목록 백링크 ---------- */
+
+.support-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.support-back:hover {
+  color: var(--foreground);
+}
+
+.support-back--below {
+  margin-top: 2.5rem;
+}
+
+.support-back--above {
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- support-page: 공지·FAQ·문의 공통 가운데 헤딩 (board-page__title 위에 크기만 키운다) ---------- */
+
+.support-page__head {
+  text-align: center;
+}
+
+.support-page__title {
+  font-size: 1.875rem;
+  line-height: 2.375rem;
+}
+
+.support-page__head .board-page__subtitle {
+  margin-top: 0.5rem;
+}
+
+/* ---------- notice-toolbar: 헤딩 아래 한 줄 — 왼쪽 검색, 오른쪽 정렬 ---------- */
+
+.notice-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* ---------- notice-search: 검색 바 (헤더 검색창과 같은 무드) ---------- */
+
+.notice-search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 24rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  background-color: var(--background);
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
+}
+
+.notice-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+/* 돋보기 = 제출 버튼 (모바일에서 Enter 대신 탭) */
+.notice-search__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.notice-search__icon:hover {
+  color: var(--foreground);
+}
+
+.notice-search__input {
+  flex: 1;
+  min-width: 0;
+  background-color: transparent;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  color: var(--foreground);
+  outline: none;
+}
+
+.notice-search__input::placeholder {
+  color: var(--muted);
+}
+
+/* ---------- notice-sort: 최신순·조회순 토글 (활성은 사이드바 활성 필과 같은 문법) ---------- */
+
+.notice-sort {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.notice-sort__item {
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition-property: background-color, color;
+  transition-duration: 150ms;
+}
+
+.notice-sort__item:hover {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+.notice-sort__item--active,
+.notice-sort__item--active:hover {
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+/* 검색 결과 라인의 초기화 링크 */
+.notice-search__reset {
+  margin-left: 0.5rem;
+  text-decoration-line: underline;
+  text-underline-offset: 0.2em;
+}
+
+.notice-search__reset:hover {
+  color: var(--foreground);
+}
+
+/* ---------- notice-list: 공지 목록 (hairline 행) ---------- */
+
+.notice-list {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.notice-list__item {
+  border-bottom: 1px solid var(--border);
+}
+
+.notice-list__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0.25rem;
+}
+
+.notice-list__pin {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+
+.notice-list__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.notice-list__item--pinned .notice-list__title {
+  font-weight: 600;
+}
+
+.notice-list__link:hover .notice-list__title {
+  color: var(--primary-text);
+}
+
+.notice-list__views,
+.notice-list__date {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 모바일 — 툴바는 세로 스택(검색 전폭, 정렬 오른쪽), 행의 조회수는 감춰 제목 폭 확보 */
+@media (max-width: 39.9375rem) {
+  .notice-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notice-search {
+    max-width: none;
+  }
+
+  .notice-sort {
+    justify-content: flex-end;
+  }
+
+  .notice-list__views {
+    display: none;
+  }
+}
+
+/* ---------- notice-detail: 공지 상세 (문서형) ---------- */
+
+.notice-detail {
+  max-width: 48rem;
+}
+
+.notice-detail__header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+
+.notice-detail__title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.notice-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted);
+}
+
+.notice-detail__body {
+  margin-top: 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--foreground);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- faq: 분류 탭은 category-tabs 재사용, 항목은 details/summary 아코디언 ---------- */
+
+.faq-list {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* "전체" 탭에서 분류별 소제목 */
+.faq-group__title {
+  margin-top: 2rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.faq-group__title + .faq-list {
+  margin-top: 0.75rem;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 0.25rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.faq-item__summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item__summary:hover {
+  color: var(--primary-text);
+}
+
+.faq-item__q {
+  flex-shrink: 0;
+  width: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-text);
+}
+
+.faq-item__question {
+  flex: 1;
+  min-width: 0;
+}
+
+.faq-item__chevron {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--muted);
+  transition: rotate 150ms ease;
+}
+
+.faq-item[open] .faq-item__chevron {
+  rotate: 180deg;
+}
+
+.faq-item__answer {
+  padding: 0 0.25rem 1.25rem 2.25rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--foreground);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- inquiry-form: 1:1 문의 작성 ---------- */
+
+/* 40rem 블록을 가운데 두고 내부는 왼쪽 정렬 */
+.inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 40rem;
+  margin: 1.5rem auto 0;
+}
+
+.inquiry-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inquiry-form__label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+
+.inquiry-form__input,
+.inquiry-form__textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.inquiry-form__textarea {
+  min-height: 12rem;
+  resize: vertical;
+}
+
+.inquiry-form__input::placeholder,
+.inquiry-form__textarea::placeholder {
+  color: var(--muted);
+}
+
+.inquiry-form__input:focus,
+.inquiry-form__textarea:focus {
+  outline: 2px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+.inquiry-form__input:disabled,
+.inquiry-form__textarea:disabled {
+  opacity: 0.6;
+}
+
+.inquiry-form__hint {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.inquiry-form__error {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--danger);
+}
+
+.inquiry-form__actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+}
+
+/* 공용 .btn은 크기를 갖지 않으므로 여기서 부여 */
+.inquiry-form__btn {
+  padding: 0.625rem 1.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+}
+
+/* ---------- inquiry-status: 답변 대기/완료 도트 칩 (내 문의 목록·상세) ---------- */
+
+.inquiry-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.inquiry-status::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--muted);
+  flex-shrink: 0;
+}
+
+.inquiry-status--pending {
+  color: var(--primary-text);
+}
+
+.inquiry-status--pending::before {
+  background-color: var(--primary);
+}
+
+.inquiry-status--answered {
+  color: var(--success);
+}
+
+.inquiry-status--answered::before {
+  background-color: var(--success);
+}
+
+/* ---------- inquiry-list: 마이페이지 내 문의 목록 (mypage-group 안의 hairline 행) ---------- */
+
+.inquiry-list__item {
+  border-bottom: 1px solid var(--border);
+}
+
+.inquiry-list__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 0.25rem;
+}
+
+.inquiry-list__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.inquiry-list__link:hover .inquiry-list__title {
+  color: var(--primary-text);
+}
+
+.inquiry-list__date {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- inquiry-detail: 내 문의 상세 — 본문·답변 블록 ---------- */
+
+.inquiry-detail__text {
+  padding: 0.875rem 0.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--foreground);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.inquiry-detail__pending {
+  padding: 0.875rem 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
