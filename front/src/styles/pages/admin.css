@@ -4,7 +4,7 @@
  * admin-main(풀폭 본문) · admin-topbar(브랜드 뱃지) · admin-page(헤더 행) ·
  * admin-filter(상태 탭 + 총 건수) · admin-table(데이터 테이블) · admin-status(도트 상태 칩) ·
  * admin-role(역할 칩) · admin-stats(대시보드 스탯) · admin-mini(대시보드 하위 섹션) ·
- * admin-search · admin-detail · admin-actions · admin-reject · admin-pagination.
+ * admin-search · admin-back · admin-row--multiline · admin-actions · admin-reject · admin-pagination.
  * 원칙: 카드/박스 감싸기 금지 — hairline(var(--border))·여백·타이포로만 구분. 색은 토큰 변수만.
  */
 
@@ -384,7 +384,7 @@ a.admin-stats__item:hover {
   line-height: 1.25rem;
 }
 
-/* ---------- admin-detail: 상세 — 백링크·헤더·정의 리스트 ---------- */
+/* ---------- admin-back: 상세 페이지 백링크 ---------- */
 
 .admin-back {
   display: inline-flex;
@@ -401,46 +401,14 @@ a.admin-stats__item:hover {
   color: var(--foreground);
 }
 
-.admin-detail {
-  max-width: 48rem; /* 소개문 등 글줄 가독 — 콘솔 폭과 무관하게 제한 */
-  margin-top: 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background-color: var(--background);
+/* ---------- 상세 페이지 — 본문은 마이페이지 공통 문법(mypage-column > mypage-group > mypage-row) 재사용 ---------- */
+
+/* 여러 줄 값(업체 소개·반려 사유) 행 — 라벨을 첫 줄에 맞추고 줄바꿈·긴 문자열 보존 */
+.admin-row--multiline {
+  align-items: flex-start;
 }
 
-.admin-detail__row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
-  padding: 0.9375rem 1.5rem;
-}
-
-.admin-detail__row:last-child {
-  border-bottom: none;
-}
-
-@media (min-width: 40rem) {
-  .admin-detail__row {
-    flex-direction: row;
-    gap: 1.25rem;
-  }
-}
-
-.admin-detail__term {
-  flex-shrink: 0;
-  width: 8.5rem;
-  font-size: 0.8125rem;
-  line-height: 1.375rem;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.admin-detail__desc {
-  font-size: 0.9375rem;
-  line-height: 1.375rem;
-  color: var(--foreground);
+.admin-row--multiline .mypage-row__value {
   white-space: pre-line;
   overflow-wrap: anywhere;
 }

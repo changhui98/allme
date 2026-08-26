@@ -70,50 +70,83 @@ export default function ApplicationDetail({ id }: { id: number }) {
   if (error) return <p className="admin-error">{error}</p>;
   if (!detail) return <p className="admin-loading">불러오는 중…</p>;
 
-  const rows: { term: string; desc: string | null }[] = [
+  const formatDateTime = (value: string) => value.slice(0, 16).replace("T", " ");
+
+  type Row = { term: string; desc: string | null; multiline?: boolean };
+
+  const applicationRows: Row[] = [
     { term: "업체명", desc: detail.businessName },
     { term: "사업자등록번호", desc: detail.businessRegistrationNumber },
-    { term: "업체 소개", desc: detail.introduction },
+    { term: "업체 소개", desc: detail.introduction, multiline: true },
     { term: "연락처", desc: detail.contactPhone },
+  ];
+
+  const reviewRows: Row[] = [
     { term: "신청자", desc: detail.applicantLoginId },
-    { term: "신청일", desc: detail.createdDate.slice(0, 16).replace("T", " ") },
+    { term: "신청일", desc: formatDateTime(detail.createdDate) },
   ];
   if (detail.status !== "PENDING") {
-    rows.push(
+    reviewRows.push(
       { term: "처리자", desc: detail.processedByLoginId },
       {
         term: "처리일",
-        desc: detail.processedDate
-          ? detail.processedDate.slice(0, 16).replace("T", " ")
-          : null,
+        desc: detail.processedDate ? formatDateTime(detail.processedDate) : null,
       },
     );
     if (detail.status === "REJECTED") {
-      rows.push({ term: "반려 사유", desc: detail.rejectReason });
+      reviewRows.push({
+        term: "반려 사유",
+        desc: detail.rejectReason,
+        multiline: true,
+      });
     }
   }
 
+  const renderRow = (row: Row) => (
+    <div
+      key={row.term}
+      className={`mypage-row${row.multiline ? " admin-row--multiline" : ""}`}
+    >
+      <dt className="mypage-row__label">{row.term}</dt>
+      <dd className="mypage-row__value">{row.desc ?? "-"}</dd>
+    </div>
+  );
+
   return (
     <>
-      <dl className="admin-detail">
-        {/* 상태는 첫 행 — 떠 있는 칩 대신 다른 항목과 같은 위계로 */}
-        <div className="admin-detail__row">
-          <dt className="admin-detail__term">상태</dt>
-          <dd className="admin-detail__desc">
-            <span
-              className={`admin-status admin-status--${detail.status.toLowerCase()}`}
-            >
-              {APPLICATION_STATUS_LABEL[detail.status]}
-            </span>
-          </dd>
-        </div>
-        {rows.map((row) => (
-          <div key={row.term} className="admin-detail__row">
-            <dt className="admin-detail__term">{row.term}</dt>
-            <dd className="admin-detail__desc">{row.desc ?? "-"}</dd>
+      {/* 마이페이지 공통 문법 — 세로 바 제목 그룹 + hairline 행, 카드 없음 */}
+      <div className="mypage-settings">
+        <section className="mypage-group" aria-labelledby="application-info-title">
+          <div className="mypage-group__header">
+            <h2 id="application-info-title" className="mypage-group__title">
+              신청 정보
+            </h2>
           </div>
-        ))}
-      </dl>
+          <dl className="mypage-rows">{applicationRows.map(renderRow)}</dl>
+        </section>
+
+        <section className="mypage-group" aria-labelledby="review-info-title">
+          <div className="mypage-group__header">
+            <h2 id="review-info-title" className="mypage-group__title">
+              심사 정보
+            </h2>
+          </div>
+          <dl className="mypage-rows">
+            {/* 상태는 첫 행 — 떠 있는 칩 대신 다른 항목과 같은 위계로 */}
+            <div className="mypage-row">
+              <dt className="mypage-row__label">상태</dt>
+              <dd className="mypage-row__value">
+                <span
+                  className={`admin-status admin-status--${detail.status.toLowerCase()}`}
+                >
+                  {APPLICATION_STATUS_LABEL[detail.status]}
+                </span>
+              </dd>
+            </div>
+            {reviewRows.map(renderRow)}
+          </dl>
+        </section>
+      </div>
 
       {actionError && <p className="admin-error">{actionError}</p>}
 
