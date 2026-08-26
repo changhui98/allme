@@ -5,3 +5,13 @@ export function formatPriceFrom(price: number): string {
   }
   return `${price.toLocaleString("ko-KR")}원~`;
 }
+
+/** ISO 일시("2026-08-26T14:30:12")를 "2026.08.26"으로 — 목록 날짜 표기 공용 */
+export function formatDate(iso: string): string {
+  return iso.slice(0, 10).replaceAll("-", ".");
+}
+
+/** ISO 일시를 "2026.08.26 14:30"으로 — 상세 화면의 처리·답변 시각 표기 */
+export function formatDateTime(iso: string): string {
+  return `${formatDate(iso)} ${iso.slice(11, 16)}`;
+}

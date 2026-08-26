@@ -4,6 +4,7 @@
  */
 
 import { request } from "@/lib/api";
+import type { FaqCategory, InquiryStatus, NoticeSort } from "@/lib/support";
 
 export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -53,6 +54,8 @@ export type AdminDashboardSummary = {
   providerCount: number;
   pendingApplicationCount: number;
   totalApplicationCount: number;
+  /** 답변 대기 중인 1:1 문의 수 */
+  pendingInquiryCount: number;
 };
 
 export function fetchDashboardSummary(): Promise<AdminDashboardSummary> {
@@ -107,3 +110,182 @@ export const APPLICATION_STATUS_LABEL: Record<ApplicationStatus, string> = {
   APPROVED: "승인",
   REJECTED: "반려",
 };
+
+/* ---------- 공지사항 관리 ---------- */
+
+export type AdminNoticeSummary = {
+  id: number;
+  title: string;
+  published: boolean;
+  pinned: boolean;
+  viewCount: number;
+  authorLoginId: string;
+  createdDate: string;
+};
+
+export type AdminNoticeDetail = AdminNoticeSummary & {
+  content: string;
+  lastModifiedDate: string;
+};
+
+export type NoticeSaveInput = {
+  title: string;
+  content: string;
+  published: boolean;
+  pinned: boolean;
+};
+
+export function fetchAdminNotices(params: {
+  published?: boolean;
+  /** 제목·본문 부분 일치 검색어 */
+  q?: string;
+  /** 기본 LATEST(고정 우선 + 최신순) */
+  sort?: NoticeSort;
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<AdminNoticeSummary>> {
+  const query = new URLSearchParams();
+  if (params.published !== undefined) query.set("published", String(params.published));
+  if (params.q) query.set("q", params.q);
+  if (params.sort && params.sort !== "LATEST") query.set("sort", params.sort);
+  query.set("page", String(params.page ?? 0));
+  query.set("size", String(params.size ?? 20));
+  return request(`/api/admin/notices?${query}`);
+}
+
+export function fetchAdminNotice(id: number): Promise<AdminNoticeDetail> {
+  return request(`/api/admin/notices/${id}`);
+}
+
+export function createNotice(input: NoticeSaveInput): Promise<{ id: number }> {
+  return request("/api/admin/notices", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    fallbackMessage: "공지 등록에 실패했습니다.",
+  });
+}
+
+export function updateNotice(id: number, input: NoticeSaveInput): Promise<void> {
+  return request(`/api/admin/notices/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    fallbackMessage: "공지 수정에 실패했습니다.",
+  });
+}
+
+export function deleteNotice(id: number): Promise<void> {
+  return request(`/api/admin/notices/${id}`, {
+    method: "DELETE",
+    fallbackMessage: "공지 삭제에 실패했습니다.",
+  });
+}
+
+/* ---------- FAQ 관리 ---------- */
+
+export type AdminFaqSummary = {
+  id: number;
+  category: FaqCategory;
+  question: string;
+  displayOrder: number;
+  published: boolean;
+  createdDate: string;
+};
+
+export type AdminFaqDetail = AdminFaqSummary & {
+  answer: string;
+  lastModifiedDate: string;
+};
+
+export type FaqSaveInput = {
+  category: FaqCategory;
+  question: string;
+  answer: string;
+  displayOrder: number;
+  published: boolean;
+};
+
+export function fetchAdminFaqs(params: {
+  category?: FaqCategory;
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<AdminFaqSummary>> {
+  const query = new URLSearchParams();
+  if (params.category) query.set("category", params.category);
+  query.set("page", String(params.page ?? 0));
+  query.set("size", String(params.size ?? 20));
+  return request(`/api/admin/faqs?${query}`);
+}
+
+export function fetchAdminFaq(id: number): Promise<AdminFaqDetail> {
+  return request(`/api/admin/faqs/${id}`);
+}
+
+export function createFaq(input: FaqSaveInput): Promise<{ id: number }> {
+  return request("/api/admin/faqs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    fallbackMessage: "FAQ 등록에 실패했습니다.",
+  });
+}
+
+export function updateFaq(id: number, input: FaqSaveInput): Promise<void> {
+  return request(`/api/admin/faqs/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    fallbackMessage: "FAQ 수정에 실패했습니다.",
+  });
+}
+
+export function deleteFaq(id: number): Promise<void> {
+  return request(`/api/admin/faqs/${id}`, {
+    method: "DELETE",
+    fallbackMessage: "FAQ 삭제에 실패했습니다.",
+  });
+}
+
+/* ---------- 1:1 문의 관리 ---------- */
+
+export type AdminInquirySummary = {
+  id: number;
+  title: string;
+  status: InquiryStatus;
+  authorLoginId: string;
+  /** 답변한 관리자·매니저 loginId — 답변 전이면 null */
+  answeredByLoginId: string | null;
+  createdDate: string;
+  answeredDate: string | null;
+};
+
+export type AdminInquiryDetail = AdminInquirySummary & {
+  content: string;
+  answer: string | null;
+};
+
+export function fetchAdminInquiries(params: {
+  status?: InquiryStatus;
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<AdminInquirySummary>> {
+  const query = new URLSearchParams();
+  if (params.status) query.set("status", params.status);
+  query.set("page", String(params.page ?? 0));
+  query.set("size", String(params.size ?? 20));
+  return request(`/api/admin/inquiries?${query}`);
+}
+
+export function fetchAdminInquiry(id: number): Promise<AdminInquiryDetail> {
+  return request(`/api/admin/inquiries/${id}`);
+}
+
+export function answerInquiry(id: number, answer: string): Promise<void> {
+  return request(`/api/admin/inquiries/${id}/answer`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ answer }),
+    fallbackMessage: "답변 등록에 실패했습니다.",
+  });
+}

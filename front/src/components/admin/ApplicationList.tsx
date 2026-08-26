@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import AdminPagination from "@/components/admin/AdminPagination";
 import {
   APPLICATION_STATUS_LABEL,
   fetchApplications,
@@ -150,28 +151,12 @@ export default function ApplicationList() {
         </div>
       )}
 
-      {data && data.totalPages > 1 && (
-        <div className="admin-pagination">
-          <button
-            type="button"
-            className="btn btn--outline admin-pagination__btn"
-            disabled={data.page === 0}
-            onClick={() => navigate(statusParam, data.page - 1)}
-          >
-            이전
-          </button>
-          <span className="admin-pagination__info">
-            {data.page + 1} / {data.totalPages} 페이지
-          </span>
-          <button
-            type="button"
-            className="btn btn--outline admin-pagination__btn"
-            disabled={data.page >= data.totalPages - 1}
-            onClick={() => navigate(statusParam, data.page + 1)}
-          >
-            다음
-          </button>
-        </div>
+      {data && (
+        <AdminPagination
+          page={data.page}
+          totalPages={data.totalPages}
+          onChange={(page) => navigate(statusParam, page)}
+        />
       )}
     </>
   );

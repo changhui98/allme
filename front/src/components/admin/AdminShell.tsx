@@ -10,10 +10,12 @@ import {
   type ReactNode,
 } from "react";
 import {
+  BellIcon,
   ClipboardCheckIcon,
   HamburgerIcon,
   HomeIcon,
   LogoutIcon,
+  TuningIcon,
   UsersGroupIcon,
   WidgetGridIcon,
 } from "@/components/icons/SolarIcons";
@@ -28,19 +30,46 @@ import { useSessionRevalidation } from "@/lib/use-session-revalidation";
 import { useSidebarCollapsed } from "@/lib/use-sidebar-collapsed";
 import { displayName, logoutAndGoHome } from "@/lib/user";
 
+type SubMenuItem = {
+  href: string;
+  label: string;
+};
+
 type MenuItem = {
   href: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
   exact?: boolean;
+  /** 하위 메뉴가 있을 때 상위 활성 판정에 쓰는 경로 프리픽스(기본은 href) */
+  activePrefix?: string;
+  /** 하위 메뉴 — 항상 펼쳐 보이고(아코디언 없음) 레일 모드에선 숨긴다. 아이콘 없이 텍스트만. */
+  children?: SubMenuItem[];
 };
 
-/** 관리자 메뉴 — /admin만 정확 일치, 나머지는 프리픽스 일치(상세 페이지에서도 활성 유지) */
+/**
+ * 관리자 메뉴 — /admin만 정확 일치, 나머지는 프리픽스 일치(상세 페이지에서도 활성 유지).
+ * 서비스 관리는 하위 메뉴(FAQ·문의사항)를 가진 그룹 — 상위 링크는 첫 하위로 가고
+ * /admin/service 프리픽스로 활성 판정한다(/admin/service 직접 진입은 next.config redirects가 FAQ로 보낸다).
+ */
 const MENU_ITEMS: MenuItem[] = [
   { href: "/admin", label: "대시보드", icon: WidgetGridIcon, exact: true },
   { href: "/admin/applications", label: "업체 신청", icon: ClipboardCheckIcon },
   { href: "/admin/users", label: "회원", icon: UsersGroupIcon },
+  { href: "/admin/notices", label: "공지사항", icon: BellIcon },
+  {
+    href: "/admin/service/faqs",
+    label: "서비스 관리",
+    icon: TuningIcon,
+    activePrefix: "/admin/service",
+    children: [
+      { href: "/admin/service/faqs", label: "FAQ" },
+      { href: "/admin/service/inquiries", label: "문의사항" },
+    ],
+  },
 ];
+
+const isPathActive = (pathname: string, href: string, exact?: boolean) =>
+  exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
 /**
  * 관리자 전용 셸 — MypageShell과 같은 골격(상단 바 [햄버거][로고] + 사이드바(레일 토글) + 모바일 패널)이라
@@ -88,16 +117,19 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
   const renderMenuLinks = (onNavigate?: () => void) =>
     MENU_ITEMS.map((item) => {
-      const isActive = item.exact
-        ? pathname === item.href
-        : pathname === item.href || pathname.startsWith(`${item.href}/`);
+      const isActive = isPathActive(
+        pathname,
+        item.activePrefix ?? item.href,
+        item.exact,
+      );
       const Icon = item.icon;
       return (
         <li key={item.href} className="mypage-sidebar__item">
           <Link
             href={item.href}
             onClick={onNavigate}
-            aria-current={isActive ? "page" : undefined}
+            // 하위 메뉴가 있으면 정확한 현재 페이지는 하위 링크가 표시한다
+            aria-current={isActive && !item.children ? "page" : undefined}
             title={isRail ? item.label : undefined}
             className={`mypage-sidebar__link${
               isActive ? " mypage-sidebar__link--active" : ""
@@ -108,6 +140,27 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </span>
             <span className="mypage-sidebar__label">{item.label}</span>
           </Link>
+          {item.children && (
+            <ul className="admin-sidebar__sublist">
+              {item.children.map((child) => {
+                const isChildActive = isPathActive(pathname, child.href);
+                return (
+                  <li key={child.href}>
+                    <Link
+                      href={child.href}
+                      onClick={onNavigate}
+                      aria-current={isChildActive ? "page" : undefined}
+                      className={`admin-sidebar__sublink${
+                        isChildActive ? " admin-sidebar__sublink--active" : ""
+                      }`}
+                    >
+                      {child.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </li>
       );
     });

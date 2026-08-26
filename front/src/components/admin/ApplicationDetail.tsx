@@ -201,7 +201,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
           onChange={(e) => setRejectReason(e.target.value)}
           maxLength={500}
           placeholder="신청자에게 전달될 반려 사유를 입력해주세요. (500자 이내)"
-          className="admin-reject__textarea"
+          className="admin-form__textarea"
         />
       </Modal>
     </>

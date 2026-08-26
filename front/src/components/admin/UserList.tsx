@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import AdminPagination from "@/components/admin/AdminPagination";
 import {
   fetchAdminUsers,
   type AdminUserSummary,
@@ -140,28 +141,12 @@ export default function UserList() {
         </div>
       )}
 
-      {data && data.totalPages > 1 && (
-        <div className="admin-pagination">
-          <button
-            type="button"
-            className="btn btn--outline admin-pagination__btn"
-            disabled={data.page === 0}
-            onClick={() => setQuery((q) => ({ ...q, page: q.page - 1 }))}
-          >
-            이전
-          </button>
-          <span className="admin-pagination__info">
-            {data.page + 1} / {data.totalPages} 페이지
-          </span>
-          <button
-            type="button"
-            className="btn btn--outline admin-pagination__btn"
-            disabled={data.page >= data.totalPages - 1}
-            onClick={() => setQuery((q) => ({ ...q, page: q.page + 1 }))}
-          >
-            다음
-          </button>
-        </div>
+      {data && (
+        <AdminPagination
+          page={data.page}
+          totalPages={data.totalPages}
+          onChange={(page) => setQuery((q) => ({ ...q, page }))}
+        />
       )}
     </>
   );
