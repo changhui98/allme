@@ -12,6 +12,7 @@ import {
 import {
   BuildingsIcon,
   CaseIcon,
+  ChatRoundLineIcon,
   ClipboardListIcon,
   HamburgerIcon,
   HomeIcon,
@@ -37,22 +38,25 @@ type MenuItem = {
   href: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
+  /** true면 정확 일치로만 활성(대시보드) — 기본은 프리픽스 일치(상세 페이지에서도 활성 유지) */
+  exact?: boolean;
 };
 
 /**
  * 모드별 메뉴 — 개인(/mypage/*)과 업체(/mypage/biz/*)를 URL로 분리하고
- * 사이드바·모바일 패널은 현재 모드의 메뉴 한 벌만 렌더한다(활성 판정은 정확 일치 유지).
+ * 사이드바·모바일 패널은 현재 모드의 메뉴 한 벌만 렌더한다(활성 판정은 대시보드만 정확 일치, 나머지는 프리픽스).
  * 업체 모드 접근 가드는 biz/layout.tsx의 RoleGuard가 담당하므로 항목별 role 필터는 없다.
  * 아이콘은 레일(접힌 사이드바)에서 라벨을 대신하므로 항목마다 필수.
  */
 const PERSONAL_MENU_ITEMS: MenuItem[] = [
-  { href: "/mypage", label: "대시보드", icon: WidgetIcon },
+  { href: "/mypage", label: "대시보드", icon: WidgetIcon, exact: true },
   { href: "/mypage/requests", label: "요청한 서비스", icon: ClipboardListIcon },
+  { href: "/mypage/inquiries", label: "내 문의", icon: ChatRoundLineIcon },
   { href: "/mypage/profile", label: "내 정보", icon: UserIcon },
 ];
 
 const BIZ_MENU_ITEMS: MenuItem[] = [
-  { href: "/mypage/biz", label: "업체 대시보드", icon: ShopIcon },
+  { href: "/mypage/biz", label: "업체 대시보드", icon: ShopIcon, exact: true },
   { href: "/mypage/biz/services", label: "내 서비스", icon: CaseIcon },
   { href: "/mypage/biz/received", label: "받은 요청", icon: InboxIcon },
   { href: "/mypage/biz/profile", label: "업체 정보", icon: BuildingsIcon },
@@ -145,7 +149,9 @@ export default function MypageShell({ children }: { children: ReactNode }) {
 
   const renderMenuLinks = (onNavigate?: () => void) =>
     menuItems.map((item) => {
-      const isActive = pathname === item.href;
+      const isActive = item.exact
+        ? pathname === item.href
+        : pathname === item.href || pathname.startsWith(`${item.href}/`);
       const Icon = item.icon;
       return (
         <li key={item.href} className="mypage-sidebar__item">
