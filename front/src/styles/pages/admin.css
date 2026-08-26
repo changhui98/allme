@@ -94,12 +94,12 @@
 
 /* ---------- admin-table: 데이터 테이블 (모바일은 래퍼 가로 스크롤) ---------- */
 
-/* 테이블 카드 래퍼 — 경계선 카드 안에 테이블, 모바일은 내부 가로 스크롤 */
+/* 테이블 래퍼 — 상하 hairline으로만 구획(좌우 경계·둥근 모서리 없음), 모바일은 내부 가로 스크롤 */
 .admin-table-wrap {
   overflow-x: auto;
   margin-top: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background-color: var(--background);
 }
 
@@ -107,8 +107,11 @@
   margin-top: 1rem;
 }
 
+/* 열 너비는 내용과 무관하게 균등 분배(table-layout: fixed). 좁은 화면에선 min-width로 열당 최소 폭을 지키고 래퍼가 가로 스크롤 */
 .admin-table {
   width: 100%;
+  min-width: 40rem;
+  table-layout: fixed;
   border-collapse: collapse;
   text-align: left;
 }

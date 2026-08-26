@@ -20,7 +20,10 @@ export type ProviderApplicationSummary = {
   businessName: string;
   applicantLoginId: string;
   status: ApplicationStatus;
+  /** 승인/반려한 관리자·매니저 loginId — 대기 중이면 null */
+  processedByLoginId: string | null;
   createdDate: string;
+  processedDate: string | null;
 };
 
 export type ProviderApplicationDetail = {

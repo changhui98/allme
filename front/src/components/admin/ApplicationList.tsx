@@ -103,6 +103,7 @@ export default function ApplicationList() {
                 <th scope="col">업체명</th>
                 <th scope="col">신청자</th>
                 <th scope="col">상태</th>
+                <th scope="col">처리자</th>
                 <th scope="col" className="admin-table__num">
                   신청일
                 </th>
@@ -135,6 +136,9 @@ export default function ApplicationList() {
                     >
                       {APPLICATION_STATUS_LABEL[application.status]}
                     </span>
+                  </td>
+                  <td className="admin-table__muted">
+                    {application.processedByLoginId ?? "—"}
                   </td>
                   <td className="admin-table__num">
                     {application.createdDate.slice(0, 10)}

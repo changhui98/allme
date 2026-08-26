@@ -39,7 +39,7 @@ public class AdminProviderApplicationController {
 
     private final ProviderApplicationService applicationService;
 
-    /** 목록 — status 미지정 시 전체, 신청 최신순. 신청자 loginId는 배치 조회로 채운다. */
+    /** 목록 — status 미지정 시 전체, 신청 최신순. 신청자·처리자 loginId는 한 번의 배치 조회로 채운다. */
     @GetMapping
     public PageResponse<ProviderApplicationSummaryResponse> list(
         @RequestParam(required = false) ApplicationStatus status,
@@ -47,12 +47,24 @@ public class AdminProviderApplicationController {
         @RequestParam(defaultValue = "20") int size
     ) {
         Page<ProviderApplication> applications = applicationService.getPage(status, page, size);
-        Map<Long, String> loginIds = applicationService.loginIdsOf(
-            applications.getContent().stream().map(ProviderApplication::getUserId).toList());
+
+        List<Long> userIds = new ArrayList<>();
+        for (ProviderApplication application : applications.getContent()) {
+            userIds.add(application.getUserId());
+            if (application.getProcessedByUserId() != null) {
+                userIds.add(application.getProcessedByUserId());
+            }
+        }
+        Map<Long, String> loginIds = applicationService.loginIdsOf(userIds);
 
         return PageResponse.from(applications.map(application ->
             ProviderApplicationSummaryResponse.from(
-                application, loginIds.get(application.getUserId()))));
+                application,
+                loginIds.get(application.getUserId()),
+                application.getProcessedByUserId() != null
+                    ? loginIds.get(application.getProcessedByUserId())
+                    : null
+            )));
     }
 
     @GetMapping("/{id}")
