@@ -1,8 +1,8 @@
 package com.allme.back.provider.presentation.controller;
 
 import com.allme.back.global.auth.RequireRole;
+import com.allme.back.global.auth.SessionUsers;
 import com.allme.back.global.dto.PageResponse;
-import com.allme.back.global.exception.AppException;
 import com.allme.back.provider.application.service.ProviderApplicationService;
 import com.allme.back.provider.domain.ApplicationStatus;
 import com.allme.back.provider.domain.entity.ProviderApplication;
@@ -10,9 +10,7 @@ import com.allme.back.provider.presentation.dto.request.ProviderApplicationRejec
 import com.allme.back.provider.presentation.dto.response.ProviderApplicationDetailResponse;
 import com.allme.back.provider.presentation.dto.response.ProviderApplicationSummaryResponse;
 import com.allme.back.user.domain.Role;
-import com.allme.back.user.domain.UserErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +88,7 @@ public class AdminProviderApplicationController {
     /** 승인 — 신청자에게 PROVIDER 역할이 즉시 부여된다(재로그인 불필요). */
     @PostMapping("/{id}/approve")
     public void approve(@PathVariable Long id, HttpServletRequest httpRequest) {
-        applicationService.approve(id, sessionUserId(httpRequest));
+        applicationService.approve(id, SessionUsers.requireUserId(httpRequest));
     }
 
     @PostMapping("/{id}/reject")
@@ -99,17 +97,7 @@ public class AdminProviderApplicationController {
         @Valid @RequestBody ProviderApplicationRejectRequest request,
         HttpServletRequest httpRequest
     ) {
-        applicationService.reject(id, sessionUserId(httpRequest), request.reason());
-    }
-
-    /** 세션에서 userId를 꺼낸다. 없으면 U011 — UserController.sessionUserId와 동일 계약. */
-    private Long sessionUserId(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        Object userId = session != null ? session.getAttribute("userId") : null;
-        if (!(userId instanceof Long id)) {
-            throw new AppException(UserErrorCode.UNAUTHORIZED);
-        }
-        return id;
+        applicationService.reject(id, SessionUsers.requireUserId(httpRequest), request.reason());
     }
 
 }

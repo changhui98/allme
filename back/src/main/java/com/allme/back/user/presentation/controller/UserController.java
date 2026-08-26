@@ -1,5 +1,6 @@
 package com.allme.back.user.presentation.controller;
 
+import com.allme.back.global.auth.SessionUsers;
 import com.allme.back.global.exception.AppException;
 import com.allme.back.user.application.service.SettlementAccountVerification;
 import com.allme.back.user.application.service.UserService;
@@ -96,7 +97,7 @@ public class UserController {
      */
     @GetMapping("/me")
     public UserSummaryResponse me(HttpServletRequest httpRequest) {
-        return summaryOf(userService.getById(sessionUserId(httpRequest)));
+        return summaryOf(userService.getById(SessionUsers.requireUserId(httpRequest)));
     }
 
     /**
@@ -107,7 +108,7 @@ public class UserController {
     public UserSummaryResponse uploadProfileImage(
         @RequestParam("image") MultipartFile image, HttpServletRequest httpRequest
     ) {
-        Long userId = sessionUserId(httpRequest);
+        Long userId = SessionUsers.requireUserId(httpRequest);
 
         byte[] content;
         try {
@@ -127,13 +128,13 @@ public class UserController {
         @Valid @RequestBody UserNicknameUpdateRequest request, HttpServletRequest httpRequest
     ) {
         return summaryOf(
-            userService.updateNickname(sessionUserId(httpRequest), request.nickname()));
+            userService.updateNickname(SessionUsers.requireUserId(httpRequest), request.nickname()));
     }
 
     /** 랜덤 닉네임 제안 — 저장하지 않고 유니크한 후보만 내려준다("랜덤 다시 뽑기"). */
     @GetMapping("/me/nickname/random")
     public NicknameSuggestionResponse randomNickname(HttpServletRequest httpRequest) {
-        sessionUserId(httpRequest); // 로그인 가드
+        SessionUsers.requireUserId(httpRequest); // 로그인 가드
         return new NicknameSuggestionResponse(userService.suggestNickname());
     }
 
@@ -143,7 +144,7 @@ public class UserController {
         @Valid @RequestBody MarketingConsentUpdateRequest request, HttpServletRequest httpRequest
     ) {
         return summaryOf(userService.updateMarketingConsent(
-            sessionUserId(httpRequest), request.marketingConsent()));
+            SessionUsers.requireUserId(httpRequest), request.marketingConsent()));
     }
 
     /** 세션에 계좌 인증 결과를 담는 attribute 키 — 저장(PUT) 시 대조 후 소거한다. */
@@ -153,7 +154,7 @@ public class UserController {
     @GetMapping("/me/settlement-account")
     public SettlementAccountResponse settlementAccount(HttpServletRequest httpRequest) {
         return SettlementAccountResponse.from(
-            userService.getSettlementAccount(sessionUserId(httpRequest)));
+            userService.getSettlementAccount(SessionUsers.requireUserId(httpRequest)));
     }
 
     /**
@@ -165,7 +166,7 @@ public class UserController {
     public SettlementAccountVerifyResponse verifySettlementAccount(
         @Valid @RequestBody SettlementAccountVerifyRequest request, HttpServletRequest httpRequest
     ) {
-        Long userId = sessionUserId(httpRequest);
+        Long userId = SessionUsers.requireUserId(httpRequest);
         SettlementAccountVerification verification =
             userService.verifySettlementAccount(userId, request.bank(), request.accountNumber());
         httpRequest.getSession().setAttribute(SETTLEMENT_VERIFICATION_ATTR, verification);
@@ -177,7 +178,7 @@ public class UserController {
     public SettlementAccountResponse saveSettlementAccount(
         @Valid @RequestBody SettlementAccountUpdateRequest request, HttpServletRequest httpRequest
     ) {
-        Long userId = sessionUserId(httpRequest);
+        Long userId = SessionUsers.requireUserId(httpRequest);
         HttpSession session = httpRequest.getSession(false);
         Object attr = session != null ? session.getAttribute(SETTLEMENT_VERIFICATION_ATTR) : null;
         SettlementAccountVerification verification =
@@ -198,7 +199,7 @@ public class UserController {
     public void withdraw(
         @Valid @RequestBody UserWithdrawRequest request, HttpServletRequest httpRequest
     ) {
-        userService.withdraw(sessionUserId(httpRequest), request.password());
+        userService.withdraw(SessionUsers.requireUserId(httpRequest), request.password());
 
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
@@ -209,16 +210,6 @@ public class UserController {
     /** 회원 요약 응답 조립 — 프로필 이미지 경로는 파일 테이블에서 조회한다. */
     private UserSummaryResponse summaryOf(User user) {
         return UserSummaryResponse.from(user, userService.getProfileImagePath(user));
-    }
-
-    /** 세션에서 userId를 꺼낸다. 없으면 U011 — 로그인 필요 API 공통 가드. */
-    private Long sessionUserId(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        Object userId = session != null ? session.getAttribute("userId") : null;
-        if (!(userId instanceof Long id)) {
-            throw new AppException(UserErrorCode.UNAUTHORIZED);
-        }
-        return id;
     }
 
     private String extensionOf(String filename) {

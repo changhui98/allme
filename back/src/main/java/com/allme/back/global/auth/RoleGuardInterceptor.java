@@ -3,11 +3,9 @@ package com.allme.back.global.auth;
 import com.allme.back.global.exception.ApiErrorCode;
 import com.allme.back.global.exception.AppException;
 import com.allme.back.user.domain.Role;
-import com.allme.back.user.domain.UserErrorCode;
 import com.allme.back.user.domain.repository.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -44,23 +42,13 @@ public class RoleGuardInterceptor implements HandlerInterceptor {
             return true; // 어노테이션 없는 API는 기존 방식(컨트롤러의 세션 검사) 그대로
         }
 
-        Set<Role> owned = userRoleRepository.findRolesByUserId(sessionUserId(request));
+        Set<Role> owned = userRoleRepository.findRolesByUserId(SessionUsers.requireUserId(request));
         for (Role required : requireRole.value()) {
             if (owned.contains(required)) {
                 return true;
             }
         }
         throw new AppException(ApiErrorCode.FORBIDDEN);
-    }
-
-    /** UserController.sessionUserId와 동일 계약 — 세션에 userId(Long)가 없으면 U011(401). */
-    private Long sessionUserId(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        Object userId = session != null ? session.getAttribute("userId") : null;
-        if (!(userId instanceof Long id)) {
-            throw new AppException(UserErrorCode.UNAUTHORIZED);
-        }
-        return id;
     }
 
 }

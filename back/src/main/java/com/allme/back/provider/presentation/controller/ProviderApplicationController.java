@@ -1,14 +1,12 @@
 package com.allme.back.provider.presentation.controller;
 
 import com.allme.back.global.auth.RequireRole;
-import com.allme.back.global.exception.AppException;
+import com.allme.back.global.auth.SessionUsers;
 import com.allme.back.provider.application.service.ProviderApplicationService;
 import com.allme.back.provider.presentation.dto.request.ProviderApplicationSubmitRequest;
 import com.allme.back.provider.presentation.dto.response.MyApplicationResponse;
 import com.allme.back.user.domain.Role;
-import com.allme.back.user.domain.UserErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,7 +36,7 @@ public class ProviderApplicationController {
         @Valid @RequestBody ProviderApplicationSubmitRequest request, HttpServletRequest httpRequest
     ) {
         return MyApplicationResponse.from(applicationService.submit(
-            sessionUserId(httpRequest),
+            SessionUsers.requireUserId(httpRequest),
             request.businessName(),
             request.businessRegistrationNumber(),
             request.introduction(),
@@ -50,17 +48,7 @@ public class ProviderApplicationController {
     @GetMapping("/me")
     public MyApplicationResponse myLatest(HttpServletRequest httpRequest) {
         return MyApplicationResponse.from(
-            applicationService.getMyLatest(sessionUserId(httpRequest)));
-    }
-
-    /** 세션에서 userId를 꺼낸다. 없으면 U011 — UserController.sessionUserId와 동일 계약. */
-    private Long sessionUserId(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        Object userId = session != null ? session.getAttribute("userId") : null;
-        if (!(userId instanceof Long id)) {
-            throw new AppException(UserErrorCode.UNAUTHORIZED);
-        }
-        return id;
+            applicationService.getMyLatest(SessionUsers.requireUserId(httpRequest)));
     }
 
 }
