@@ -5,5 +5,6 @@ public record AdminDashboardSummaryResponse(
     long activeUserCount,
     long providerCount,
     long pendingApplicationCount,
-    long totalApplicationCount
+    long totalApplicationCount,
+    long pendingInquiryCount
 ) { }
