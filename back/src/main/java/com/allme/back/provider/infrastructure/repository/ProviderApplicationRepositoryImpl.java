@@ -3,6 +3,8 @@ package com.allme.back.provider.infrastructure.repository;
 import com.allme.back.provider.domain.ApplicationStatus;
 import com.allme.back.provider.domain.entity.ProviderApplication;
 import com.allme.back.provider.domain.repository.ProviderApplicationRepository;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,19 @@ public class ProviderApplicationRepositoryImpl implements ProviderApplicationRep
     @Override
     public boolean existsByUserIdAndStatus(Long userId, ApplicationStatus status) {
         return jpaRepository.existsByUserIdAndStatus(userId, status);
+    }
+
+    @Override
+    public Optional<ProviderApplication> findLatestApprovedByUserId(Long userId) {
+        return jpaRepository.findTopByUserIdAndStatusOrderByIdDesc(userId, ApplicationStatus.APPROVED);
+    }
+
+    @Override
+    public List<ProviderApplication> findApprovedByUserIds(Collection<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return List.of(); // in () 문법 오류 방지
+        }
+        return jpaRepository.findByStatusAndUserIdInOrderByIdDesc(ApplicationStatus.APPROVED, userIds);
     }
 
     @Override
