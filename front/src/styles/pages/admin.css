@@ -180,9 +180,18 @@
   color: var(--muted);
 }
 
+/* 날짜·건수 열 — 다른 열과 같은 왼쪽 정렬(오른쪽 정렬이면 짧은 열 제목이 값의 시작선과 어긋난다), 자릿수만 고정폭 */
 .admin-table th.admin-table__num,
 .admin-table td.admin-table__num {
-  text-align: right;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* 첫 열의 순서 번호 — table-layout: fixed의 균등 분배를 받지 않도록 폭을 고정한 좁은 열 */
+.admin-table th.admin-table__order,
+.admin-table td.admin-table__order {
+  width: 4.5rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }

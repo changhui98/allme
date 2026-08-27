@@ -102,6 +102,9 @@ export default function InquiryList() {
                 <th scope="col" className="admin-table__num">
                   작성일
                 </th>
+                <th scope="col" className="admin-table__num">
+                  답변일
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -133,6 +136,9 @@ export default function InquiryList() {
                   </td>
                   <td className="admin-table__num">
                     {formatDate(inquiry.createdDate)}
+                  </td>
+                  <td className="admin-table__num">
+                    {inquiry.answeredDate ? formatDate(inquiry.answeredDate) : "—"}
                   </td>
                 </tr>
               ))}

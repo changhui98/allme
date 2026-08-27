@@ -98,7 +98,7 @@ export default function FaqList() {
           <table className="admin-table">
             <thead>
               <tr>
-                <th scope="col" className="admin-table__num">
+                <th scope="col" className="admin-table__order">
                   순서
                 </th>
                 <th scope="col">분류</th>
@@ -116,7 +116,7 @@ export default function FaqList() {
                   className="admin-table__row--link"
                   onClick={() => router.push(`/admin/service/faqs/${faq.id}`)}
                 >
-                  <td className="admin-table__num">{faq.displayOrder}</td>
+                  <td className="admin-table__order">{faq.displayOrder}</td>
                   <td className="admin-table__muted">
                     {FAQ_CATEGORY_LABEL[faq.category]}
                   </td>
