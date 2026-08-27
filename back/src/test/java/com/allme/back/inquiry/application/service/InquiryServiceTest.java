@@ -107,7 +107,7 @@ class InquiryServiceTest {
             }
 
             @Override
-            public Page<AdminUserRow> search(String loginIdKeywordOrNull, Pageable pageable) {
+            public Page<AdminUserRow> search(String loginIdKeywordOrNull, Role roleOrNull, Pageable pageable) {
                 return Page.empty();
             }
 

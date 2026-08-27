@@ -5,6 +5,7 @@
 
 import { request } from "@/lib/api";
 import type { FaqCategory, InquiryStatus, NoticeSort } from "@/lib/support";
+import type { UserRole } from "@/lib/user";
 
 export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -94,11 +95,14 @@ export function rejectApplication(id: number, reason: string): Promise<void> {
 
 export function fetchAdminUsers(params: {
   loginId?: string;
+  /** 역할 필터 — USER는 "일반 회원"(USER 외 역할 없음), 그 외는 보유 여부 */
+  role?: UserRole;
   page?: number;
   size?: number;
 }): Promise<PageResponse<AdminUserSummary>> {
   const query = new URLSearchParams();
   if (params.loginId) query.set("loginId", params.loginId);
+  if (params.role) query.set("role", params.role);
   query.set("page", String(params.page ?? 0));
   query.set("size", String(params.size ?? 20));
   return request(`/api/admin/users?${query}`);

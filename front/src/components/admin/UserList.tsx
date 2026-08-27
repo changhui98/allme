@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import {
@@ -7,18 +8,39 @@ import {
   type AdminUserSummary,
   type PageResponse,
 } from "@/lib/admin";
+import { formatDate } from "@/lib/format";
+import type { UserRole } from "@/lib/user";
 
 const PAGE_SIZE = 20;
+
+/** 역할 필터 탭 — USER는 "일반 회원"(USER 외 역할 없음), 나머지는 해당 역할 보유 */
+const FILTERS: { value: UserRole | ""; label: string }[] = [
+  { value: "", label: "전체 회원" },
+  { value: "USER", label: "일반" },
+  { value: "PROVIDER", label: "업체" },
+  { value: "MANAGER", label: "매니저" },
+  { value: "ADMIN", label: "관리자" },
+];
+
+const ROLE_VALUES = new Set<string>(["USER", "PROVIDER", "MANAGER", "ADMIN"]);
 
 /** 운영 권한 역할 — 칩을 브랜드 색으로 구분 */
 const STAFF_ROLES = new Set(["MANAGER", "ADMIN"]);
 
-/** 회원 목록 — 컬럼 헤더가 있는 데이터 테이블 + loginId 검색·역할 칩. 탈퇴 회원은 흐리게. */
+/**
+ * 회원 목록 — 역할 탭 + loginId 검색 + 데이터 테이블. 탈퇴 회원은 흐리게.
+ * 역할(?role)·검색어(?q)·페이지(?page)를 URL 쿼리로 동기화한다(대시보드 링크·뒤로가기 대응).
+ */
 export default function UserList() {
-  const [keywordInput, setKeywordInput] = useState("");
-  const [query, setQuery] = useState({ keyword: "", page: 0 });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const roleRaw = searchParams.get("role") ?? "";
+  const roleParam = (ROLE_VALUES.has(roleRaw) ? roleRaw : "") as UserRole | "";
+  const qParam = searchParams.get("q")?.trim() ?? "";
+  const pageParam = Number(searchParams.get("page") ?? "0");
+  const [keywordInput, setKeywordInput] = useState(qParam);
 
-  const requestKey = `${query.keyword}|${query.page}`;
+  const requestKey = `${roleParam}|${qParam}|${pageParam}`;
   const [result, setResult] = useState<{
     key: string;
     page?: PageResponse<AdminUserSummary>;
@@ -28,8 +50,9 @@ export default function UserList() {
   useEffect(() => {
     let cancelled = false;
     fetchAdminUsers({
-      loginId: query.keyword || undefined,
-      page: query.page,
+      loginId: qParam || undefined,
+      role: roleParam || undefined,
+      page: pageParam,
       size: PAGE_SIZE,
     })
       .then((page) => {
@@ -41,26 +64,45 @@ export default function UserList() {
     return () => {
       cancelled = true;
     };
-  }, [query, requestKey]);
+  }, [roleParam, qParam, pageParam, requestKey]);
 
   const data = result?.key === requestKey ? result.page : undefined;
   const error = result?.key === requestKey ? result.error : undefined;
 
+  const navigate = (role: string, q: string, page: number) => {
+    const query = new URLSearchParams();
+    if (role) query.set("role", role);
+    if (q) query.set("q", q);
+    if (page > 0) query.set("page", String(page));
+    const qs = query.toString();
+    router.replace(`/admin/users${qs ? `?${qs}` : ""}`);
+  };
+
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    setQuery({ keyword: keywordInput.trim(), page: 0 });
+    navigate(roleParam, keywordInput.trim(), 0);
   };
 
   return (
     <>
-      <div className="admin-filter">
-        <span className="admin-filter__item admin-filter__item--active">
-          전체 회원
-        </span>
+      <nav aria-label="역할 필터" className="admin-filter">
+        {FILTERS.map((filter) => (
+          <button
+            key={filter.value}
+            type="button"
+            onClick={() => navigate(filter.value, qParam, 0)}
+            aria-current={roleParam === filter.value ? "true" : undefined}
+            className={`admin-filter__item${
+              roleParam === filter.value ? " admin-filter__item--active" : ""
+            }`}
+          >
+            {filter.label}
+          </button>
+        ))}
         {data && (
           <span className="admin-filter__total">총 {data.totalElements}명</span>
         )}
-      </div>
+      </nav>
 
       <form
         role="search"
@@ -83,7 +125,9 @@ export default function UserList() {
       {error && <p className="admin-error">{error}</p>}
       {!error && !data && <p className="admin-loading">불러오는 중…</p>}
       {data && data.content.length === 0 && (
-        <p className="admin-loading">검색 결과가 없어요.</p>
+        <p className="admin-loading">
+          {qParam ? "검색 결과가 없어요." : "해당 역할의 회원이 없어요."}
+        </p>
       )}
 
       {data && data.content.length > 0 && (
@@ -124,15 +168,17 @@ export default function UserList() {
                   </td>
                   <td>
                     <span
-                      className={`admin-status${
-                        user.withdrawn ? " admin-status--rejected" : ""
+                      className={`admin-status ${
+                        user.withdrawn
+                          ? "admin-status--rejected"
+                          : "admin-status--active"
                       }`}
                     >
                       {user.withdrawn ? "탈퇴" : "활성"}
                     </span>
                   </td>
                   <td className="admin-table__num">
-                    {user.createdDate.slice(0, 10)}
+                    {formatDate(user.createdDate)}
                   </td>
                 </tr>
               ))}
@@ -145,7 +191,7 @@ export default function UserList() {
         <AdminPagination
           page={data.page}
           totalPages={data.totalPages}
-          onChange={(page) => setQuery((q) => ({ ...q, page }))}
+          onChange={(page) => navigate(roleParam, qParam, page)}
         />
       )}
     </>

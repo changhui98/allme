@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** 회원 목록 조회 — 관리자/매니저 전용. 개인정보 컬럼은 조회 자체를 하지 않는다(프로젝션). */
+/** 회원 목록 조회 — 관리자/매니저 전용. role 필터(USER=일반 회원, 그 외는 보유). 개인정보 컬럼은 조회 자체를 하지 않는다(프로젝션). */
 @RestController
 @RequestMapping("/api/admin/users")
 @RequireRole({Role.MANAGER, Role.ADMIN})
@@ -27,10 +27,11 @@ public class AdminUserController {
     @GetMapping
     public PageResponse<AdminUserResponse> list(
         @RequestParam(required = false) String loginId,
+        @RequestParam(required = false) Role role,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
-        Page<AdminUserRow> rows = userAdminService.search(loginId, page, size);
+        Page<AdminUserRow> rows = userAdminService.search(loginId, role, page, size);
         Map<Long, Set<Role>> roles = userAdminService.rolesOf(
             rows.getContent().stream().map(AdminUserRow::id).toList());
 

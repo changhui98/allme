@@ -26,10 +26,10 @@ public class UserAdminService {
     private final UserAdminQueryRepository userAdminQueryRepository;
 
     /**
-     * 회원 검색 — loginId 부분 일치(공백/빈 문자열은 전체), 가입 최신순(id desc — created_date 정렬과 동치).
-     * name 등 개인정보 컬럼은 비결정적 암호문이라 검색 키로 쓸 수 없다.
+     * 회원 검색 — loginId 부분 일치(공백/빈 문자열은 전체) × 역할 필터(null이면 전체, USER는 "일반 회원"),
+     * 가입 최신순(id desc — created_date 정렬과 동치). name 등 개인정보 컬럼은 비결정적 암호문이라 검색 키로 쓸 수 없다.
      */
-    public Page<AdminUserRow> search(String loginIdKeyword, int page, int size) {
+    public Page<AdminUserRow> search(String loginIdKeyword, Role roleOrNull, int page, int size) {
         String keyword = loginIdKeyword != null && !loginIdKeyword.isBlank()
             ? loginIdKeyword.trim()
             : null;
@@ -38,7 +38,7 @@ public class UserAdminService {
             Math.min(Math.max(size, 1), MAX_PAGE_SIZE),
             Sort.by(Sort.Direction.DESC, "id")
         );
-        return userAdminQueryRepository.search(keyword, pageable);
+        return userAdminQueryRepository.search(keyword, roleOrNull, pageable);
     }
 
     /** 페이지 회원들의 역할 배치 조회 — 응답 조립용. */

@@ -30,12 +30,22 @@ public class UserAdminQueryRepositoryImpl implements UserAdminQueryRepository {
             .collect(Collectors.toMap(row -> (Long) row[0], row -> (String) row[1]));
     }
 
+    /** 키워드 유무 × 역할(없음 / USER만 / 보유) 6가지 조합을 각각 다른 쿼리로 — null을 like에 바인딩하지 않는다 */
     @Override
-    public Page<AdminUserRow> search(String loginIdKeywordOrNull, Pageable pageable) {
-        if (loginIdKeywordOrNull == null) {
-            return userJpaRepository.findAllAdminRows(pageable); // null을 like에 바인딩하지 않는다
+    public Page<AdminUserRow> search(String loginIdKeywordOrNull, Role roleOrNull, Pageable pageable) {
+        if (roleOrNull == null) {
+            return loginIdKeywordOrNull == null
+                ? userJpaRepository.findAllAdminRows(pageable)
+                : userJpaRepository.searchAdminRowsByLoginId(loginIdKeywordOrNull, pageable);
         }
-        return userJpaRepository.searchAdminRowsByLoginId(loginIdKeywordOrNull, pageable);
+        if (roleOrNull == Role.USER) {
+            return loginIdKeywordOrNull == null
+                ? userJpaRepository.findAdminRowsUserOnly(pageable)
+                : userJpaRepository.searchAdminRowsByLoginIdUserOnly(loginIdKeywordOrNull, pageable);
+        }
+        return loginIdKeywordOrNull == null
+            ? userJpaRepository.findAdminRowsByRole(roleOrNull, pageable)
+            : userJpaRepository.searchAdminRowsByLoginIdAndRole(loginIdKeywordOrNull, roleOrNull, pageable);
     }
 
     @Override

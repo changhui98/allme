@@ -240,12 +240,14 @@
   background-color: var(--danger);
 }
 
-/* 문의 답변 완료·공지 공개는 success, 비공개(초안)는 기본(muted) 도트 */
+/* 회원 활성·문의 답변 완료·공지 공개는 success, 비공개(초안)는 기본(muted) 도트 */
+.admin-status--active,
 .admin-status--answered,
 .admin-status--published {
   color: var(--success);
 }
 
+.admin-status--active::before,
 .admin-status--answered::before,
 .admin-status--published::before {
   background-color: var(--success);
