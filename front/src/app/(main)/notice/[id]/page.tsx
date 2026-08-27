@@ -10,7 +10,7 @@ export default async function NoticeDetailPage({
 }) {
   const { id } = await params;
   return (
-    <main className="page-container board-page">
+    <main className="page-container board-page support-page">
       <NoticeDetail id={Number(id)} />
     </main>
   );

@@ -153,7 +153,13 @@ export default function NoticeList() {
             >
               <Link href={`/notice/${notice.id}`} className="notice-list__link">
                 {notice.pinned && (
-                  <span className="notice-list__pin">고정</span>
+                  <span
+                    className="notice-list__pin"
+                    role="img"
+                    aria-label="고정 공지"
+                  >
+                    ★
+                  </span>
                 )}
                 <span className="notice-list__title">{notice.title}</span>
                 <span className="notice-list__views">

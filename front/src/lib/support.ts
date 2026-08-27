@@ -16,6 +16,9 @@ export type NoticeSummary = {
   createdDate: string;
 };
 
+/** 상세 하단 이전·다음 글 링크 — 공개 공지 시간순 이웃 */
+export type NoticeLink = { id: number; title: string };
+
 export type NoticeDetail = {
   id: number;
   title: string;
@@ -24,6 +27,8 @@ export type NoticeDetail = {
   viewCount: number;
   createdDate: string;
   lastModifiedDate: string;
+  previous: NoticeLink | null;
+  next: NoticeLink | null;
 };
 
 /** 목록 정렬 — 백엔드 NoticeSort와 동일. 어느 쪽이든 상단 고정이 먼저. */

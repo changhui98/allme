@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /** FAQ — 공통 헤딩 + 분류 탭 + 아코디언. 스타일: styles/pages/support.css */
 export default function FaqPage() {
   return (
-    <main className="page-container board-page">
+    <main className="page-container board-page support-page">
       <SupportPageHead
         title="자주 묻는 질문"
         description={

@@ -22,15 +22,16 @@
   color: var(--foreground);
 }
 
-.support-back--below {
-  margin-top: 2.5rem;
-}
-
 .support-back--above {
   margin-bottom: 1.25rem;
 }
 
-/* ---------- support-page: 공지·FAQ·문의 공통 가운데 헤딩 (board-page__title 위에 크기만 키운다) ---------- */
+/* ---------- support-page: 공지·FAQ·문의 공통 컬럼 폭 + 가운데 헤딩 ---------- */
+
+/* 네 페이지(공지 목록·상세, FAQ, 1:1 문의)의 본문 폭을 48rem으로 통일 — page-container(72rem)를 좁힌다(패딩 1rem 포함 50rem) */
+.support-page {
+  max-width: 50rem;
+}
 
 .support-page__head {
   text-align: center;
@@ -164,15 +165,12 @@
   padding: 1rem 0.25rem;
 }
 
+/* 상단 고정 표시 — 배지 대신 꽉 찬 별(★) 하나, 브랜드색 */
 .notice-list__pin {
   flex-shrink: 0;
-  border-radius: 999px;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.6875rem;
-  line-height: 1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.375rem;
   color: var(--primary-text);
-  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
 }
 
 .notice-list__title {
@@ -224,15 +222,17 @@
   }
 }
 
-/* ---------- notice-detail: 공지 상세 (문서형) ---------- */
+/* ---------- notice-detail: 공지 상세 (가운데 컬럼 — 제목·메타 가운데, 본문 왼쪽) ---------- */
 
+/* 폭은 support-page 컬럼이 정한다 */
 .notice-detail {
-  max-width: 48rem;
+  width: 100%;
 }
 
 .notice-detail__header {
   border-bottom: 1px solid var(--border);
   padding-bottom: 1.5rem;
+  text-align: center;
 }
 
 .notice-detail__title {
@@ -247,6 +247,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
   font-size: 0.875rem;
@@ -261,6 +262,90 @@
   color: var(--foreground);
   white-space: pre-line;
   overflow-wrap: anywhere;
+}
+
+/* ---------- notice-nav: 상세 하단 ‹ 이전 글 | 목록 | 다음 글 › (hairline 위 한 줄 3분할) ---------- */
+
+.notice-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+/* 오류 화면 — 목록 버튼만 가운데 */
+.notice-nav--only-list {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.notice-nav__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.notice-nav__item--next {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.notice-nav__label {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted);
+}
+
+.notice-nav__title {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition-property: color;
+  transition-duration: 150ms;
+}
+
+.notice-nav__item:hover .notice-nav__title {
+  color: var(--primary-text);
+}
+
+/* 공용 .btn은 크기를 갖지 않으므로 여기서 부여 */
+.notice-nav__list {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+/* 모바일 — 이전 → 다음 세로 스택, 목록 버튼은 아래 가운데. 다음 글도 왼쪽 정렬 */
+@media (max-width: 39.9375rem) {
+  .notice-nav {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+
+  .notice-nav__item--prev {
+    order: 1;
+  }
+
+  .notice-nav__item--next {
+    order: 2;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .notice-nav__list {
+    order: 3;
+    justify-self: center;
+    margin-top: 0.5rem;
+  }
 }
 
 /* ---------- faq: 분류 탭은 category-tabs 재사용, 항목은 details/summary 아코디언 ---------- */
@@ -343,13 +428,12 @@
 
 /* ---------- inquiry-form: 1:1 문의 작성 ---------- */
 
-/* 40rem 블록을 가운데 두고 내부는 왼쪽 정렬 */
+/* 폭은 support-page 컬럼(48rem)이 정한다 — 내부는 왼쪽 정렬 */
 .inquiry-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  max-width: 40rem;
-  margin: 1.5rem auto 0;
+  margin-top: 1.5rem;
 }
 
 .inquiry-form__field {
