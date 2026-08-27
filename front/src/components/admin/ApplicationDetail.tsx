@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
@@ -43,7 +44,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
     setActionError(null);
     try {
       await approveApplication(id);
-      router.replace("/admin/applications");
+      router.replace("/admin/providers/applications");
     } catch (e) {
       setActionError((e as Error).message);
       setProcessing(false);
@@ -59,7 +60,7 @@ export default function ApplicationDetail({ id }: { id: number }) {
     setActionError(null);
     try {
       await rejectApplication(id, rejectReason.trim());
-      router.replace("/admin/applications");
+      router.replace("/admin/providers/applications");
     } catch (e) {
       setActionError((e as Error).message);
       setProcessing(false);
@@ -150,26 +151,35 @@ export default function ApplicationDetail({ id }: { id: number }) {
 
       {actionError && <p className="admin-error">{actionError}</p>}
 
-      {detail.status === "PENDING" && (
-        <div className="admin-actions">
-          <button
-            type="button"
-            className="btn btn--primary admin-actions__btn"
-            disabled={processing}
-            onClick={handleApprove}
-          >
-            승인
-          </button>
-          <button
-            type="button"
-            className="btn btn--outline admin-actions__btn"
-            disabled={processing}
-            onClick={() => setRejectOpen(true)}
-          >
-            반려
-          </button>
-        </div>
-      )}
+      {/* 승인/반려는 대기 중에만, 목록으로는 항상 — 같은 행 오른쪽 끝(공지·FAQ 폼과 같은 하단 버튼 문법) */}
+      <div className="admin-actions">
+        {detail.status === "PENDING" && (
+          <>
+            <button
+              type="button"
+              className="btn btn--primary admin-actions__btn"
+              disabled={processing}
+              onClick={handleApprove}
+            >
+              승인
+            </button>
+            <button
+              type="button"
+              className="btn btn--outline admin-actions__btn"
+              disabled={processing}
+              onClick={() => setRejectOpen(true)}
+            >
+              반려
+            </button>
+          </>
+        )}
+        <Link
+          href="/admin/providers/applications"
+          className="btn btn--outline admin-actions__btn admin-actions__btn--end"
+        >
+          목록으로
+        </Link>
+      </div>
 
       <Modal
         open={rejectOpen}

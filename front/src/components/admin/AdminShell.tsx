@@ -48,12 +48,21 @@ type MenuItem = {
 
 /**
  * 관리자 메뉴 — /admin만 정확 일치, 나머지는 프리픽스 일치(상세 페이지에서도 활성 유지).
- * 서비스 관리는 하위 메뉴(FAQ·문의사항)를 가진 그룹 — 상위 링크는 첫 하위로 가고
- * /admin/service 프리픽스로 활성 판정한다(/admin/service 직접 진입은 next.config redirects가 FAQ로 보낸다).
+ * 업체 관리(신청 심사·활동 업체)·서비스 관리(FAQ·문의사항)는 하위 메뉴를 가진 그룹 — 상위 링크는 첫 하위로 가고
+ * 그룹 프리픽스(/admin/providers, /admin/service)로 활성 판정한다(그룹 루트 직접 진입은 next.config redirects가 첫 하위로 보낸다).
  */
 const MENU_ITEMS: MenuItem[] = [
   { href: "/admin", label: "대시보드", icon: WidgetGridIcon, exact: true },
-  { href: "/admin/applications", label: "업체 신청", icon: ClipboardCheckIcon },
+  {
+    href: "/admin/providers/applications",
+    label: "업체 관리",
+    icon: ClipboardCheckIcon,
+    activePrefix: "/admin/providers",
+    children: [
+      { href: "/admin/providers/applications", label: "신청 심사" },
+      { href: "/admin/providers/active", label: "활동 업체" },
+    ],
+  },
   { href: "/admin/users", label: "회원", icon: UsersGroupIcon },
   { href: "/admin/notices", label: "공지사항", icon: BellIcon },
   {

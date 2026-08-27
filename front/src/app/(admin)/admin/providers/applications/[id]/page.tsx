@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import ApplicationDetail from "@/components/admin/ApplicationDetail";
 
 export const metadata: Metadata = { title: "신청 상세" };
@@ -13,9 +12,6 @@ export default async function AdminApplicationDetailPage({
   return (
     // 마이페이지 공통 문법 — 52rem 가운데 컬럼 안에 그룹 + hairline 행(카드 없음)
     <div className="mypage-column">
-      <Link href="/admin/applications" className="admin-back">
-        ← 목록으로
-      </Link>
       <h1 className="mypage-page__title">업체 신청 상세</h1>
       <p className="mypage-page__subtitle">
         신청 내용을 확인하고 승인 또는 반려해요.

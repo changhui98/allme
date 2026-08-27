@@ -293,3 +293,58 @@ export function answerInquiry(id: number, answer: string): Promise<void> {
     fallbackMessage: "답변 등록에 실패했습니다.",
   });
 }
+
+/* ---------- 활동 업체 관리 ---------- */
+
+/**
+ * 활동 업체 목록 행 — "활동 중"은 PROVIDER 역할 보유 기준. 업체명·사업자번호·승인일·승인자는
+ * 최신 승인 신청서에서 오며, 수동으로 역할이 부여된 회원(테스트 계정 등)은 전부 null.
+ */
+export type ActiveProviderSummary = {
+  userId: number;
+  loginId: string;
+  businessName: string | null;
+  businessRegistrationNumber: string | null;
+  approvedDate: string | null;
+  approvedByLoginId: string | null;
+};
+
+export type ActiveProviderDetail = {
+  userId: number;
+  loginId: string;
+  /** 최신 승인 신청서 — 없으면 null */
+  application: {
+    id: number;
+    businessName: string;
+    businessRegistrationNumber: string;
+    introduction: string;
+    contactPhone: string;
+    createdDate: string;
+    approvedDate: string | null;
+    approvedByLoginId: string | null;
+  } | null;
+};
+
+export function fetchActiveProviders(params: {
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<ActiveProviderSummary>> {
+  const query = new URLSearchParams();
+  query.set("page", String(params.page ?? 0));
+  query.set("size", String(params.size ?? 20));
+  return request(`/api/admin/providers?${query}`);
+}
+
+export function fetchActiveProvider(userId: number): Promise<ActiveProviderDetail> {
+  return request(`/api/admin/providers/${userId}`);
+}
+
+/** 업체 자격 해제 — PROVIDER 역할이 즉시 회수되고 사유는 이력으로 남는다. */
+export function revokeProvider(userId: number, reason: string): Promise<void> {
+  return request(`/api/admin/providers/${userId}/revoke`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reason }),
+    fallbackMessage: "업체 자격 해제에 실패했습니다.",
+  });
+}

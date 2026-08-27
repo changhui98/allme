@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     return [
       { source: "/support", destination: "/support/faq", permanent: false },
       { source: "/admin/service", destination: "/admin/service/faqs", permanent: false },
+      { source: "/admin/providers", destination: "/admin/providers/applications", permanent: false },
+      // 구 경로(업체 관리 그룹으로 이동하기 전) — 북마크·대시보드 링크 호환
+      { source: "/admin/applications", destination: "/admin/providers/applications", permanent: false },
+      { source: "/admin/applications/:id", destination: "/admin/providers/applications/:id", permanent: false },
       { source: "/mypage/received", destination: "/mypage/biz/received", permanent: false },
     ];
   },

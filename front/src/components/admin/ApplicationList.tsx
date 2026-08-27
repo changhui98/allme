@@ -65,7 +65,7 @@ export default function ApplicationList() {
     if (status) query.set("status", status);
     if (page > 0) query.set("page", String(page));
     const qs = query.toString();
-    router.replace(`/admin/applications${qs ? `?${qs}` : ""}`);
+    router.replace(`/admin/providers/applications${qs ? `?${qs}` : ""}`);
   };
 
   return (
@@ -116,12 +116,12 @@ export default function ApplicationList() {
                   key={application.id}
                   className="admin-table__row--link"
                   onClick={() =>
-                    router.push(`/admin/applications/${application.id}`)
+                    router.push(`/admin/providers/applications/${application.id}`)
                   }
                 >
                   <td>
                     <Link
-                      href={`/admin/applications/${application.id}`}
+                      href={`/admin/providers/applications/${application.id}`}
                       onClick={(e) => e.stopPropagation()}
                       className="admin-table__primary"
                     >
