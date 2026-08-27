@@ -16,8 +16,11 @@ export default function MypageInquiriesPage() {
             <h2 id="inquiries-list-title" className="mypage-group__title">
               문의 목록
             </h2>
-            <Link href="/support/inquiry" className="mypage-group__action">
-              새 문의
+            <Link
+              href="/support/inquiry"
+              className="mypage-group__action mypage-group__action--button"
+            >
+              1:1 문의하기
             </Link>
           </div>
           <MyInquiryList />

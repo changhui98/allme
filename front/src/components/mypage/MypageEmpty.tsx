@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 /**
- * 마이페이지 목록 빈 상태 — 게시판 도메인 API 연동 전 안내(연동 시 목록으로 교체).
+ * 마이페이지 목록 빈 상태 — 안내 문구 + 선택적 CTA 버튼(그룹 헤더에 같은 동선 버튼이 있으면 생략).
  * 스타일: styles/pages/mypage.css
  */
 export default function MypageEmpty({
@@ -10,15 +10,17 @@ export default function MypageEmpty({
   ctaHref,
 }: {
   message: string;
-  ctaLabel: string;
-  ctaHref: string;
+  ctaLabel?: string;
+  ctaHref?: string;
 }) {
   return (
     <div className="mypage-empty">
       <p className="mypage-empty__message">{message}</p>
-      <Link href={ctaHref} className="mypage-empty__cta">
-        {ctaLabel}
-      </Link>
+      {ctaLabel && ctaHref && (
+        <Link href={ctaHref} className="mypage-empty__cta">
+          {ctaLabel}
+        </Link>
+      )}
     </div>
   );
 }

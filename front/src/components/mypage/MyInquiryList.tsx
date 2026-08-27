@@ -44,11 +44,8 @@ export default function MyInquiryList() {
   if (!data) return <p className="mypage-group__note">불러오는 중…</p>;
   if (data.content.length === 0) {
     return (
-      <MypageEmpty
-        message="아직 보낸 문의가 없어요."
-        ctaLabel="1:1 문의하기"
-        ctaHref="/support/inquiry"
-      />
+      // 문의하기 버튼은 그룹 헤더에 하나만 둔다(빈 상태에 중복 노출하지 않음)
+      <MypageEmpty message="아직 보낸 문의가 없어요." />
     );
   }
 

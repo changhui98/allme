@@ -795,6 +795,25 @@ a.mypage-stats__item:hover .mypage-stats__value {
   flex-shrink: 0;
 }
 
+/* 헤더 액션의 버튼형 — 빈 상태 CTA(mypage-empty__cta)와 같은 외곽선 버튼 모양 */
+.mypage-group__action--button {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition-property: border-color, color;
+  transition-duration: 150ms;
+}
+
+.mypage-group__action--button:hover {
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
 .mypage-group__note {
   margin-top: 0.75rem;
   font-size: 0.875rem;
