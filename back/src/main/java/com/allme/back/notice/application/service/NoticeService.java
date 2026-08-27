@@ -86,6 +86,15 @@ public class NoticeService {
         return notice;
     }
 
+    /** 상세의 이전·다음 글 — 공개 공지 시간순, 없으면 null. 고정·정렬 옵션과 무관(섞으면 순환·중복). */
+    public record Neighbors(Notice previous, Notice next) { }
+
+    public Neighbors neighborsOf(Long id) {
+        return new Neighbors(
+            noticeRepository.findPreviousPublished(id).orElse(null),
+            noticeRepository.findNextPublished(id).orElse(null));
+    }
+
     /** 고정 공지가 항상 먼저, 그 안에서 최신순(id desc) 또는 조회순(viewCount desc, id desc). */
     static Sort sortOf(NoticeSort sort) {
         Sort pinnedFirst = Sort.by(Sort.Direction.DESC, "pinned");

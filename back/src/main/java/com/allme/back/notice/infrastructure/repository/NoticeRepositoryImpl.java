@@ -50,6 +50,16 @@ public class NoticeRepositoryImpl implements NoticeRepository {
     }
 
     @Override
+    public Optional<Notice> findPreviousPublished(Long id) {
+        return jpaRepository.findFirstByPublishedTrueAndDeletedDateIsNullAndIdLessThanOrderByIdDesc(id);
+    }
+
+    @Override
+    public Optional<Notice> findNextPublished(Long id) {
+        return jpaRepository.findFirstByPublishedTrueAndDeletedDateIsNullAndIdGreaterThanOrderByIdAsc(id);
+    }
+
+    @Override
     public void incrementViewCount(Long id) {
         jpaRepository.incrementViewCount(id);
     }

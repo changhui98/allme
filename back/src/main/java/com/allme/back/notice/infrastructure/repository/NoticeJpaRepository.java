@@ -19,6 +19,12 @@ public interface NoticeJpaRepository extends JpaRepository<Notice, Long> {
 
     Page<Notice> findByPublishedAndDeletedDateIsNull(boolean published, Pageable pageable);
 
+    /** 이전 글 — 공개 공지 중 id가 더 작은 것(먼저 올라온 글) */
+    Optional<Notice> findFirstByPublishedTrueAndDeletedDateIsNullAndIdLessThanOrderByIdDesc(Long id);
+
+    /** 다음 글 — 공개 공지 중 id가 더 큰 것(나중에 올라온 글) */
+    Optional<Notice> findFirstByPublishedTrueAndDeletedDateIsNullAndIdGreaterThanOrderByIdAsc(Long id);
+
     /*
      * 키워드 검색 — 제목·본문 부분 일치(대소문자 무시).
      * LIKE에 null을 바인딩하면 PostgreSQL이 bytea로 추론해 실패하므로(회원 검색 이력),

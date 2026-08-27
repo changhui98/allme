@@ -4,6 +4,7 @@ import com.allme.back.global.auth.SessionUsers;
 import com.allme.back.global.dto.PageResponse;
 import com.allme.back.notice.application.service.NoticeService;
 import com.allme.back.notice.domain.NoticeSort;
+import com.allme.back.notice.domain.entity.Notice;
 import com.allme.back.notice.presentation.dto.response.NoticeDetailResponse;
 import com.allme.back.notice.presentation.dto.response.NoticeSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,10 +35,12 @@ public class NoticeController {
             noticeService.getPublishedPage(q, sort, page, size).map(NoticeSummaryResponse::from));
     }
 
-    /** 공개 상세 — 열람 집계(24시간 중복 방지). 비공개·삭제·부재는 모두 404(N001). */
+    /** 공개 상세 — 열람 집계(24시간 중복 방지) + 이전·다음 글. 비공개·삭제·부재는 모두 404(N001). */
     @GetMapping("/{id}")
     public NoticeDetailResponse detail(@PathVariable Long id, HttpServletRequest request) {
-        return NoticeDetailResponse.from(noticeService.viewPublished(id, viewerKeyOf(request)));
+        Notice notice = noticeService.viewPublished(id, viewerKeyOf(request));
+        NoticeService.Neighbors neighbors = noticeService.neighborsOf(id);
+        return NoticeDetailResponse.from(notice, neighbors.previous(), neighbors.next());
     }
 
     /** 열람자 식별 — 로그인은 userId, 비로그인은 클라이언트 IP(프록시 뒤면 X-Forwarded-For 첫 값). */

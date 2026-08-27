@@ -21,6 +21,12 @@ public interface NoticeRepository {
     /** 공개 목록 — keyword가 null이면 검색 없음. 정렬(고정 우선 + 최신/조회순)은 pageable이 정한다. */
     Page<Notice> findPublishedPage(String keywordOrNull, Pageable pageable);
 
+    /** 상세의 이전 글 — 공개 공지 시간순(id 작은 쪽), 고정·정렬 옵션 무관 */
+    Optional<Notice> findPreviousPublished(Long id);
+
+    /** 상세의 다음 글 — 공개 공지 시간순(id 큰 쪽) */
+    Optional<Notice> findNextPublished(Long id);
+
     /** 조회수 +1 (원자 UPDATE). 호출 후 같은 트랜잭션에서 findById 하면 증가된 값을 읽는다. */
     void incrementViewCount(Long id);
 

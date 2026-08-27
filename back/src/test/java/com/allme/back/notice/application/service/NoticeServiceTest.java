@@ -56,9 +56,21 @@ class NoticeServiceTest {
         }
 
         @Override
+        public Optional<Notice> findPreviousPublished(Long id) {
+            return Optional.ofNullable(previous);
+        }
+
+        @Override
+        public Optional<Notice> findNextPublished(Long id) {
+            return Optional.empty();
+        }
+
+        @Override
         public void incrementViewCount(Long id) {
             incrementCalls++;
         }
+
+        Notice previous;
     }
 
     private static final UserAdminQueryRepository NO_USERS = new UserAdminQueryRepository() {
@@ -119,6 +131,18 @@ class NoticeServiceTest {
             .containsExactly("pinned", "viewCount", "id");
         assertThat(NoticeService.sortOf(NoticeSort.VIEWS).stream().map(Sort.Order::getDirection))
             .containsOnly(Sort.Direction.DESC);
+    }
+
+    @Test
+    @DisplayName("이전 글만 있으면 previous는 채워지고 next는 null이다")
+    void neighborsOf_previousOnly() {
+        StubNoticeRepository repository = new StubNoticeRepository();
+        repository.previous = Notice.create(1L, "이전 공지", "본문", true, false);
+
+        NoticeService.Neighbors neighbors = serviceWith(repository, true).neighborsOf(2L);
+
+        assertThat(neighbors.previous().getTitle()).isEqualTo("이전 공지");
+        assertThat(neighbors.next()).isNull();
     }
 
     @Test
