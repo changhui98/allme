@@ -860,6 +860,16 @@ a.mypage-stats__item:hover .mypage-stats__value {
   font-weight: 500;
 }
 
+/* 여러 줄 값(문의 본문·답변) 행 — 라벨을 첫 줄에 맞추고 줄바꿈·긴 문자열 보존 */
+.mypage-row--multiline {
+  align-items: flex-start;
+}
+
+.mypage-row--multiline .mypage-row__value {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 40rem) {
   .mypage-row__label {
     width: 5rem;

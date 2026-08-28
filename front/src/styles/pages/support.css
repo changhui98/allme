@@ -581,16 +581,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- inquiry-detail: 내 문의 상세 — 본문·답변 블록 ---------- */
-
-.inquiry-detail__text {
-  padding: 0.875rem 0.25rem;
-  font-size: 0.9375rem;
-  line-height: 1.75;
-  color: var(--foreground);
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
+/* ---------- inquiry-detail: 내 문의 상세 — 본문·답변은 mypage-row--multiline 행으로 표시 ---------- */
 
 .inquiry-detail__pending {
   padding: 0.875rem 0.25rem;

@@ -8,7 +8,7 @@ import {
   type MyInquiryDetail as MyInquiryDetailData,
 } from "@/lib/support";
 
-/** 내 문의 상세 — 문의 내용 그룹 + 답변 그룹(마이페이지 공통 문법). 타인 문의는 서버가 404(I001). */
+/** 내 문의 상세 — 문의 내용 그룹 + 답변 그룹(마이페이지 공통 문법, 본문도 "내용" 라벨 행). 타인 문의는 서버가 404(I001). */
 export default function MyInquiryDetail({ id }: { id: number }) {
   const [inquiry, setInquiry] = useState<MyInquiryDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +55,11 @@ export default function MyInquiryDetail({ id }: { id: number }) {
             <dt className="mypage-row__label">제목</dt>
             <dd className="mypage-row__value">{inquiry.title}</dd>
           </div>
+          <div className="mypage-row mypage-row--multiline">
+            <dt className="mypage-row__label">내용</dt>
+            <dd className="mypage-row__value">{inquiry.content}</dd>
+          </div>
         </dl>
-        <p className="inquiry-detail__text">{inquiry.content}</p>
       </section>
 
       <section className="mypage-group" aria-labelledby="my-inquiry-answer-title">
@@ -74,8 +77,11 @@ export default function MyInquiryDetail({ id }: { id: number }) {
                   {inquiry.answeredDate ? formatDateTime(inquiry.answeredDate) : "-"}
                 </dd>
               </div>
+              <div className="mypage-row mypage-row--multiline">
+                <dt className="mypage-row__label">내용</dt>
+                <dd className="mypage-row__value">{inquiry.answer}</dd>
+              </div>
             </dl>
-            <p className="inquiry-detail__text">{inquiry.answer}</p>
           </>
         ) : (
           <p className="inquiry-detail__pending">
