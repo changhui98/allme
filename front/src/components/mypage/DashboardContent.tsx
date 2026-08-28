@@ -1,17 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { fetchMyServiceRequests } from "@/lib/service-requests";
 import { useMe } from "@/lib/use-me";
 import { displayName, hasRole } from "@/lib/user";
 
 /**
  * 대시보드 본문 — 인사말 + 거래 현황 3열 스트립 + 최근 활동 그룹 (내 정보와 같은 카드 없는 컬럼 문법).
- * 수치는 게시판·예약 도메인 API 연동 전이라 0 고정(연동 시 실데이터로 교체).
+ * 요청한 서비스 수는 내 요청 목록의 totalElements로 채우고, 거래 수치는 예약 도메인 연동 전이라 0 고정.
  * 셸(MypageShell)이 세션을 보장하므로 me 유무만 가드한다.
  * 스타일: styles/pages/mypage.css
  */
 export default function DashboardContent() {
   const { me } = useMe();
+  const [requestCount, setRequestCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!me) return;
+    let cancelled = false;
+    fetchMyServiceRequests({ page: 0, size: 1 })
+      .then((page) => {
+        if (!cancelled) setRequestCount(page.totalElements);
+      })
+      .catch(() => {
+        if (!cancelled) setRequestCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [me]);
 
   if (!me) return null;
 
@@ -20,11 +38,11 @@ export default function DashboardContent() {
       <h1 className="mypage-page__title">{displayName(me)}님, 안녕하세요.</h1>
       <p className="mypage-page__subtitle">오늘의 거래 현황이에요.</p>
 
-      {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}
+      {/* 거래 루프 기준 스탯 — 거래 수치는 예약 도메인 연동 전 0 고정 */}
       <div className="mypage-stats">
         <Link href="/mypage/requests" className="mypage-stats__item">
           <span className="mypage-stats__label">요청한 서비스</span>
-          <span className="mypage-stats__value">0</span>
+          <span className="mypage-stats__value">{requestCount ?? "–"}</span>
         </Link>
         <div className="mypage-stats__item">
           <span className="mypage-stats__label">진행 중 거래</span>

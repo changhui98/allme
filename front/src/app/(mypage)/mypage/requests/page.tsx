@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import MypageEmpty from "@/components/mypage/MypageEmpty";
+import Link from "next/link";
+import MyServiceRequestList from "@/components/mypage/MyServiceRequestList";
 
 export const metadata: Metadata = { title: "요청한 서비스" };
 
-/** 사용자 관점 — 내가 맡긴 서비스 요청 목록. (게시판 API 연동 전 빈 상태) */
+/** 사용자 관점 — 내가 맡긴 서비스 요청 목록. 요청 등록은 그룹 헤더 버튼(내 문의의 1:1 문의하기와 같은 슬롯). */
 export default function MypageRequestsPage() {
   return (
     <div className="mypage-column">
@@ -17,12 +18,14 @@ export default function MypageRequestsPage() {
             <h2 id="requests-list-title" className="mypage-group__title">
               요청 목록
             </h2>
+            <Link
+              href="/mypage/requests/new"
+              className="mypage-group__action mypage-group__action--button"
+            >
+              요청 등록
+            </Link>
           </div>
-          <MypageEmpty
-            message="아직 요청한 서비스가 없어요."
-            ctaLabel="해주세요 둘러보기"
-            ctaHref="/requests"
-          />
+          <MyServiceRequestList />
         </section>
       </div>
     </div>
