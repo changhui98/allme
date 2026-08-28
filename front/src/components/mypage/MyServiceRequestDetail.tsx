@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import ReceivedProposalList from "@/components/mypage/ReceivedProposalList";
 import { API_BASE_URL } from "@/lib/api";
 import { getCategoryByCode } from "@/lib/categories";
 import { formatDateTime } from "@/lib/format";
@@ -15,12 +16,14 @@ import {
 } from "@/lib/service-requests";
 
 /**
- * 내 요청 상세 — 요청 정보 그룹(mypage-rows) + 참고 사진 그룹. 타인 요청은 서버가 404(R001).
- * 상세 주소는 본인에게만 내려오는 값이라 여기서만 보여준다.
+ * 내 요청 상세 — 요청 정보 그룹(mypage-rows) + 참고 사진 그룹 + 받은 제안 그룹. 타인 요청은 서버가 404(R001).
+ * 상세 주소는 본인에게만 내려오는 값이라 여기서만 보여준다. 제안 수락·거절 후엔 version을 올려 둘 다 다시 불러온다.
  */
 export default function MyServiceRequestDetail({ id }: { id: number }) {
   const [item, setItem] = useState<MyServiceRequestDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
+  const reload = useCallback(() => setVersion((v) => v + 1), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +37,7 @@ export default function MyServiceRequestDetail({ id }: { id: number }) {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, version]);
 
   if (error) return <p className="mypage-group__error">{error}</p>;
   if (!item) return <p className="mypage-group__note">불러오는 중…</p>;
@@ -138,6 +141,20 @@ export default function MyServiceRequestDetail({ id }: { id: number }) {
         ) : (
           <p className="mypage-group__note">첨부한 사진이 없어요.</p>
         )}
+      </section>
+
+      <section className="mypage-group" aria-labelledby="my-request-proposals-title">
+        <div className="mypage-group__header">
+          <h2 id="my-request-proposals-title" className="mypage-group__title">
+            받은 제안 <span className="mypage-group__count">{item.proposalCount}</span>
+          </h2>
+        </div>
+        <ReceivedProposalList
+          requestId={item.id}
+          requestOpen={item.status === "OPEN"}
+          version={version}
+          onChanged={reload}
+        />
       </section>
     </div>
   );

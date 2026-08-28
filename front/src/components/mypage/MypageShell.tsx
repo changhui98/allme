@@ -13,6 +13,7 @@ import {
   BuildingsIcon,
   CaseIcon,
   ChatRoundLineIcon,
+  ClipboardCheckIcon,
   ClipboardListIcon,
   HamburgerIcon,
   HomeIcon,
@@ -59,6 +60,7 @@ const BIZ_MENU_ITEMS: MenuItem[] = [
   { href: "/mypage/biz", label: "업체 대시보드", icon: ShopIcon, exact: true },
   { href: "/mypage/biz/services", label: "내 서비스", icon: CaseIcon },
   { href: "/mypage/biz/received", label: "받은 요청", icon: InboxIcon },
+  { href: "/mypage/biz/proposals", label: "보낸 제안", icon: ClipboardCheckIcon },
   { href: "/mypage/biz/profile", label: "업체 정보", icon: BuildingsIcon },
 ];
 

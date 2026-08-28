@@ -42,6 +42,8 @@ export type MyServiceRequestSummary = {
   budgetMax: number | null;
   budgetNegotiable: boolean;
   status: ServiceRequestStatus;
+  /** 받은 제안 수 */
+  proposalCount: number;
   createdDate: string;
 };
 
@@ -56,8 +58,55 @@ export type MyServiceRequestDetail = MyServiceRequestSummary & {
   addressDetail: string | null;
   unitType: UnitType;
   unitValue: number | null;
+  /** 수락한 제안 id — 마감(CLOSED) 시 기록 */
+  acceptedProposalId: number | null;
   attachments: ServiceRequestAttachment[];
 };
+
+/* ---------- 공개 게시판("해주세요") — 비로그인 포함 누구나 조회 ---------- */
+
+/** 공개 목록 행 — 상세 주소·본문 없음, 작성자는 닉네임만 */
+export type OpenServiceRequestSummary = {
+  id: number;
+  category: ServiceCategoryCode;
+  title: string;
+  region: RegionId;
+  preferredDate: string | null;
+  scheduleNegotiable: boolean;
+  budgetMin: number | null;
+  budgetMax: number | null;
+  budgetNegotiable: boolean;
+  status: ServiceRequestStatus;
+  /** 탈퇴 회원 등 닉네임이 없으면 null */
+  authorNickname: string | null;
+  proposalCount: number;
+  createdDate: string;
+};
+
+export type OpenServiceRequestDetail = OpenServiceRequestSummary & {
+  content: string;
+  unitType: UnitType;
+  unitValue: number | null;
+  /** 조회자가 작성자 본인인지(비로그인은 false) */
+  mine: boolean;
+  attachments: ServiceRequestAttachment[];
+};
+
+export function fetchOpenServiceRequests(params: {
+  category?: ServiceCategoryCode;
+  page?: number;
+  size?: number;
+}): Promise<PageResponse<OpenServiceRequestSummary>> {
+  const query = new URLSearchParams();
+  if (params.category) query.set("category", params.category);
+  query.set("page", String(params.page ?? 0));
+  query.set("size", String(params.size ?? 20));
+  return request(`/api/service-requests/open?${query}`);
+}
+
+export function fetchOpenServiceRequest(id: number): Promise<OpenServiceRequestDetail> {
+  return request(`/api/service-requests/open/${id}`);
+}
 
 export type UploadedAttachment = {
   tempFileId: number;
@@ -128,8 +177,8 @@ export function manwonToWon(manwon: number): number {
   return manwon * WON_PER_MANWON;
 }
 
-/** 원 → "50만원" (만원 미만 단수는 "3,500원"처럼 원 단위로) */
-function formatWon(won: number): string {
+/** 원 → "50만원" (만원 미만 단수는 "3,500원"처럼 원 단위로). 제안 금액 표시에도 쓴다 */
+export function formatWon(won: number): string {
   if (won >= WON_PER_MANWON && won % WON_PER_MANWON === 0) {
     return `${(won / WON_PER_MANWON).toLocaleString("ko-KR")}만원`;
   }

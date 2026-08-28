@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { fetchMyProposals } from "@/lib/proposals";
 import { useMe } from "@/lib/use-me";
 import { displayName } from "@/lib/user";
 
@@ -12,13 +14,30 @@ import { displayName } from "@/lib/user";
  */
 export default function BizDashboardContent() {
   const { me } = useMe();
+  const [proposalCount, setProposalCount] = useState<number | null>(null);
+
+  // 보낸 제안 수 — 내 제안 목록의 totalElements. 나머지 수치는 게시판·예약 도메인 연동 전 0 고정
+  useEffect(() => {
+    if (!me) return;
+    let cancelled = false;
+    fetchMyProposals({ page: 0, size: 1 })
+      .then((page) => {
+        if (!cancelled) setProposalCount(page.totalElements);
+      })
+      .catch(() => {
+        if (!cancelled) setProposalCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [me]);
 
   if (!me) return null;
 
   return (
     <div className="mypage-column">
       <h1 className="mypage-page__title">{displayName(me)}님의 업체 공간이에요.</h1>
-      <p className="mypage-page__subtitle">내 서비스와 받은 요청 현황이에요.</p>
+      <p className="mypage-page__subtitle">내 서비스와 보낸 제안 현황이에요.</p>
 
       {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}
       <div className="mypage-stats">
@@ -26,9 +45,9 @@ export default function BizDashboardContent() {
           <span className="mypage-stats__label">내 서비스</span>
           <span className="mypage-stats__value">0</span>
         </Link>
-        <Link href="/mypage/biz/received" className="mypage-stats__item">
-          <span className="mypage-stats__label">받은 요청</span>
-          <span className="mypage-stats__value">0</span>
+        <Link href="/mypage/biz/proposals" className="mypage-stats__item">
+          <span className="mypage-stats__label">보낸 제안</span>
+          <span className="mypage-stats__value">{proposalCount ?? "–"}</span>
         </Link>
         <div className="mypage-stats__item">
           <span className="mypage-stats__label">진행 중 거래</span>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import CategoryTabs from "@/components/board/CategoryTabs";
-import RequestCard from "@/components/board/RequestCard";
+import RequestBoardList from "@/components/board/RequestBoardList";
 import { isCategoryId } from "@/lib/categories";
-import { getRequestPosts } from "@/lib/mock/request-posts";
 
 export const metadata: Metadata = {
   title: "해주세요",
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * 해주세요 — 사용자가 올린 요청 글 목록. 업체가 둘러보고 제안한다.
- * 카테고리 필터는 ?category= 쿼리로 표현하고 서버에서 필터링해 SSR한다.
+ * 해주세요 — 사용자가 올린 요청 글 목록(공개 API). 업체가 둘러보고 제안한다.
+ * 카테고리 필터는 ?category=(슬러그) 쿼리로 표현한다(탭은 링크). 목록 자체는 클라이언트에서 불러온다
+ * (공지 목록과 같은 패턴 — 서버 fetch는 컨테이너 내부 API URL 설정이 필요해 후속).
  * 스타일: styles/pages/board.css
  */
 export default async function RequestsPage({
@@ -26,7 +27,6 @@ export default async function RequestsPage({
     typeof category === "string" && isCategoryId(category)
       ? category
       : undefined;
-  const posts = getRequestPosts(active);
 
   return (
     <main className="page-container board-page">
@@ -39,19 +39,9 @@ export default async function RequestsPage({
         <CategoryTabs basePath="/requests" active={active} />
       </div>
 
-      {posts.length === 0 ? (
-        <p className="board-page__empty">
-          이 카테고리에 올라온 요청이 아직 없어요.
-        </p>
-      ) : (
-        <ul className="card-grid">
-          {posts.map((post) => (
-            <li key={post.id}>
-              <RequestCard post={post} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <Suspense fallback={<p className="board-page__empty">불러오는 중…</p>}>
+        <RequestBoardList />
+      </Suspense>
     </main>
   );
 }
