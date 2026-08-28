@@ -28,6 +28,10 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     @Query("select u.id, u.loginId from User u where u.id in :userIds")
     List<Object[]> findIdAndLoginIdByIdIn(@Param("userIds") Collection<Long> userIds);
 
+    /** 대외 표시용 — 평문 컬럼(id·nickname)만 조회해 암호화 컬럼 복호화를 피한다 */
+    @Query("select u.id, u.nickname from User u where u.id in :userIds")
+    List<Object[]> findIdAndNicknameByIdIn(@Param("userIds") Collection<Long> userIds);
+
     /** 관리자 회원 목록 전체 — 생성자 프로젝션으로 암호화 컬럼 미로딩. */
     @Query(
         value = """
