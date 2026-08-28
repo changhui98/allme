@@ -1,0 +1,115 @@
+/*
+ * select: 공용 셀렉트 (components/common/Select) — 네이티브 <select> 대신 트리거 버튼 + listbox 팝오버.
+ * 트리거는 폼 입력 박스 문법(mypage-account__bank-btn·request-form__input과 동일 기하)이고,
+ * 화살표(alt-arrow-right)는 오른쪽 패딩 안쪽에 두어 테두리에서 떨어뜨리며 열리면 90° 회전해 아래를 향한다.
+ * 색은 토큰만 써서 다크·액센트 테마에 자동 대응한다. 페이지별 기하 차이(관리자 폼 등)는 페이지 CSS가 덮어쓴다.
+ */
+
+.select {
+  position: relative;
+  width: 100%;
+}
+
+.select__trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  background-color: var(--background);
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
+}
+
+.select__trigger:focus-visible,
+.select.is-open .select__trigger {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 15%, transparent);
+}
+
+.select__trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.select__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select__value--placeholder {
+  color: var(--muted);
+}
+
+/* 닫힘 ">" → 열림 "v" */
+.select__chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--muted);
+  transition-property: rotate;
+  transition-duration: 150ms;
+}
+
+.select.is-open .select__chevron {
+  rotate: 90deg;
+}
+
+.select__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.375rem);
+  z-index: 50;
+  max-height: 16rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: var(--background);
+  padding: 0.375rem;
+  box-shadow:
+    0 10px 25px -5px #00000026,
+    0 4px 10px -6px #0000001a;
+}
+
+.select__option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  color: var(--foreground);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.select__option:hover,
+.select__option:focus-visible {
+  background-color: var(--surface);
+}
+
+.select__option.is-selected {
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select__trigger,
+  .select__chevron {
+    transition: none;
+  }
+}

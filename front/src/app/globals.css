@@ -26,6 +26,7 @@
 @import "../styles/components/theme-menu.css";
 @import "../styles/components/modal.css";
 @import "../styles/components/switch.css";
+@import "../styles/components/select.css"; /* 공용 셀렉트(트리거 + listbox 팝오버) — 페이지 CSS가 기하를 덮어쓸 수 있게 pages 앞 */
 @import "../styles/pages/home.css";
 @import "../styles/pages/board.css";
 @import "../styles/pages/provider.css";

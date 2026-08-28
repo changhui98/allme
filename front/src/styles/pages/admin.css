@@ -556,8 +556,7 @@
 }
 
 .admin-form__input,
-.admin-form__textarea,
-.admin-form__select {
+.admin-form__textarea {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
@@ -583,17 +582,21 @@
 }
 
 .admin-form__input:focus,
-.admin-form__textarea:focus,
-.admin-form__select:focus {
+.admin-form__textarea:focus {
   outline: 2px solid color-mix(in oklab, var(--primary) 45%, transparent);
   outline-offset: 0;
   border-color: var(--primary);
 }
 
 .admin-form__input:disabled,
-.admin-form__textarea:disabled,
-.admin-form__select:disabled {
+.admin-form__textarea:disabled {
   opacity: 0.6;
+}
+
+/* 공용 셀렉트(select.css) 트리거를 관리자 입력 박스 기하에 맞춘다 */
+.admin-form .select__trigger {
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
 }
 
 /* 짧은 입력(노출 순서 등)은 폭을 제한 */

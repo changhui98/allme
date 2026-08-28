@@ -240,3 +240,12 @@ export function ChatRoundLineIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** alt-arrow-right (svgrepo id 524356) — 셀렉트 트리거 화살표(열리면 CSS로 90° 회전해 아래를 향한다) */
+export function AltArrowRightIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 5L15 12L9 19" strokeLinecap="round" strokeLinejoin="round" />
+    </Icon>
+  );
+}

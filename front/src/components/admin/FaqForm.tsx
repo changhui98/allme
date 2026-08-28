@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import Modal from "@/components/common/Modal";
+import Select from "@/components/common/Select";
 import {
   createFaq,
   deleteFaq,
@@ -113,19 +114,13 @@ export default function FaqForm({ id }: { id?: number }) {
             <label htmlFor="faq-category" className="admin-form__label">
               분류
             </label>
-            <select
+            <Select
               id="faq-category"
               value={category}
-              onChange={(e) => setCategory(e.target.value as FaqCategory)}
+              onChange={(v) => setCategory(v as FaqCategory)}
+              options={FAQ_CATEGORIES.map((c) => ({ value: c, label: FAQ_CATEGORY_LABEL[c] }))}
               disabled={submitting}
-              className="admin-form__select"
-            >
-              {FAQ_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {FAQ_CATEGORY_LABEL[c]}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div className="admin-form__field">
             <label htmlFor="faq-order" className="admin-form__label">
