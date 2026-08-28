@@ -16,6 +16,11 @@
     color-mix(in oklab, var(--foreground) 25%, transparent);
 }
 
+/* 정보량이 많은 모달(업체 정보 등) */
+.modal--wide {
+  width: min(40rem, calc(100vw - 2rem));
+}
+
 /* 변수 미지원 구형 브라우저용 폴백 → 아래 color-mix가 덮어쓴다 */
 .modal::backdrop {
   background-color: rgb(0 0 0 / 0.4);

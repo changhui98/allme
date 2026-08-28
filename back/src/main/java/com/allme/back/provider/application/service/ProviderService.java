@@ -1,5 +1,6 @@
 package com.allme.back.provider.application.service;
 
+import com.allme.back.file.application.service.FileService;
 import com.allme.back.global.exception.AppException;
 import com.allme.back.provider.domain.ProviderErrorCode;
 import com.allme.back.provider.domain.entity.ProviderApplication;
@@ -39,6 +40,7 @@ public class ProviderService {
     private final ProviderRevocationRepository revocationRepository;
     private final UserRepository userRepository;
     private final UserAdminQueryRepository userAdminQueryRepository;
+    private final FileService fileService;
 
     /** 활동 업체 목록 — PROVIDER 보유 회원, 최신순(id desc). 개인정보 컬럼은 로딩하지 않는 프로젝션. */
     public Page<AdminUserRow> getActivePage(int page, int size) {
@@ -87,6 +89,23 @@ public class ProviderService {
         revocationRepository.save(ProviderRevocation.create(userId, applicationId, reason, adminUserId));
     }
 
+    /**
+     * 공개 업체 프로필 — 제안을 받은 클라이언트 등 누구나 보는 정보(닉네임·프로필 사진·업체명·소개·활동 시작일).
+     * PROVIDER 미보유·탈퇴면 P006. 사업자번호·연락처·loginId·실명은 응답 DTO가 내리지 않는다.
+     */
+    public PublicProfile getPublicProfile(Long userId) {
+        requireProviderRole(userId);
+        User user = userRepository.findById(userId)
+            .filter(found -> !found.isDeleted())
+            .orElseThrow(() -> new AppException(ProviderErrorCode.NOT_ACTIVE_PROVIDER));
+        String profileImagePath = user.getProfileImageFileId() != null
+            ? fileService.getStoredPath(user.getProfileImageFileId())
+            : null;
+        return new PublicProfile(
+            userId, user.getNickname(), profileImagePath,
+            applicationRepository.findLatestApprovedByUserId(userId).orElse(null));
+    }
+
     /** 표시용 loginId 배치 조회 — 컨트롤러의 응답 조립용. */
     public Map<Long, String> loginIdsOf(Collection<Long> userIds) {
         return userAdminQueryRepository.findLoginIdsByUserIds(userIds);
@@ -102,5 +121,10 @@ public class ProviderService {
 
     /** 활동 업체 조회 결과 — application은 최신 승인 신청서(없으면 null). */
     public record ActiveProvider(Long userId, String loginId, ProviderApplication application) { }
+
+    /** 공개 프로필 조회 결과 — application은 최신 승인 신청서(수동 역할 부여 회원은 null). */
+    public record PublicProfile(
+        Long userId, String nickname, String profileImagePath, ProviderApplication application
+    ) { }
 
 }

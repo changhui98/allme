@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PortfolioGrid from "@/components/provider/PortfolioGrid";
+import ProviderPublicProfile from "@/components/provider/ProviderPublicProfile";
 import ProviderCtaCard from "@/components/provider/ProviderCtaCard";
 import ProviderHero from "@/components/provider/ProviderHero";
 import ReviewList from "@/components/provider/ReviewList";
@@ -8,6 +9,11 @@ import { getCategoryLabel } from "@/lib/categories";
 import { formatPriceFrom } from "@/lib/format";
 import { getProvider, getProviders } from "@/lib/mock/providers";
 import { getServicePostsByProvider } from "@/lib/mock/service-posts";
+
+/** 실제 업체는 회원 id(숫자)로 접근한다 — 목업 슬러그(p1…)와 구분 */
+function isRealProviderId(id: string): boolean {
+  return /^\d+$/.test(id);
+}
 
 /** 목업 업체 전체를 빌드 시점에 정적 생성한다 (업체 상세는 SEO 필수). */
 export function generateStaticParams() {
@@ -20,6 +26,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  if (isRealProviderId(id)) return { title: "업체 정보" };
   const provider = getProvider(id);
   if (!provider) return { title: "업체를 찾을 수 없어요" };
   return {
@@ -35,6 +42,14 @@ export default async function ProviderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  // 숫자 id는 실제 업체(회원 id) — 공개 프로필 API로 렌더. 목업 업체(p1…)는 아래 서버 렌더 그대로.
+  if (isRealProviderId(id)) {
+    return (
+      <main className="page-container provider-page provider-page--real">
+        <ProviderPublicProfile userId={Number(id)} />
+      </main>
+    );
+  }
   const provider = getProvider(id);
   if (!provider) notFound();
 

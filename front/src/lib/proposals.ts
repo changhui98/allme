@@ -20,7 +20,10 @@ export const PROPOSAL_STATUS_LABEL: Record<ProposalStatus, string> = {
 export type ReceivedProposal = {
   id: number;
   providerUserId: number;
+  /** 업체명(최신 승인 신청서), 없으면 닉네임 */
   providerName: string | null;
+  /** 항상 닉네임(탈퇴 회원은 null) */
+  providerNickname: string | null;
   /** 원 단위 */
   amount: number;
   message: string;

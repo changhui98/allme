@@ -680,3 +680,29 @@
     display: none;
   }
 }
+
+/* ---------- 실제 업체 공개 페이지(회원 id) — ProviderPublicProfile. 하단 CTA 바가 없어 여백을 줄이고 본문은 단일 컬럼 ---------- */
+
+.provider-page--real {
+  padding-bottom: 2rem;
+}
+
+.provider-page__main--single {
+  margin-top: 2rem;
+}
+
+.provider-page__empty {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.provider-page__back-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+

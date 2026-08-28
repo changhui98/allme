@@ -23,6 +23,7 @@ export default function Modal({
   actions,
   onClose,
   closeOnBackdrop = true,
+  size = "default",
 }: {
   open: boolean;
   title: string;
@@ -33,6 +34,8 @@ export default function Modal({
   onClose: () => void;
   /** 패널 밖(백드롭) 클릭으로 닫기 허용 여부 */
   closeOnBackdrop?: boolean;
+  /** wide: 정보량이 많은 모달(업체 정보 등) — 폭 40rem */
+  size?: "default" | "wide";
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -57,7 +60,7 @@ export default function Modal({
   return (
     <dialog
       ref={ref}
-      className="modal"
+      className={`modal${size === "wide" ? " modal--wide" : ""}`}
       aria-labelledby={titleId}
       onClose={onClose}
       onClick={handleClick}

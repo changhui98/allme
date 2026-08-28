@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
 import MypageEmpty from "@/components/mypage/MypageEmpty";
+import ProviderProfileModal from "@/components/mypage/ProviderProfileModal";
 import { formatDateTime } from "@/lib/format";
 import {
   PROPOSAL_STATUS_LABEL,
@@ -14,7 +15,8 @@ import {
 import { formatWon } from "@/lib/service-requests";
 
 /**
- * 내 요청에 온 제안 목록 — 업체명·금액·메시지·상태. 요청이 모집 중이고 제안이 대기 중이면 수락/거절 버튼.
+ * 내 요청에 온 제안 목록 — 업체명(+닉네임)·금액·메시지·상태. 업체명을 누르면 업체 정보 모달(ProviderProfileModal).
+ * "메시지 보내기"는 메시지 기능 전까지 비활성 자리. 요청이 모집 중이고 제안이 대기 중이면 수락/거절 버튼.
  * 수락은 확인 모달을 거치며(요청 마감 + 나머지 자동 거절), 처리 후 onChanged로 부모(요청 상세)를 갱신한다.
  * 스타일: styles/pages/mypage.css(proposal-list·proposal-status)
  */
@@ -35,6 +37,7 @@ export default function ReceivedProposalList({
   const [pending, setPending] = useState<{ action: "accept" | "reject"; proposal: ReceivedProposal } | null>(null);
   const [processing, setProcessing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [profileUserId, setProfileUserId] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,7 +81,19 @@ export default function ReceivedProposalList({
         {items.map((proposal) => (
           <li key={proposal.id} className="proposal-list__item">
             <div className="proposal-list__head">
-              <span className="proposal-list__provider">{proposal.providerName ?? "탈퇴한 업체"}</span>
+              <button
+                type="button"
+                onClick={() => setProfileUserId(proposal.providerUserId)}
+                className="proposal-list__provider"
+                title="업체 정보 보기"
+              >
+                <span className="proposal-list__provider-name">
+                  {proposal.providerName ?? proposal.providerNickname ?? "탈퇴한 업체"}
+                </span>
+                {proposal.providerNickname && proposal.providerName !== proposal.providerNickname && (
+                  <span className="proposal-list__nickname">{proposal.providerNickname}</span>
+                )}
+              </button>
               <span className="proposal-list__amount">{formatWon(proposal.amount)}</span>
               <span className={`proposal-status proposal-status--${proposal.status.toLowerCase()}`}>
                 {PROPOSAL_STATUS_LABEL[proposal.status]}
@@ -89,28 +104,40 @@ export default function ReceivedProposalList({
               <time dateTime={proposal.createdDate} className="proposal-list__date">
                 {formatDateTime(proposal.createdDate)}
               </time>
-              {requestOpen && proposal.status === "PENDING" && (
-                <div className="proposal-list__actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline proposal-list__btn"
-                    onClick={() => setPending({ action: "reject", proposal })}
-                  >
-                    거절
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn--primary proposal-list__btn"
-                    onClick={() => setPending({ action: "accept", proposal })}
-                  >
-                    수락
-                  </button>
-                </div>
-              )}
+              <div className="proposal-list__actions">
+                <button
+                  type="button"
+                  className="btn btn--outline proposal-list__btn"
+                  disabled
+                  title="메시지 기능은 준비 중이에요"
+                >
+                  메시지 보내기
+                </button>
+                {requestOpen && proposal.status === "PENDING" && (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn--outline proposal-list__btn"
+                      onClick={() => setPending({ action: "reject", proposal })}
+                    >
+                      거절
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn--primary proposal-list__btn"
+                      onClick={() => setPending({ action: "accept", proposal })}
+                    >
+                      수락
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </li>
         ))}
       </ul>
+
+      <ProviderProfileModal userId={profileUserId} onClose={() => setProfileUserId(null)} />
 
       <Modal
         open={pending !== null}
