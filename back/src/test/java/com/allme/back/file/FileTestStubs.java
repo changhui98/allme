@@ -1,12 +1,14 @@
 package com.allme.back.file;
 
 import com.allme.back.file.application.port.FileStoragePort;
+import com.allme.back.file.domain.FilePurpose;
 import com.allme.back.file.domain.entity.UploadFile;
 import com.allme.back.file.domain.entity.UploadTempFile;
 import com.allme.back.file.domain.repository.UploadFileRepository;
 import com.allme.back.file.domain.repository.UploadTempFileRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,11 @@ public final class FileTestStubs {
         @Override
         public Optional<UploadFile> findById(Long id) {
             return Optional.ofNullable(store.get(id));
+        }
+
+        @Override
+        public List<UploadFile> findAllByIdIn(Collection<Long> ids) {
+            return ids.stream().map(store::get).filter(f -> f != null).toList();
         }
 
         @Override
@@ -70,8 +77,11 @@ public final class FileTestStubs {
         }
 
         @Override
-        public List<UploadTempFile> findAllByCreatedDateBefore(LocalDateTime threshold) {
+        public List<UploadTempFile> findAllByPurposeAndCreatedDateBefore(
+            FilePurpose purpose, LocalDateTime threshold
+        ) {
             return store.values().stream()
+                .filter(t -> t.getPurpose() == purpose)
                 .filter(t -> t.getCreatedDate() != null && t.getCreatedDate().isBefore(threshold))
                 .toList();
         }

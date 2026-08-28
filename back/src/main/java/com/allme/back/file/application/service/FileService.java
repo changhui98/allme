@@ -10,9 +10,11 @@ import com.allme.back.file.domain.repository.UploadTempFileRepository;
 import com.allme.back.global.exception.AppException;
 import java.security.SecureRandom;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,9 +44,6 @@ public class FileService {
     private static final String RANDOM_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
     private static final int RANDOM_SUFFIX_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
-
-    /** 이 시간을 넘긴 임시 레코드는 실패 잔재로 보고 청소한다 (정상 업로드는 수 초면 끝난다) */
-    private static final Duration TEMP_FILE_RETENTION = Duration.ofHours(1);
 
     private final UploadFileRepository uploadFileRepository;
     private final UploadTempFileRepository uploadTempFileRepository;
@@ -78,8 +77,24 @@ public class FileService {
      */
     @Transactional
     public Long promote(Long tempFileId) {
+        return promote(uploadTempFileRepository.findById(tempFileId)
+            .orElseThrow(() -> new AppException(FileErrorCode.TEMP_FILE_NOT_FOUND)));
+    }
+
+    /**
+     * 업로더·용도를 대조하는 승격 — 클라이언트가 임시 파일 id를 들고 나중에 제출하는 흐름
+     * (서비스 요청 첨부 등)에서 타인의 임시 파일이나 다른 용도의 파일을 붙이는 것을 막는다.
+     * 불일치도 존재를 숨기기 위해 같은 TEMP_FILE_NOT_FOUND로 응답한다.
+     */
+    @Transactional
+    public Long promote(Long tempFileId, Long uploaderId, FilePurpose expectedPurpose) {
         UploadTempFile temp = uploadTempFileRepository.findById(tempFileId)
+            .filter(t -> t.getUploaderId().equals(uploaderId) && t.getPurpose() == expectedPurpose)
             .orElseThrow(() -> new AppException(FileErrorCode.TEMP_FILE_NOT_FOUND));
+        return promote(temp);
+    }
+
+    private Long promote(UploadTempFile temp) {
         UploadFile file = uploadFileRepository.save(UploadFile.promoteFrom(temp));
         uploadTempFileRepository.delete(temp);
         return file.getId();
@@ -91,6 +106,13 @@ public class FileService {
         return uploadFileRepository.findById(fileId)
             .map(UploadFile::getStoredPath)
             .orElse(null);
+    }
+
+    /** 여러 파일 id → 저장 상대경로 맵(배치 조회). 없는 id는 맵에서 빠진다. */
+    @Transactional(readOnly = true)
+    public Map<Long, String> getStoredPaths(Collection<Long> fileIds) {
+        return uploadFileRepository.findAllByIdIn(fileIds).stream()
+            .collect(Collectors.toMap(UploadFile::getId, UploadFile::getStoredPath));
     }
 
     /**
@@ -106,15 +128,22 @@ public class FileService {
         });
     }
 
-    /** 유예시간을 넘긴 임시 레코드를 디스크 파일과 함께 삭제한다 (청소 스케줄러 진입점). */
+    /**
+     * 용도별 유예시간({@link FilePurpose#getTempRetention()})을 넘긴 임시 레코드를
+     * 디스크 파일과 함께 삭제한다 (청소 스케줄러 진입점).
+     */
     @Transactional
     public void cleanupExpiredTempFiles() {
-        LocalDateTime threshold = LocalDateTime.now(clock).minus(TEMP_FILE_RETENTION);
-        for (UploadTempFile temp : uploadTempFileRepository.findAllByCreatedDateBefore(threshold)) {
-            // 디스크 먼저 지운다 — 중간에 죽어도 레코드가 남아 다음 주기에 재시도된다(멱등)
-            fileStoragePort.delete(temp.getStoredPath());
-            uploadTempFileRepository.delete(temp);
-            log.info("[File] 만료 임시 파일 정리: {}", temp.getStoredPath());
+        LocalDateTime now = LocalDateTime.now(clock);
+        for (FilePurpose purpose : FilePurpose.values()) {
+            LocalDateTime threshold = now.minus(purpose.getTempRetention());
+            for (UploadTempFile temp
+                : uploadTempFileRepository.findAllByPurposeAndCreatedDateBefore(purpose, threshold)) {
+                // 디스크 먼저 지운다 — 중간에 죽어도 레코드가 남아 다음 주기에 재시도된다(멱등)
+                fileStoragePort.delete(temp.getStoredPath());
+                uploadTempFileRepository.delete(temp);
+                log.info("[File] 만료 임시 파일 정리: {}", temp.getStoredPath());
+            }
         }
     }
 

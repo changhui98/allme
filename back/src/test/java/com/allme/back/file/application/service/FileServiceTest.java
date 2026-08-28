@@ -74,6 +74,41 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("업로더·용도 대조 승격 — 일치하면 승격되고, 타인 파일이나 다른 용도는 TEMP_FILE_NOT_FOUND")
+    void promote_withOwnerAndPurpose() {
+        UploadTempFile mine =
+            fileService.createTemp(FilePurpose.SERVICE_REQUEST, "a.jpg", 1L, "jpg", 7L);
+        UploadTempFile others =
+            fileService.createTemp(FilePurpose.SERVICE_REQUEST, "b.jpg", 1L, "jpg", 8L);
+        UploadTempFile profile =
+            fileService.createTemp(FilePurpose.PROFILE, "c.jpg", 1L, "jpg", 7L);
+
+        Long fileId = fileService.promote(mine.getId(), 7L, FilePurpose.SERVICE_REQUEST);
+        assertThat(fileRepository.store.get(fileId).getPurpose()).isEqualTo(FilePurpose.SERVICE_REQUEST);
+
+        assertThatThrownBy(() -> fileService.promote(others.getId(), 7L, FilePurpose.SERVICE_REQUEST))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(FileErrorCode.TEMP_FILE_NOT_FOUND);
+        assertThatThrownBy(() -> fileService.promote(profile.getId(), 7L, FilePurpose.SERVICE_REQUEST))
+            .isInstanceOf(AppException.class)
+            .extracting(e -> ((AppException) e).getErrorCode())
+            .isEqualTo(FileErrorCode.TEMP_FILE_NOT_FOUND);
+        assertThat(tempRepository.store).containsOnlyKeys(others.getId(), profile.getId());
+    }
+
+    @Test
+    @DisplayName("저장경로 배치 조회 — 있는 id만 맵에 담기고 없는 id는 빠진다")
+    void getStoredPaths() {
+        UploadTempFile temp =
+            fileService.createTemp(FilePurpose.PROFILE, null, 1L, "png", 1L);
+        Long fileId = fileService.promote(temp.getId());
+
+        assertThat(fileService.getStoredPaths(java.util.List.of(fileId, 999L)))
+            .containsExactly(java.util.Map.entry(fileId, temp.getStoredPath()));
+    }
+
+    @Test
     @DisplayName("저장경로 조회 — 있으면 경로, 없으면 null을 반환한다")
     void getStoredPath() {
         UploadTempFile temp =
@@ -100,7 +135,7 @@ class FileServiceTest {
     }
 
     @Test
-    @DisplayName("청소 시 유예시간(1시간)을 넘긴 임시 레코드만 디스크 파일과 함께 삭제된다")
+    @DisplayName("청소 시 용도별 유예시간을 넘긴 임시 레코드만 디스크 파일과 함께 삭제된다 — 프로필 1시간, 서비스 요청 24시간")
     void cleanupExpiredTempFiles() {
         UploadTempFile expired =
             fileService.createTemp(FilePurpose.PROFILE, null, 1L, "png", 1L);
@@ -111,10 +146,21 @@ class FileServiceTest {
             fileService.createTemp(FilePurpose.PROFILE, null, 1L, "png", 1L);
         InMemoryUploadTempFileRepository.setCreatedDate(fresh, FIXED_NOW.minusMinutes(5));
 
+        // 서비스 요청 첨부는 폼 작성 중 유지돼야 하므로 2시간이 지나도 살아 있다
+        UploadTempFile requestAttachment =
+            fileService.createTemp(FilePurpose.SERVICE_REQUEST, null, 1L, "png", 1L);
+        InMemoryUploadTempFileRepository.setCreatedDate(requestAttachment, FIXED_NOW.minusHours(2));
+
+        UploadTempFile requestExpired =
+            fileService.createTemp(FilePurpose.SERVICE_REQUEST, null, 1L, "png", 1L);
+        fileService.storeContent(requestExpired, new byte[] {1});
+        InMemoryUploadTempFileRepository.setCreatedDate(requestExpired, FIXED_NOW.minusHours(25));
+
         fileService.cleanupExpiredTempFiles();
 
-        assertThat(tempRepository.store).containsOnlyKeys(fresh.getId());
-        assertThat(storage.deleted).containsExactly(expired.getStoredPath());
+        assertThat(tempRepository.store).containsOnlyKeys(fresh.getId(), requestAttachment.getId());
+        assertThat(storage.deleted)
+            .containsExactly(expired.getStoredPath(), requestExpired.getStoredPath());
     }
 
 }

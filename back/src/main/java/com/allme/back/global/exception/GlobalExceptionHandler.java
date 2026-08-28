@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,6 +56,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse("VALIDATION_ERROR", message, null));
+    }
+
+    /**
+     * JSON 본문을 읽을 수 없는 요청(문법 오류, enum에 없는 값, 날짜 형식 불일치 등) —
+     * 클라이언트 잘못이므로 400. 없으면 Exception 핸들러로 떨어져 500(A999)으로 새어 나간다.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(
+        HttpMessageNotReadableException e, HttpServletRequest request
+    ) {
+
+        log.info("[NotReadable] {} {} -> {}",
+            request.getMethod(), request.getRequestURI(), e.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.from(ApiErrorCode.INVALID_REQUEST));
     }
 
     /** 멀티파트가 아니거나 필수 파트가 빠진 업로드 요청 — 클라이언트 잘못이므로 400 */

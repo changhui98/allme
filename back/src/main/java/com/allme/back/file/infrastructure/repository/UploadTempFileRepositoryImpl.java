@@ -1,5 +1,6 @@
 package com.allme.back.file.infrastructure.repository;
 
+import com.allme.back.file.domain.FilePurpose;
 import com.allme.back.file.domain.entity.UploadTempFile;
 import com.allme.back.file.domain.repository.UploadTempFileRepository;
 import java.time.LocalDateTime;
@@ -30,8 +31,10 @@ public class UploadTempFileRepositoryImpl implements UploadTempFileRepository {
     }
 
     @Override
-    public List<UploadTempFile> findAllByCreatedDateBefore(LocalDateTime threshold) {
-        return uploadTempFileJpaRepository.findAllByCreatedDateBefore(threshold);
+    public List<UploadTempFile> findAllByPurposeAndCreatedDateBefore(
+        FilePurpose purpose, LocalDateTime threshold
+    ) {
+        return uploadTempFileJpaRepository.findAllByPurposeAndCreatedDateBefore(purpose, threshold);
     }
 
 }

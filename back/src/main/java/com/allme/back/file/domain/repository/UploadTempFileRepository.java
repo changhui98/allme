@@ -1,5 +1,6 @@
 package com.allme.back.file.domain.repository;
 
+import com.allme.back.file.domain.FilePurpose;
 import com.allme.back.file.domain.entity.UploadTempFile;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface UploadTempFileRepository {
 
     void delete(UploadTempFile tempFile);
 
-    /** 청소 스케줄러용 — 기준 시각 이전에 생성돼 아직 승격되지 못한 임시 레코드 조회 */
-    List<UploadTempFile> findAllByCreatedDateBefore(LocalDateTime threshold);
+    /** 청소 스케줄러용 — 해당 용도에서 기준 시각 이전에 생성돼 아직 승격되지 못한 임시 레코드 조회 */
+    List<UploadTempFile> findAllByPurposeAndCreatedDateBefore(FilePurpose purpose, LocalDateTime threshold);
 
 }
