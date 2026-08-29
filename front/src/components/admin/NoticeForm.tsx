@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import Checkbox from "@/components/common/Checkbox";
 import Modal from "@/components/common/Modal";
 import {
   createNotice,
@@ -125,24 +126,12 @@ export default function NoticeForm({ id }: { id?: number }) {
         </div>
 
         <div className="admin-form__checks">
-          <label className="admin-form__check">
-            <input
-              type="checkbox"
-              checked={published}
-              onChange={(e) => setPublished(e.target.checked)}
-              disabled={submitting}
-            />
+          <Checkbox checked={published} onChange={setPublished} disabled={submitting}>
             공개 (클라이언트 공지사항에 노출)
-          </label>
-          <label className="admin-form__check">
-            <input
-              type="checkbox"
-              checked={pinned}
-              onChange={(e) => setPinned(e.target.checked)}
-              disabled={submitting}
-            />
+          </Checkbox>
+          <Checkbox checked={pinned} onChange={setPinned} disabled={submitting}>
             상단 고정
-          </label>
+          </Checkbox>
         </div>
 
         {detail && (

@@ -1,0 +1,73 @@
+/*
+ * checkbox: 공용 체크박스 (components/common/Checkbox) — 폼 옵션용 둥근 사각 커스텀 체크.
+ * 네이티브 input은 시각적으로만 숨기고(클릭·포커스·:checked 담당) 형제 박스를 :checked/:focus-visible로 그린다.
+ * 동의 체크(consent-step·withdraw-consent, 원형)와 같은 원리이며 색은 토큰만 써서 다크·액센트에 자동 대응한다.
+ */
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.checkbox.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 네이티브 체크박스는 시각적으로만 숨긴다 */
+.checkbox__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 커스텀 박스 — 체크 SVG는 currentColor라 미체크 시 transparent로 숨긴다 */
+.checkbox__box {
+  display: flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: var(--background);
+  color: transparent;
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.checkbox__icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.checkbox:not(.is-disabled):hover .checkbox__box {
+  border-color: var(--primary);
+}
+
+.checkbox__input:checked + .checkbox__box {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* 키보드 포커스 링은 숨긴 input 대신 커스텀 박스에 표시 */
+.checkbox__input:focus-visible + .checkbox__box {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkbox__box {
+    transition: none;
+  }
+}

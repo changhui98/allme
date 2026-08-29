@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import Checkbox from "@/components/common/Checkbox";
 import Modal from "@/components/common/Modal";
 import Select from "@/components/common/Select";
 import {
@@ -172,15 +173,9 @@ export default function FaqForm({ id }: { id?: number }) {
         </div>
 
         <div className="admin-form__checks">
-          <label className="admin-form__check">
-            <input
-              type="checkbox"
-              checked={published}
-              onChange={(e) => setPublished(e.target.checked)}
-              disabled={submitting}
-            />
+          <Checkbox checked={published} onChange={setPublished} disabled={submitting}>
             공개 (클라이언트 FAQ에 노출)
-          </label>
+          </Checkbox>
         </div>
 
         {detail && (

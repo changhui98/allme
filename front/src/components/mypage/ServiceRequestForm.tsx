@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
+import Checkbox from "@/components/common/Checkbox";
 import Modal from "@/components/common/Modal";
 import Select from "@/components/common/Select";
 import { API_BASE_URL } from "@/lib/api";
@@ -273,15 +274,9 @@ export default function ServiceRequestForm() {
               disabled={busy || scheduleNegotiable}
               className="request-form__input"
             />
-            <label className="request-form__check">
-              <input
-                type="checkbox"
-                checked={scheduleNegotiable}
-                onChange={(e) => setScheduleNegotiable(e.target.checked)}
-                disabled={busy}
-              />
+            <Checkbox checked={scheduleNegotiable} onChange={setScheduleNegotiable} disabled={busy}>
               협의 가능
-            </label>
+            </Checkbox>
           </div>
 
           <div className="request-form__field">
@@ -345,15 +340,9 @@ export default function ServiceRequestForm() {
               <span className="request-form__unit-label">만원</span>
             </div>
           </div>
-          <label className="request-form__check">
-            <input
-              type="checkbox"
-              checked={budgetNegotiable}
-              onChange={(e) => setBudgetNegotiable(e.target.checked)}
-              disabled={busy}
-            />
+          <Checkbox checked={budgetNegotiable} onChange={setBudgetNegotiable} disabled={busy}>
             제안 받아요 (예산 미정)
-          </label>
+          </Checkbox>
         </fieldset>
 
         <div className="request-form__field">
