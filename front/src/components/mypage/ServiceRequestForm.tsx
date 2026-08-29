@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import Checkbox from "@/components/common/Checkbox";
+import DatePicker from "@/components/common/DatePicker";
 import Modal from "@/components/common/Modal";
 import Select from "@/components/common/Select";
 import { API_BASE_URL } from "@/lib/api";
@@ -265,14 +266,13 @@ export default function ServiceRequestForm() {
             <label htmlFor="request-date" className="request-form__label">
               희망 일정
             </label>
-            <input
+            <DatePicker
               id="request-date"
-              type="date"
               value={preferredDate}
               min={today}
-              onChange={(e) => setPreferredDate(e.target.value)}
+              onChange={setPreferredDate}
               disabled={busy || scheduleNegotiable}
-              className="request-form__input"
+              placeholder="날짜를 선택하세요"
             />
             <Checkbox checked={scheduleNegotiable} onChange={setScheduleNegotiable} disabled={busy}>
               협의 가능
