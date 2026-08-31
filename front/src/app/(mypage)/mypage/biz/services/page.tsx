@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import MypageEmpty from "@/components/mypage/MypageEmpty";
+import Link from "next/link";
+import MyProviderServiceList from "@/components/mypage/MyProviderServiceList";
 
 export const metadata: Metadata = { title: "내 서비스" };
 
-/**
- * 업체 관점 — 해드려요에 올린 내 서비스 관리. (게시판 API 연동 전 빈 상태)
- * CTA는 게시판 API 설계 후 글 작성 폼 경로로 교체한다.
- */
+/** 업체 관점 — 해드려요에 올린 내 서비스 관리. 서비스 등록은 그룹 헤더 버튼(요청한 서비스와 같은 슬롯). */
 export default function BizServicesPage() {
   return (
     <div className="mypage-column">
@@ -20,12 +18,14 @@ export default function BizServicesPage() {
             <h2 id="services-list-title" className="mypage-group__title">
               서비스 목록
             </h2>
+            <Link
+              href="/mypage/biz/services/new"
+              className="mypage-group__action mypage-group__action--button"
+            >
+              서비스 등록
+            </Link>
           </div>
-          <MypageEmpty
-            message="아직 등록한 서비스가 없어요. 서비스 등록 기능은 준비 중이에요."
-            ctaLabel="해드려요 둘러보기"
-            ctaHref="/services"
-          />
+          <MyProviderServiceList />
         </section>
       </div>
     </div>

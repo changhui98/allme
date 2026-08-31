@@ -36,6 +36,11 @@ export type RegionId = (typeof REGIONS)[number]["id"];
 
 export const ONLINE_REGION: RegionId = "ONLINE";
 
+/** 서울 25개 자치구 id — 지역 복수 선택(RegionPicker)의 전체 선택·표시 기준 */
+export const SEOUL_GU_IDS: RegionId[] = REGIONS.filter((r) => r.id !== ONLINE_REGION).map(
+  (r) => r.id,
+);
+
 export const REGION_LABEL: Record<RegionId, string> = Object.fromEntries(
   REGIONS.map((r) => [r.id, r.label]),
 ) as Record<RegionId, string>;

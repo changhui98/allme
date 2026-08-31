@@ -3,20 +3,22 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchMyProposals } from "@/lib/proposals";
+import { fetchMyServiceListings } from "@/lib/provider-services";
 import { useMe } from "@/lib/use-me";
 import { displayName } from "@/lib/user";
 
 /**
  * 업체 대시보드 본문 — 인사말 + 업체 활동 3열 스트립 + 최근 활동 그룹 (개인 대시보드와 같은 카드 없는 컬럼 문법).
- * 수치는 게시판·예약 도메인 API 연동 전이라 0 고정(연동 시 실데이터로 교체).
+ * 내 서비스·보낸 제안 수는 각 목록 API의 totalElements. 진행 중 거래는 예약 도메인 연동 전 0 고정.
  * 셸(MypageShell)이 세션을, biz/layout의 RoleGuard가 역할을 보장하므로 me 유무만 가드한다.
  * 스타일: styles/pages/mypage.css
  */
 export default function BizDashboardContent() {
   const { me } = useMe();
   const [proposalCount, setProposalCount] = useState<number | null>(null);
+  const [serviceCount, setServiceCount] = useState<number | null>(null);
 
-  // 보낸 제안 수 — 내 제안 목록의 totalElements. 나머지 수치는 게시판·예약 도메인 연동 전 0 고정
+  // 내 서비스·보낸 제안 수 — 각 목록 API의 totalElements. 진행 중 거래는 예약 도메인 연동 전 0 고정
   useEffect(() => {
     if (!me) return;
     let cancelled = false;
@@ -26,6 +28,13 @@ export default function BizDashboardContent() {
       })
       .catch(() => {
         if (!cancelled) setProposalCount(0);
+      });
+    fetchMyServiceListings({ page: 0, size: 1 })
+      .then((page) => {
+        if (!cancelled) setServiceCount(page.totalElements);
+      })
+      .catch(() => {
+        if (!cancelled) setServiceCount(0);
       });
     return () => {
       cancelled = true;
@@ -39,11 +48,11 @@ export default function BizDashboardContent() {
       <h1 className="mypage-page__title">{displayName(me)}님의 업체 공간이에요.</h1>
       <p className="mypage-page__subtitle">내 서비스와 보낸 제안 현황이에요.</p>
 
-      {/* 거래 루프 기준 스탯 — 수치는 게시판·예약 도메인 연동 전 0 고정 */}
+      {/* 거래 루프 기준 스탯 — 진행 중 거래는 예약 도메인 연동 전 0 고정 */}
       <div className="mypage-stats">
         <Link href="/mypage/biz/services" className="mypage-stats__item">
           <span className="mypage-stats__label">내 서비스</span>
-          <span className="mypage-stats__value">0</span>
+          <span className="mypage-stats__value">{serviceCount ?? "–"}</span>
         </Link>
         <Link href="/mypage/biz/proposals" className="mypage-stats__item">
           <span className="mypage-stats__label">보낸 제안</span>
