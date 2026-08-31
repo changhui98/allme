@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import AdBannerCarousel from "@/components/board/AdBannerCarousel";
 import CategoryTabs from "@/components/board/CategoryTabs";
-import ServiceCard from "@/components/board/ServiceCard";
+import ServiceBoardList from "@/components/board/ServiceBoardList";
 import { isCategoryId } from "@/lib/categories";
 import { getAdBanners } from "@/lib/mock/ad-banners";
-import { getServicePosts } from "@/lib/mock/service-posts";
 
 export const metadata: Metadata = {
   title: "해드려요",
@@ -13,23 +13,22 @@ export const metadata: Metadata = {
 };
 
 /**
- * 해드려요 — 업체가 등록한 서비스 목록.
- * 카테고리 필터(?category=)와 검색어(?q=)를 쿼리로 표현하고 서버에서 필터링해 SSR한다.
+ * 해드려요 — 업체가 등록한 서비스 목록(공개 API).
+ * 카테고리 필터(?category=)·검색어(?q=)는 URL로 표현하고, 목록 자체는 클라이언트에서 불러온다
+ * (해주세요와 같은 패턴 — 서버 fetch는 컨테이너 내부 API URL 설정이 필요해 후속).
  * 스타일: styles/pages/board.css
  */
 export default async function ServicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string | string[]; q?: string | string[] }>;
+  searchParams: Promise<{ category?: string | string[] }>;
 }) {
-  const { category, q } = await searchParams;
+  const { category } = await searchParams;
   // 무효한 값(배열 포함)은 "전체"로 폴백한다.
   const active =
     typeof category === "string" && isCategoryId(category)
       ? category
       : undefined;
-  const query = typeof q === "string" ? q.trim() : undefined;
-  const posts = getServicePosts(active, query);
 
   return (
     <main className="page-container board-page">
@@ -46,30 +45,9 @@ export default async function ServicesPage({
         <CategoryTabs basePath="/services" active={active} />
       </div>
 
-      {query && (
-        <p className="board-page__result-line">
-          <span className="board-page__result-query">
-            &lsquo;{query}&rsquo;
-          </span>{" "}
-          검색 결과 {posts.length}건
-        </p>
-      )}
-
-      {posts.length === 0 ? (
-        <p className="board-page__empty">
-          {query
-            ? "검색 결과가 없어요. 다른 검색어로 시도해 보세요."
-            : "이 카테고리에 등록된 서비스가 아직 없어요."}
-        </p>
-      ) : (
-        <ul className="card-grid">
-          {posts.map((post) => (
-            <li key={post.id}>
-              <ServiceCard post={post} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <Suspense fallback={<p className="board-page__empty">불러오는 중…</p>}>
+        <ServiceBoardList />
+      </Suspense>
     </main>
   );
 }

@@ -1,12 +1,11 @@
 import Link from "next/link";
-import ServiceCard from "@/components/board/ServiceCard";
 import DualCtaSection from "@/components/home/DualCtaSection";
 import HeroSection from "@/components/home/HeroSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import NewItemsSection from "@/components/home/NewItemsSection";
 import TrustSection from "@/components/home/TrustSection";
+import PopularServicesSection from "@/components/home/PopularServicesSection";
 import ScrollReveal from "@/components/motion/ScrollReveal";
-import { getPopularServicePosts } from "@/lib/mock/service-posts";
 
 /**
  * 랜딩 페이지 (서버 컴포넌트 — SEO를 위해 전체 콘텐츠를 SSR).
@@ -15,8 +14,6 @@ import { getPopularServicePosts } from "@/lib/mock/service-posts";
  * 스타일: styles/pages/home.css
  */
 export default function Home() {
-  const popularPosts = getPopularServicePosts(6);
-
   return (
     <main className="page-container home-page">
       <HeroSection />
@@ -40,19 +37,8 @@ export default function Home() {
             </Link>
           </div>
         </ScrollReveal>
-        <ul className="card-grid">
-          {popularPosts.map((post, index) => (
-            <li key={post.id}>
-              {/* 스태거는 줄 단위로 반복 — 아래 줄 카드가 과하게 늦지 않도록 */}
-              <ScrollReveal
-                delay={(index % 3) * 80}
-                className="home-page__card-reveal"
-              >
-                <ServiceCard post={post} />
-              </ScrollReveal>
-            </li>
-          ))}
-        </ul>
+        {/* 목록은 공개 서비스 API — 최신 6건(리뷰 도메인 전이라 인기 정렬은 후속) */}
+        <PopularServicesSection />
       </section>
 
       <ScrollReveal className="home-page__section">

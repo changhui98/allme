@@ -275,6 +275,28 @@
   color: var(--stone-300);
 }
 
+/* 대표 사진 — 없으면 카드가 텍스트로만 구성된다 */
+.service-card__thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 0.625rem;
+  border: 1px solid var(--border);
+}
+
+/* 평점 자리의 소요 기간 — 리뷰 도메인 도입 시 rating으로 교체 */
+.service-card__duration {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
+  color: var(--stone-500);
+  white-space: nowrap;
+}
+
+.dark .service-card__duration {
+  color: var(--stone-400);
+}
+
 .service-card__star {
   color: var(--amber-500);
 }

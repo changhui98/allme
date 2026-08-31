@@ -1,9 +1,9 @@
 import type { CategoryId } from "@/lib/categories";
 
 /**
- * "해드려요" 목록의 목업 데이터.
- * 백엔드가 아직 없어 프론트 상수로 둔다 — API 연동 시 getServicePosts 내부만
- * fetch로 교체하면 페이지 코드는 그대로 유지된다.
+ * 목업 업체(p1…) 전용 서비스 데이터 — 목업 업체 상세 페이지(/providers/p1…)의 "제공 서비스" 섹션에서만 쓴다.
+ * 해드려요 목록(/services)·홈 인기 서비스는 listing 도메인 공개 API(lib/provider-services.ts)로 전환됐다.
+ * 실제 업체(회원 id) 페이지가 자리를 잡으면 목업 업체와 함께 제거한다.
  */
 
 export type ServicePost = {
