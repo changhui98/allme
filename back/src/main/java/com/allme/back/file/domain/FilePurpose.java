@@ -12,6 +12,10 @@ import lombok.RequiredArgsConstructor;
  * 청소 스케줄러가 실패 잔재로 보고 디스크 파일과 함께 지운다.
  * - PROFILE: 업로드와 승격이 한 요청 안에서 끝나므로 1시간이면 충분하다.
  * - SERVICE_REQUEST: 폼에서 먼저 업로드하고 나중에 제출(승격)하므로 작성 시간을 넉넉히 준다.
+ * - PROVIDER_SERVICE: 업체 서비스 사진 — SERVICE_REQUEST와 같은 선업로드 → 제출 승격 흐름.
+ *
+ * 상수를 추가하면 기존 DB의 upload_files/upload_temp_files purpose CHECK 제약을
+ * 수동으로 갱신해야 한다(ddl-auto: update 미갱신 — CLAUDE.md 참고).
  */
 @Getter
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public enum FilePurpose {
 
     PROFILE("profile", Duration.ofHours(1)),
     SERVICE_REQUEST("request", Duration.ofHours(24)),
+    PROVIDER_SERVICE("service", Duration.ofHours(24)),
     ;
 
     private final String dir;
