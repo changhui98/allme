@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import DashSection from "@/components/mypage/DashSection";
 import { useMe } from "@/lib/use-me";
 import { updateMarketingConsent } from "@/lib/user";
 
 /**
  * 알림 설정 섹션 — 마케팅 수신 동의 스위치 토글, 낙관적 갱신 + 실패 시 원복.
  * useMe 캐시는 건드리지 않고 로컬 state로만 관리한다(다른 화면에 노출되지 않는 값).
- * 스타일: styles/pages/mypage.css(mypage-group·mypage-consent) + components/switch.css
+ * 셸은 DashSection 카드(내 정보 카드형 문법), 행은 mypage-row 위에 mypage-consent를 얹는다.
+ * 스타일: styles/pages/mypage.css(dash-section·dash-card·mypage-consent) + components/switch.css
  */
 export default function MarketingConsentSection() {
   const { me } = useMe();
@@ -38,12 +40,7 @@ export default function MarketingConsentSection() {
   };
 
   return (
-    <section className="mypage-group" aria-labelledby="notification-title">
-      <div className="mypage-group__header">
-        <h2 id="notification-title" className="mypage-group__title">
-          알림 설정
-        </h2>
-      </div>
+    <DashSection title="알림 설정" titleId="notification-title">
       <div className="mypage-rows">
         <div className="mypage-row mypage-consent">
           <div className="mypage-consent__body">
@@ -68,10 +65,10 @@ export default function MarketingConsentSection() {
         </div>
       </div>
       {error ? (
-        <p className="mypage-group__error" role="alert">
+        <p className="dash-card__error" role="alert">
           {error}
         </p>
       ) : null}
-    </section>
+    </DashSection>
   );
 }

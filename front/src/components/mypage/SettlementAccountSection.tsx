@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import FormField from "@/components/auth/FormField";
 import BankPickerModal from "@/components/mypage/BankPickerModal";
+import DashSection from "@/components/mypage/DashSection";
 import { ApiError } from "@/lib/api";
 import { BANKS, bankIconSrc } from "@/lib/banks";
 import { useMe } from "@/lib/use-me";
@@ -22,7 +23,8 @@ const NOT_VERIFIED_CODE = "U020";
  * 실명이 표시되고, 그 상태에서만 저장할 수 있다. 은행·계좌번호를 바꾸면 인증이 무효화된다.
  * 조회 응답의 계좌번호는 마스킹(앞 3·뒤 4자리)이라 변경 시 은행만 프리필하고 번호는 재입력한다.
  * 본인 명의만 허용 — 서버가 예금주를 회원 실명과 대조한다(U022). 폼에 실명 일치 안내를 띄운다.
- * 스타일: styles/pages/mypage.css (mypage-group·mypage-rows·mypage-account)
+ * 셸은 DashSection 카드(내 정보 카드형 문법) — 등록 상태는 행 목록(list), 폼·안내·로딩·오류는 본문(panel).
+ * 스타일: styles/pages/mypage.css (dash-section·dash-card·mypage-rows·mypage-account)
  */
 export default function SettlementAccountSection() {
   const { me } = useMe();
@@ -130,24 +132,25 @@ export default function SettlementAccountSection() {
 
   const selectedBank = BANKS.find((b) => b.code === bank);
 
+  const showingRows = loaded && !loadError && account !== null && !editing;
+
   return (
-    <section className="mypage-group" aria-labelledby="settlement-title">
-      <div className="mypage-group__header">
-        <h2 id="settlement-title" className="mypage-group__title">
-          정산 계좌
-        </h2>
-        {loaded && !loadError && account && !editing ? (
-          <div className="mypage-group__action">
-            <button
-              type="button"
-              onClick={openEdit}
-              className="mypage-profile__text-btn"
-            >
-              계좌 변경
-            </button>
-          </div>
-        ) : null}
-      </div>
+    <DashSection
+      title="정산 계좌"
+      titleId="settlement-title"
+      variant={showingRows ? "list" : "panel"}
+      action={
+        showingRows ? (
+          <button
+            type="button"
+            onClick={openEdit}
+            className="mypage-profile__text-btn"
+          >
+            계좌 변경
+          </button>
+        ) : undefined
+      }
+    >
 
       {!loaded ? (
         <p className="mypage-group__note">불러오는 중...</p>
@@ -304,7 +307,7 @@ export default function SettlementAccountSection() {
           </button>
         </>
       )}
-    </section>
+    </DashSection>
   );
 }
 

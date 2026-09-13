@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Avatar from "@/components/mypage/Avatar";
+import DashSection from "@/components/mypage/DashSection";
 import FormField from "@/components/auth/FormField";
 import MarketingConsentSection from "@/components/mypage/MarketingConsentSection";
 import SettlementAccountSection from "@/components/mypage/SettlementAccountSection";
@@ -15,12 +16,12 @@ import {
 } from "@/lib/user";
 
 /**
- * 내 정보 본문 — 프로필 히어로 + 단일 컬럼 섹션 리스트(설정 화면 문법, 카드 없음).
- * 히어로(아바타·닉네임·사진 변경·닉네임 인라인 편집) 아래에
- * 계정 정보 · 정산 계좌(SettlementAccountSection) · 알림 설정(MarketingConsentSection) 섹션을 쌓는다.
+ * 내 정보 본문 — 대시보드와 같은 토스풍 카드형: 그라데이션 프로필 카드(dash-hero + profile-hero) + DashSection 카드.
+ * 프로필 카드(아바타·닉네임·아이디·사진 변경/닉네임 변경 필 버튼) 아래에 닉네임 편집 패널(편집 중일 때만),
+ * 계정 정보 · 정산 계좌(SettlementAccountSection) · 알림 설정(MarketingConsentSection) 카드를 쌓는다.
  * 사진·닉네임 변경 성공 시 풀 리로드로 useMe 캐시를 초기화해 상단 바까지 반영한다.
  * 셸(MypageShell)이 이미 세션을 보장하므로 여기서는 me 유무만 가드한다.
- * 스타일: styles/pages/mypage.css (mypage-hero · mypage-group · mypage-rows)
+ * 스타일: styles/pages/mypage.css (dash-hero · profile-hero · dash-section · dash-card · mypage-rows)
  */
 export default function ProfileSection() {
   const { me } = useMe();
@@ -106,25 +107,20 @@ export default function ProfileSection() {
 
   return (
     <section aria-label="내 정보" className="mypage-profile">
-      {/* 히어로 — 대외 표시 정보(닉네임·사진). 카드가 아니라 본문 위에 그대로 놓는다 */}
-      <div className="mypage-hero">
+      {/* 프로필 카드 — 대외 표시 정보(닉네임·사진). 그라데이션·장식은 dash-hero, 배치는 profile-hero */}
+      <div className="dash-hero profile-hero">
         <Avatar
           name={displayName(me)}
           imageUrl={me.profileImageUrl}
           size="lg"
         />
-        <div className="mypage-hero__body">
-          <p className="mypage-hero__name">{displayName(me)}</p>
-          <p className="mypage-hero__login-id">{me.loginId}</p>
+        <div className="profile-hero__body">
+          <p className="profile-hero__name">{displayName(me)}</p>
+          <p className="profile-hero__id">{me.loginId}</p>
           {nicknameLocked && nicknameChangeableAt ? (
-            <p className="mypage-hero__hint">
+            <p className="profile-hero__hint">
               닉네임은 2일에 한 번 바꿀 수 있어요 ·{" "}
               {formatChangeableAt(nicknameChangeableAt)}부터 가능
-            </p>
-          ) : null}
-          {uploadError ? (
-            <p className="mypage-profile__error" role="alert">
-              {uploadError}
             </p>
           ) : null}
         </div>
@@ -135,101 +131,100 @@ export default function ProfileSection() {
           className="sr-only"
           onChange={(e) => void handleFileChange(e.target.files?.[0])}
         />
-        <div className="mypage-hero__actions">
+        <div className="profile-hero__actions">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="mypage-profile__text-btn"
+            className="profile-hero__btn"
           >
             {uploading ? "업로드 중..." : "사진 변경"}
           </button>
-          {!editingNickname ? (
-            <button
-              type="button"
-              onClick={openNicknameEdit}
-              disabled={nicknameLocked}
-              className="mypage-profile__text-btn"
-            >
-              닉네임 변경
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={openNicknameEdit}
+            disabled={nicknameLocked || editingNickname}
+            className="profile-hero__btn"
+          >
+            닉네임 변경
+          </button>
         </div>
       </div>
-
-      {editingNickname ? (
-        <form
-          className="mypage-hero__edit"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void handleNicknameSave();
-          }}
-        >
-          <FormField
-            id="nickname"
-            label="닉네임"
-            type="text"
-            autoComplete="nickname"
-            value={nicknameInput}
-            onChange={(value) => {
-              setNicknameInput(value);
-              setNicknameError(null);
-            }}
-            error={nicknameError ?? undefined}
-          />
-          <div className="mypage-profile__edit-actions">
-            <button
-              type="button"
-              onClick={() => void handleRandomNickname()}
-              className="btn btn--outline mypage-profile__edit-btn"
-            >
-              랜덤 다시 뽑기
-            </button>
-            <button
-              type="submit"
-              disabled={savingNickname}
-              className="btn btn--primary mypage-profile__edit-btn"
-            >
-              {savingNickname ? "저장 중..." : "저장"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditingNickname(false)}
-              disabled={savingNickname}
-              className="btn btn--outline mypage-profile__edit-btn"
-            >
-              취소
-            </button>
-          </div>
-        </form>
+      {/* 업로드 오류 — 그라데이션 위 danger 색은 대비가 나빠 카드 아래에 둔다 */}
+      {uploadError ? (
+        <p className="mypage-profile__error" role="alert">
+          {uploadError}
+        </p>
       ) : null}
 
-      <div className="mypage-settings">
-        {/* 계정 정보 — 실명은 여기서만 노출(계약·정산 전용) */}
-        <section className="mypage-group" aria-labelledby="account-info-title">
-          <div className="mypage-group__header">
-            <h2 id="account-info-title" className="mypage-group__title">
-              계정 정보
-            </h2>
-          </div>
-          <dl className="mypage-rows">
-            <div className="mypage-row">
-              <dt className="mypage-row__label">이름</dt>
-              <dd className="mypage-row__value">{me.name}</dd>
+      {editingNickname ? (
+        <DashSection title="닉네임 변경" variant="panel">
+          <form
+            className="profile-edit"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleNicknameSave();
+            }}
+          >
+            <FormField
+              id="nickname"
+              label="닉네임"
+              type="text"
+              autoComplete="nickname"
+              value={nicknameInput}
+              onChange={(value) => {
+                setNicknameInput(value);
+                setNicknameError(null);
+              }}
+              error={nicknameError ?? undefined}
+            />
+            <div className="mypage-profile__edit-actions">
+              <button
+                type="button"
+                onClick={() => void handleRandomNickname()}
+                className="btn btn--outline mypage-profile__edit-btn"
+              >
+                랜덤 다시 뽑기
+              </button>
+              <button
+                type="submit"
+                disabled={savingNickname}
+                className="btn btn--primary mypage-profile__edit-btn"
+              >
+                {savingNickname ? "저장 중..." : "저장"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingNickname(false)}
+                disabled={savingNickname}
+                className="btn btn--outline mypage-profile__edit-btn"
+              >
+                취소
+              </button>
             </div>
-            <div className="mypage-row">
-              <dt className="mypage-row__label">아이디</dt>
-              <dd className="mypage-row__value">{me.loginId}</dd>
-            </div>
-          </dl>
-          <p className="mypage-group__note">
-            실명은 다른 사용자에게 공개되지 않고 계약·정산에만 사용돼요.
-          </p>
-        </section>
+          </form>
+        </DashSection>
+      ) : null}
 
-        <SettlementAccountSection />
-        <MarketingConsentSection />
-      </div>
+      {/* 계정 정보 — 실명은 여기서만 노출(계약·정산 전용) */}
+      <DashSection title="계정 정보" titleId="account-info-title">
+        <dl className="mypage-rows">
+          <div className="mypage-row">
+            <dt className="mypage-row__label">이름</dt>
+            <dd className="mypage-row__value">{me.name}</dd>
+          </div>
+          <div className="mypage-row">
+            <dt className="mypage-row__label">아이디</dt>
+            <dd className="mypage-row__value">{me.loginId}</dd>
+          </div>
+        </dl>
+        <p className="dash-card__note">
+          실명은 다른 사용자에게 공개되지 않고 계약·정산에만 사용돼요.
+        </p>
+      </DashSection>
+
+      <SettlementAccountSection />
+      <MarketingConsentSection />
     </section>
   );
 }
